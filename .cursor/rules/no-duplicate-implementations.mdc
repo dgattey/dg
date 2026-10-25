@@ -11,6 +11,7 @@ Never maintain parallel implementations of the same UI component, menu behavior,
 
 ### Collage UI and interactive controls
 
+- **Typography:** `Typography` in `@dg/ui/core/Typography` (`variant` / `data-typography="<role>"`) and `apps/web/src/app/collage/typography.css` (never declare `font`, `font-family`, `font-size`, `font-weight`, `line-height`, or `letter-spacing` in route/component stylesheets, and never leak route or component class selectors into `typography.css`)
 - **Cards, status cards, tags, buttons, and filter pills:** `PaperCard`, `PaperStatus`, `PaperTag`, `PaperButton`, `PaperPills`, `PaperStrip`, and `FilterBar` in `apps/web/src/app/collage/`
 - **Sticky filter bars:** `FilterBar` (`variant="default" | "spread" | "start" | "stack"`) in `apps/web/src/app/collage/FilterBar.tsx` (never apply `.pillStrip` directly in route components or list route filter classes in `pills.css` / `chrome.css`)
 - **Dropdown and hover menus:** `HoverMenu`, `PillMenu`, `PillMenuList`, `PillMenuOption`, and `YearMenu` in `apps/web/src/app/collage/PillMenu.tsx` and `apps/web/src/app/collage/YearMenu.tsx` (never wire `bindHoverMenu` or `<details className="chrome__music">` directly in route or layout components)

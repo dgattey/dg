@@ -86,8 +86,8 @@ function TrackMeta({
   variant: ListingVariant;
 }) {
   const isCard = variant === 'card';
-  const titleVariant = isCard ? 'h5' : 'caption';
-  const artistVariant = isCard ? 'body2' : 'caption';
+  const titleVariant = isCard ? 'title-md' : 'caption';
+  const artistVariant = isCard ? 'title-md' : 'caption';
   const titleVars = textShadow ? ({ '--track-shadow': textShadow } as CSSProperties) : undefined;
   const artistVars = secondaryShadow
     ? ({ '--track-shadow': secondaryShadow } as CSSProperties)

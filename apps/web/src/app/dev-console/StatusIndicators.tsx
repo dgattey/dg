@@ -10,6 +10,7 @@ export function StatusChip({ isConnected }: { isConnected: boolean }) {
       className="collageStatusTag"
       tiltDeg={isConnected ? -2 : 2}
       tone={isConnected ? 'leaf' : 'vermilion'}
+      variant="meta"
     >
       {isConnected ? 'Connected' : 'Not connected'}
     </PaperTag>
@@ -24,7 +25,7 @@ export function ErrorMessage({ message }: { message: string | null }) {
     return null;
   }
   return (
-    <Typography className="devConsole__errorText" variant="body2">
+    <Typography className="devConsole__errorText" variant="row-title">
       {message}
     </Typography>
   );

@@ -38,10 +38,10 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
           innerClassName="error__messageCardInner"
           tiltDeg={-1.2}
         >
-          <Typography component="h2" variant="h3">
+          <Typography as="h2" variant="title-md">
             {copy.heading}
           </Typography>
-          <Typography>{copy.detail}</Typography>
+          <Typography variant="prose-lg">{copy.detail}</Typography>
         </PaperCard>
         <PaperButton href={homeRoute} tiltDeg={2} title="Home" tone="ochre">
           Back home

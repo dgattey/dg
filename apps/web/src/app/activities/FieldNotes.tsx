@@ -39,7 +39,9 @@ export function FieldNotes({
           tiltDeg={-1.4}
         >
           <Scallop className="strava__latestSeal" size="sticker" tiltDeg={12} tone="vermilion">
-            <span className="strava__sealKey">Latest</span>
+            <span className="strava__sealKey" data-typography="meta">
+              Latest
+            </span>
           </Scallop>
         </RoutePolaroid>
         {earlier.length > 0 ? (

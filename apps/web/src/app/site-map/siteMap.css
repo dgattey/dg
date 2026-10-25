@@ -19,12 +19,7 @@
 .siteMap__sectionHeading {
   justify-self: start;
   margin: 0;
-  font: inherit;
 }
-.siteMap__sectionTag {
-  font-size: var(--type-h2);
-}
-
 .siteMap__pagesGrid,
 .siteMap__appsGrid {
   display: grid;
@@ -63,13 +58,6 @@
   align-items: baseline;
   justify-content: space-between;
 }
-.siteMap__pageTitle {
-  font-family: var(--display);
-  font-size: var(--type-h2);
-  font-weight: 700;
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-label);
-}
 .siteMap__pageMainLink:hover .siteMap__pageTitle,
 .siteMap__pageMainLink:focus-visible .siteMap__pageTitle {
   text-decoration: underline;
@@ -77,19 +65,12 @@
 }
 .siteMap__routeBadge {
   padding: 3px 9px 4px;
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: var(--on);
   background: color-mix(in oklab, var(--on) 14%, transparent);
   border-radius: 7px 9px 6px 8px;
 }
 .siteMap__pageDesc {
   margin: 0;
-  font-family: var(--body);
-  font-size: var(--type-body);
-  line-height: var(--leading-body);
   color: var(--soft);
 }
 .siteMap__pageFooter {
@@ -105,10 +86,6 @@
   gap: 6px;
   align-items: center;
   padding: 3px 9px 4px;
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
-  line-height: var(--leading-title);
   color: var(--on);
   text-decoration: none;
   background: color-mix(in oklab, var(--on) 12%, transparent);
@@ -120,9 +97,6 @@
   background: color-mix(in oklab, var(--on) 22%, transparent);
 }
 .siteMap__openHint {
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
   color: var(--soft);
 }
 
@@ -172,36 +146,19 @@
   gap: 6px 10px;
   align-items: baseline;
 }
-.siteMap__appTitle {
-  font-family: var(--display);
-  font-size: var(--type-h3);
-  font-weight: 700;
-  line-height: var(--leading-title);
-}
 .siteMap__appRow:hover .siteMap__appTitle,
 .siteMap__appRow:focus-visible .siteMap__appTitle {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 .siteMap__appDomain {
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
   color: var(--cobalt);
 }
 .siteMap__appDesc {
   margin: 0;
-  font-family: var(--body);
-  font-size: var(--type-body);
-  line-height: var(--leading-body);
   color: var(--soft);
 }
 .siteMap__appArrow {
-  font-family: var(--display);
-  font-size: var(--type-h3);
-  font-weight: 700;
-  line-height: 1;
   color: var(--soft);
 }
 
@@ -235,33 +192,17 @@
   align-items: baseline;
   justify-content: space-between;
 }
-.siteMap__ledgerTitle {
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: var(--leading-title);
-}
 .siteMap__ledgerPath {
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
   color: var(--cobalt);
 }
 .siteMap__ledgerBadge {
   padding: 2px 8px 3px;
-  font-family: var(--display);
-  font-size: var(--type-micro);
-  font-weight: 700;
   color: var(--ink-on-cream);
   background: var(--ochre);
   border-radius: 6px;
 }
 .siteMap__ledgerDesc {
   margin: 0;
-  font-family: var(--body);
-  font-size: var(--type-body);
-  line-height: var(--leading-meta);
   color: var(--soft);
 }
 

@@ -118,6 +118,7 @@ export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }
                   edge="quad-c"
                   tiltDeg={yearTag.tiltDeg}
                   tone={yearTag.tone}
+                  variant="stat-md"
                 >
                   {section.label}
                   <small>

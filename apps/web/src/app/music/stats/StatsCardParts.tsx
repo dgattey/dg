@@ -52,8 +52,14 @@ export function Cover({
 export function CardHead({ aside, title }: { aside?: ReactNode; title: string }) {
   return (
     <div className="stats__head">
-      <h2 className="stats__heading">{title}</h2>
-      {aside ? <p className="stats__aside">{aside}</p> : null}
+      <h2 className="stats__heading" data-typography="title-md">
+        {title}
+      </h2>
+      {aside ? (
+        <p className="stats__aside" data-typography="meta">
+          {aside}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -69,10 +75,12 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
       tag={
         top > 0 ? (
           <Stub className="stats__cardStamp" kind="ticket" size="sm" tiltDeg={3.8} tone="ochre">
-            <span className="stats__cardStampKicker">
+            <span className="stats__cardStampKicker" data-typography="stamp">
               {isDailyRepeat ? 'Most in a day' : 'Most in a week'}
             </span>
-            <span className="stats__cardStampValue">{top} plays</span>
+            <span className="stats__cardStampValue" data-typography="badge">
+              {top} plays
+            </span>
           </Stub>
         ) : undefined
       }
@@ -88,21 +96,25 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
       <ol className="stats__repeatList">
         {stats.onRepeat.map(({ plays, track, week }, i) => (
           <li className="stats__repeatRow" key={track.id}>
-            <span className="stats__rank">{String(i + 1).padStart(2, '0')}</span>
+            <span className="stats__rank" data-typography="meta">
+              {String(i + 1).padStart(2, '0')}
+            </span>
             <AlbumLink album={track.album} label={track.album.name}>
               <Cover album={track.album} size={40} />
             </AlbumLink>
             <span className="stats__repeatName">
               <Tooltip title={track.name} whenTruncated>
-                <SpotifyAnchor className="stats__label" href={track.url}>
+                <SpotifyAnchor className="stats__label" href={track.url} variant="label">
                   {track.name}
                 </SpotifyAnchor>
               </Tooltip>
               <ArtistLinks artists={track.artists} newArtists={stats.newArtists} />
             </span>
             <span className="stats__topCountGroup">
-              <span className="stats__count">{plays}</span>
-              <span className="stats__meta stats__date">
+              <span className="stats__count" data-typography="title-md">
+                {plays}
+              </span>
+              <span className="stats__meta stats__date" data-typography="caption">
                 <span className="chrome__srOnly">{isDailyRepeat ? 'On ' : 'Week of '}</span>
                 {formatDay(week)}
               </span>
@@ -125,16 +137,20 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
       innerClassName="stats__ritualsInner"
       tag={
         <Scallop className="stats__cardSeal" tiltDeg={-7.5} tone="rose">
-          <span className="stats__cardSealTop">5+</span>
-          <span className="stats__cardSealSub">in a row</span>
+          <span data-typography="badge">5+</span>
+          <span className="stats__cardSealSub" data-typography="stamp">
+            in a row
+          </span>
         </Scallop>
       }
       tiltDeg={0.9}
       tone="black"
     >
       <div className="stats__ritualsLead">
-        <h2 className="stats__heading">Front to back</h2>
-        <p className="stats__meta">
+        <h2 className="stats__heading" data-typography="title-md">
+          Front to back
+        </h2>
+        <p className="stats__meta" data-typography="meta">
           How much of each album I heard while playing 5 or more of its songs in a row.
         </p>
       </div>
@@ -153,18 +169,19 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
                 size="sticker"
                 tiltDeg={i % 2 === 0 ? 12 : -10}
                 tone="ochre"
+                variant="row-title"
               >
                 {formatPercent(sessionPlays, plays, 0)}
               </Scallop>
             </span>
             <div>
-              <AlbumLink album={album} className="stats__label">
+              <AlbumLink album={album} className="stats__label" variant="label">
                 {album.name}
               </AlbumLink>
               <ArtistLinks artists={album.artists} newArtists={stats.newArtists} />
             </div>
             <span aria-hidden="true" className="stats__meter" style={bar(sessionPlays, plays)} />
-            <span className="stats__meta">
+            <span className="stats__meta" data-typography="meta">
               {formatCount(sessions)} {sessions === 1 ? 'time' : 'times'} through,{' '}
               {formatCount(sessionPlays)} of {formatCount(plays)} plays
             </span>
@@ -188,9 +205,13 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
       edge="quad-d"
       innerClassName="stats__pad"
       tag={
-        <Stub className="stats__cardStamp" kind="stamp" tiltDeg={-4.2} tone="viridian">
-          <span className="stats__cardStampKicker">Loyal for</span>
-          <span className="stats__cardStampValue">{topMonths} mo</span>
+        <Stub className="stats__cardStamp" kind="stamp" size="sm" tiltDeg={-4.2} tone="viridian">
+          <span className="stats__cardStampKicker" data-typography="stamp">
+            Loyal for
+          </span>
+          <span className="stats__cardStampValue" data-typography="badge">
+            {topMonths} mo
+          </span>
         </Stub>
       }
       tiltDeg={-0.7}
@@ -199,23 +220,25 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
         aside={`${formatCount(stats.activeMonths)} active months`}
         title="Depth and loyalty"
       />
-      <table className="stats__table">
+      <table className="stats__table" data-typography="prose">
         <thead>
           <tr>
-            <th className="stats__rank" scope="col">
+            <th className="stats__rank" data-typography="meta" scope="col">
               <span className="chrome__srOnly">Rank</span>
             </th>
-            <th scope="col">Artist</th>
-            <th className="stats__cell" scope="col">
+            <th data-typography="meta" scope="col">
+              Artist
+            </th>
+            <th className="stats__cell" data-typography="meta" scope="col">
               Plays
             </th>
-            <th className="stats__cell" scope="col">
+            <th className="stats__cell" data-typography="meta" scope="col">
               Tracks
             </th>
-            <th className="stats__cell" scope="col">
+            <th className="stats__cell" data-typography="meta" scope="col">
               Per track
             </th>
-            <th className="stats__cell stats__monthsHead" scope="col">
+            <th className="stats__cell stats__monthsHead" data-typography="meta" scope="col">
               Months
             </th>
           </tr>
@@ -223,20 +246,28 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
         <tbody>
           {stats.topArtists.map((artist, i) => (
             <tr key={artist.id}>
-              <td className="stats__rank">{String(i + 1).padStart(2, '0')}</td>
-              <th className="stats__artist" scope="row">
+              <td className="stats__rank" data-typography="meta">
+                {String(i + 1).padStart(2, '0')}
+              </td>
+              <th scope="row">
                 <ArtistLinks artists={[artist]} newArtists={stats.newArtists} />
               </th>
-              <td className="stats__cell">{formatCount(artist.plays)}</td>
+              <td className="stats__cell" data-typography="row-title">
+                {formatCount(artist.plays)}
+              </td>
               <td
                 className={highlight(
                   artist.tracks,
                   most((a) => a.tracks),
                 )}
+                data-typography="row-title"
               >
                 {formatCount(artist.tracks)}
               </td>
-              <td className={highlight(perTrack(artist), most(perTrack))}>
+              <td
+                className={highlight(perTrack(artist), most(perTrack))}
+                data-typography="row-title"
+              >
                 {perTrack(artist).toFixed(1)}
               </td>
               <td className="stats__months">
@@ -245,7 +276,9 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
                   className="stats__meter"
                   style={bar(artist.months, stats.activeMonths)}
                 />
-                <span className={highlight(artist.months, topMonths)}>{artist.months}</span>
+                <span className={highlight(artist.months, topMonths)} data-typography="row-title">
+                  {artist.months}
+                </span>
               </td>
             </tr>
           ))}
@@ -269,18 +302,24 @@ export function DepthPocketStickers({ stats }: { stats: ListeningStats }) {
         title="Favorite albums"
       >
         <Stub className="stats__pocketStub" kind="stamp" tiltDeg={3.8} tone="cobalt">
-          <span className="stats__meta stats__totalLabel">My favorite albums</span>
-          <span className="stats__pocketNumber">{formatCount(stats.shelf.albums)}</span>
-          <span className="stats__meta stats__totalSub">See them all →</span>
+          <span className="stats__meta stats__totalLabel" data-typography="meta">
+            My favorite albums
+          </span>
+          <span data-typography="stat-md">{formatCount(stats.shelf.albums)}</span>
+          <span className="stats__meta" data-typography="caption">
+            See them all →
+          </span>
         </Stub>
       </PageTransitionLink>
       {topArtist ? (
         <Scallop className="stats__pocketSeal" tiltDeg={-5.8} tone="ochre">
-          <span className="stats__meta stats__totalLabel">Top artist</span>
-          <span className="stats__pocketSealVal">
-            {formatPercent(topArtist.plays, stats.plays, 0)}
+          <span className="stats__meta stats__totalLabel" data-typography="badge">
+            Top artist
           </span>
-          <span className="stats__meta stats__totalSub">of plays were {topArtist.name}</span>
+          <span data-typography="title-md">{formatPercent(topArtist.plays, stats.plays, 0)}</span>
+          <span className="stats__meta" data-typography="badge">
+            of plays were {topArtist.name}
+          </span>
         </Scallop>
       ) : null}
       <PageTransitionLink
@@ -289,9 +328,13 @@ export function DepthPocketStickers({ stats }: { stats: ListeningStats }) {
         title="Listening history"
       >
         <Stub className="stats__pocketStub" kind="ticket" tiltDeg={2.9} tone="vermilion">
-          <span className="stats__meta stats__totalLabel">Every play, newest first</span>
-          <span className="stats__pocketNumber">{formatCount(stats.plays)}</span>
-          <span className="stats__meta stats__totalSub">Full listening history →</span>
+          <span className="stats__meta stats__totalLabel" data-typography="meta">
+            Every play, newest first
+          </span>
+          <span data-typography="stat-md">{formatCount(stats.plays)}</span>
+          <span className="stats__meta" data-typography="caption">
+            Full listening history →
+          </span>
         </Stub>
       </PageTransitionLink>
     </div>

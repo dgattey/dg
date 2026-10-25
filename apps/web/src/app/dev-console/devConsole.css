@@ -3,10 +3,6 @@
 .collageStatusTag {
   flex-shrink: 0;
   padding: 0.45em 0.75em 0.5em;
-  font-size: var(--type-meta);
-  font-weight: 600;
-  line-height: var(--leading-title);
-  letter-spacing: 0;
 }
 
 .devConsole__sheet {
@@ -73,11 +69,7 @@
   gap: 12px 14px;
   align-items: center;
 }
-.devConsole__actionButton {
-  font-size: var(--type-meta);
-}
 .devConsole__errorText {
-  font-weight: 700;
   color: color-mix(in srgb, var(--vermilion) 70%, var(--ink-on-cream) 30%);
 }
 

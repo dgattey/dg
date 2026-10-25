@@ -1,3 +1,4 @@
+import type { TypographyVariant } from '@dg/ui/core/Typography';
 import type { CSSProperties } from 'react';
 import { cx } from './paperVars';
 
@@ -15,43 +16,85 @@ const LETTER_TREATMENTS = [
   { offsetEm: 0, rotationDeg: -3 },
 ] as const;
 
+const LINE_INDENTS_EM = [0, 0.56, 0.28, 0.44] as const;
+
+type HeadingLine = {
+  offset: number;
+  text: string;
+};
+
+function splitHeadingLines(text: string): Array<HeadingLine> {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return [];
+  }
+  const pattern = trimmed.includes('\n') ? /[^\n]+/g : /\S+/g;
+  return Array.from(trimmed.matchAll(pattern), (match) => ({
+    offset: match.index,
+    text: match[0].trim().replace(/\s+/g, ' '),
+  })).filter((line) => line.text.length > 0);
+}
+
 /**
- * Collage page title. `cut` scatters each letter like a ransom-note cutout, which only
- * reads well on short codes (404, 500); long titles stay as set type.
+ * Collage page title. Multi-word titles stack across staggered lines with a playful
+ * horizontal offset on subsequent lines; `cut` scatters each letter like a ransom-note
+ * cutout, which only reads well on short codes (404, 500).
  */
 export function CutLetters({
   className,
   cut = false,
   text,
+  variant = 'display-page',
 }: {
   className?: string;
   cut?: boolean;
   text: string;
+  variant?: Extract<TypographyVariant, 'display-hero' | 'display-page'>;
 }) {
-  const words = Array.from(text.trim().matchAll(/\S+/g));
+  const lines = splitHeadingLines(text);
+  const accessibleLabel = lines.map((line) => line.text).join(' ');
   let treatmentIndex = 0;
 
   if (!cut) {
     return (
-      <h1 className={cx('cutHeading', className)}>
-        {words.map((wordMatch, wordIndex) => (
-          <span className="cutWord" key={`${wordMatch.index}-${wordMatch[0]}`}>
-            {wordMatch[0]}
-            {wordIndex < words.length - 1 ? ' ' : null}
-          </span>
-        ))}
+      <h1 className={cx('cutHeading', className)} data-typography={variant}>
+        {lines.map((line, lineIndex) => {
+          const indentEm = LINE_INDENTS_EM[lineIndex] ?? LINE_INDENTS_EM[1];
+          const lineStyle: (CSSProperties & Record<`--${string}`, string>) | undefined =
+            lineIndex > 0 ? { '--line-indent': `${indentEm}em` } : undefined;
+          return (
+            <span
+              className={cx('cutWord', lineIndex > 0 && 'cutIndentedLine')}
+              key={`${line.offset}-${line.text}`}
+              style={lineStyle}
+            >
+              {line.text}
+              {lineIndex < lines.length - 1 ? ' ' : null}
+            </span>
+          );
+        })}
       </h1>
     );
   }
 
   return (
-    <h1 aria-label={text} className={cx('cutHeading', 'cutHeadingCut', className)}>
-      {words.map((wordMatch, wordIndex) => {
-        const word = wordMatch[0];
-        const wordOffset = wordMatch.index;
+    <h1
+      aria-label={accessibleLabel}
+      className={cx('cutHeading', 'cutHeadingCut', className)}
+      data-typography="display-cut"
+    >
+      {lines.map((line, lineIndex) => {
+        const indentEm = LINE_INDENTS_EM[lineIndex] ?? LINE_INDENTS_EM[1];
+        const lineStyle: (CSSProperties & Record<`--${string}`, string>) | undefined =
+          lineIndex > 0 ? { '--line-indent': `${indentEm}em` } : undefined;
         return (
-          <span aria-hidden="true" className="cutWord" key={`${wordOffset}-${word}`}>
-            {Array.from(word.matchAll(/./gu)).map((letterMatch) => {
+          <span
+            aria-hidden="true"
+            className={cx('cutWord', lineIndex > 0 && 'cutIndentedLine')}
+            key={`${line.offset}-${line.text}`}
+            style={lineStyle}
+          >
+            {Array.from(line.text.matchAll(/./gu)).map((letterMatch) => {
               const letter = letterMatch[0];
               const treatment =
                 LETTER_TREATMENTS[treatmentIndex % LETTER_TREATMENTS.length] ??
@@ -64,14 +107,14 @@ export function CutLetters({
               return (
                 <span
                   className="cutLetter"
-                  key={`${wordOffset + letterMatch.index}-${letter}`}
+                  key={`${line.offset + letterMatch.index}-${letter}`}
                   style={style}
                 >
                   {letter}
                 </span>
               );
             })}
-            {wordIndex < words.length - 1 ? ' ' : null}
+            {lineIndex < lines.length - 1 ? ' ' : null}
           </span>
         );
       })}

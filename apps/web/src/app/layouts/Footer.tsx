@@ -106,8 +106,8 @@ export async function Footer() {
         {helloTitle}
       </PaperTag>
       {footerContent.description ? (
-        <div className="chrome__helloDescription">
-          <RichText {...footerContent.description} />
+        <div className="chrome__helloDescription" data-typography="stat-lg">
+          <RichText {...footerContent.description} variant="stat-lg" />
         </div>
       ) : null}
       {encodedEmail ? <FooterEmailAction encodedEmail={encodedEmail} /> : null}
@@ -135,8 +135,16 @@ export async function Footer() {
                 <span aria-hidden="true" className="chrome__elsewhereIcon">
                   {renderElsewhereIcon(link.icon)}
                 </span>
-                <span className="chrome__elsewhereTitle">{link.title}</span>
-                <span className="chrome__elsewhereHandle">{handle}</span>
+                <span className="chrome__elsewhereTitle" data-typography="label">
+                  {link.title}
+                </span>
+                <span
+                  className="chrome__elsewhereHandle"
+                  data-typography="meta"
+                  data-typography-md="caption"
+                >
+                  {handle}
+                </span>
                 <svg
                   aria-hidden="true"
                   className="chrome__elsewhereArrow"
@@ -168,7 +176,7 @@ export async function Footer() {
           <div className="chrome__footerGrid">
             {sectionOrder.map((key) => (key === 'hello' ? helloColumn : elsewhereColumn))}
           </div>
-          <div className="chrome__colophon">
+          <div className="chrome__colophon" data-typography="row-title">
             <div className="chrome__colophonGroup">
               <span>© {new Date(serverTime).getFullYear()} Dylan Gattey</span>
               {version ? (

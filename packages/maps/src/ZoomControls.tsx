@@ -19,14 +19,32 @@ const containerInteractionProps = {
 export function ZoomControls({ onReset, onZoomIn, onZoomOut }: ZoomControlsProps) {
   return (
     <div {...containerInteractionProps} data-zoom-controls="">
-      <button aria-label="Zoom in" data-zoom-button="" onClick={onZoomIn} type="button">
+      <button
+        aria-label="Zoom in"
+        data-typography="title-sm"
+        data-zoom-button=""
+        onClick={onZoomIn}
+        type="button"
+      >
         <Plus aria-hidden="true" size="1em" />
       </button>
-      <button aria-label="Zoom out" data-zoom-button="" onClick={onZoomOut} type="button">
+      <button
+        aria-label="Zoom out"
+        data-typography="title-sm"
+        data-zoom-button=""
+        onClick={onZoomOut}
+        type="button"
+      >
         <Minus aria-hidden="true" size="1em" />
       </button>
       {onReset ? (
-        <button aria-label="Reset view" data-zoom-button="" onClick={onReset} type="button">
+        <button
+          aria-label="Reset view"
+          data-typography="title-sm"
+          data-zoom-button=""
+          onClick={onReset}
+          type="button"
+        >
           <Shrink aria-hidden="true" size="0.8em" />
         </button>
       ) : null}

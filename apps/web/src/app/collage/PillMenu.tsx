@@ -1,5 +1,6 @@
 'use client';
 
+import type { TypographyVariant } from '@dg/ui/core/Typography';
 import { ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { bindHoverMenu } from './hoverMenu';
@@ -23,6 +24,8 @@ export function HoverMenu({
   panelTiltDeg = 0,
   summary,
   summaryClassName,
+  summaryTypography,
+  summaryTypographyXs,
 }: {
   children: ReactNode;
   className?: string;
@@ -32,6 +35,8 @@ export function HoverMenu({
   panelTiltDeg?: number;
   summary: ReactNode;
   summaryClassName?: string;
+  summaryTypography?: TypographyVariant;
+  summaryTypographyXs?: TypographyVariant;
 }) {
   return (
     <details
@@ -39,7 +44,13 @@ export function HoverMenu({
       onPointerEnter={onWarmup}
       ref={bindPillMenu(itemSelector)}
     >
-      <summary className={cx('chrome__musicSummary', summaryClassName)}>{summary}</summary>
+      <summary
+        className={cx('chrome__musicSummary', summaryClassName)}
+        data-typography={summaryTypography}
+        data-typography-xs={summaryTypographyXs}
+      >
+        {summary}
+      </summary>
       <PaperCard
         className={cx('chrome__musicPanel', panelClassName)}
         edge="quad-a"
@@ -85,6 +96,7 @@ export function PillMenu({
       summary={
         <PaperTag
           className={cx('paperPill', current && 'paperButtonCurrent')}
+          data-typography-sm="meta"
           edge="quad-a"
           tiltDeg={tiltDeg}
         >
@@ -124,6 +136,7 @@ export function PillMenuOption({
         className,
       )}
       data-menu-option={true}
+      data-typography="label"
       onClick={onPick}
       onFocus={onPrefetch}
       onMouseEnter={onPrefetch}

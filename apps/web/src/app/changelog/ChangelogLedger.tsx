@@ -88,32 +88,40 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
       <ul aria-label="Release totals" className="stats__totals changelog__totals">
         <li>
           <Stub className="stats__total" kind="ticket" tiltDeg={-2} tone="cobalt">
-            <span className="changelog__statKey">Current version</span>
-            <span className="changelog__statValue">{latestRelease?.tag ?? 'v2.80.1'}</span>
-            <span className="changelog__statSub">
+            <span className="changelog__statKey" data-typography="meta">
+              Current version
+            </span>
+            <span data-typography="stat-lg">{latestRelease?.tag ?? 'v2.80.1'}</span>
+            <span className="changelog__statSub" data-typography="caption">
               {formatUtcShortDate(latestRelease?.publishedAt) ?? 'Latest release'}
             </span>
           </Stub>
         </li>
         <li>
           <Scallop className="stats__total" size="seal" tiltDeg={6} tone="vermilion">
-            <span className="changelog__statValue">{releases.length}</span>
-            <span className="changelog__statKey">Total releases</span>
+            <span data-typography="stat-lg">{releases.length}</span>
+            <span className="changelog__statKey" data-typography="meta">
+              Total releases
+            </span>
           </Scallop>
         </li>
         <li>
           <Stub className="stats__total" kind="stamp" tiltDeg={2.2} tone="cream">
-            <span className="changelog__statKey">Major &amp; minor</span>
-            <span className="changelog__statValue">{majorCount + minorCount}</span>
-            <span className="changelog__statSub">
+            <span className="changelog__statKey" data-typography="meta">
+              Major &amp; minor
+            </span>
+            <span data-typography="stat-lg">{majorCount + minorCount}</span>
+            <span className="changelog__statSub" data-typography="caption">
               {majorCount} major · {minorCount} minor
             </span>
           </Stub>
         </li>
         <li>
           <Stub className="stats__total" kind="ticket" tiltDeg={-1.6} tone="viridian">
-            <span className="changelog__statKey">First release</span>
-            <span className="changelog__statValue">
+            <span className="changelog__statKey" data-typography="meta">
+              First release
+            </span>
+            <span data-typography="stat-md">
               {formatUtcShortDate(oldestRelease?.publishedAt) ?? 'Earliest release'}
             </span>
           </Stub>
@@ -162,6 +170,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
                     edge="quad-c"
                     tiltDeg={yearTag.tiltDeg}
                     tone={yearTag.tone}
+                    variant="title-md"
                   >
                     <span>{group.year}</span>
                     <small>
@@ -193,8 +202,8 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
                     tone="cream"
                   >
                     <div className="changelog__compactHeader">
-                      <span className="changelog__compactTitle">Tagged builds in {group.year}</span>
-                      <span className="changelog__compactCount">
+                      <span data-typography="label">Tagged builds in {group.year}</span>
+                      <span className="changelog__compactCount" data-typography="meta">
                         {group.compactReleases.length}{' '}
                         {group.compactReleases.length === 1 ? 'version' : 'versions'}
                       </span>
@@ -209,6 +218,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
                             <a
                               className="changelog__compactChip"
                               data-kind={release.kind}
+                              data-typography="badge"
                               href={release.htmlUrl}
                               rel="noopener noreferrer"
                               target="_blank"

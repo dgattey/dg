@@ -91,7 +91,6 @@
   width: 100%;
   aspect-ratio: 1;
   margin-bottom: 7px;
-  line-height: 0;
   border-radius: 8px;
   rotate: 1.5deg;
 }
@@ -112,7 +111,6 @@
   position: absolute;
   inset: var(--cover-inset);
   overflow: hidden;
-  line-height: 0;
   border: thin solid var(--dg-palette-card-border);
   border-radius: 6px;
   transform: var(--cover-transform);
@@ -140,7 +138,6 @@
   display: grid;
   gap: 4px;
   min-width: 0;
-  line-height: var(--leading-meta);
 }
 .music__albumName,
 .music__artist {
@@ -150,15 +147,7 @@
   -webkit-line-clamp: 3;
   line-clamp: 3;
 }
-.music__albumName {
-  font-family: var(--display);
-  font-size: var(--type-h3);
-  font-weight: 700;
-  line-height: var(--leading-title);
-  letter-spacing: var(--tracking-label);
-}
 .music__artist {
-  font-size: var(--type-meta);
   opacity: 0.92;
 }
 .music__newArtistAnchor {
@@ -168,9 +157,7 @@
 .music__newArtist {
   display: inline-block;
   padding: 1px 6px 2px;
-  font: 700 var(--type-micro) / 1.2 var(--display);
   color: var(--cream);
-  letter-spacing: 0.02em;
   white-space: nowrap;
   background: var(--ink-on-cream);
   border-radius: 4px;
@@ -189,11 +176,6 @@
   place-items: center;
   width: 28px;
   height: 28px;
-  font-family: var(--display);
-  font-size: var(--type-h3);
-  font-style: normal;
-  font-weight: 700;
-  line-height: 1;
   color: var(--cream);
   background: var(--vermilion);
   border-radius: var(--quad-b);
@@ -218,8 +200,6 @@
 }
 .music__dateTag {
   padding: 11px 20px 13px;
-  font-size: var(--type-label);
-  letter-spacing: var(--tracking-label);
 }
 .music__dateRow {
   display: flex;
@@ -228,11 +208,9 @@
 }
 .music__dateHeading {
   margin: 0;
-  font: inherit;
 }
 .music__dateStats {
   padding: 4px 10px 5px;
-  font: 700 var(--type-meta) / 1.2 var(--display);
   color: var(--ink-on-cream);
   text-decoration: none;
   background: color-mix(in oklab, var(--cream) 82%, transparent);
@@ -253,7 +231,6 @@
   right: 8px;
   z-index: 5;
   padding: 0.4em 0.7em 0.45em;
-  font-size: var(--type-meta);
   pointer-events: none;
 }
 .music__sentinel {
@@ -270,14 +247,9 @@
   gap: 14px;
   align-content: start;
   padding: 24px 28px 26px;
-  font-size: var(--type-body-lg);
-  line-height: var(--leading-body);
 }
 .music__stateInner h2 {
   margin: 0;
-  font-family: var(--display);
-  font-size: var(--type-h2);
-  line-height: var(--leading-title);
 }
 .music__stateInner p {
   margin: 0;
@@ -286,7 +258,6 @@
   grid-template-columns: auto 1fr;
   gap: 16px;
   align-items: center;
-  font-weight: 600;
 }
 .music__ring {
   width: 26px;
@@ -335,15 +306,10 @@
 .music__wellAlbumTag,
 .music__wellSpotifyTag {
   z-index: 3;
-  font-size: var(--type-meta);
 }
 .music__wellAlbumTag {
   bottom: 10px;
   left: 10px;
-  line-height: var(--leading-tight);
-}
-.music__wellAlbumTag small {
-  font-size: var(--type-meta);
 }
 .music__wellSpotifyTag {
   top: 10px;
@@ -378,7 +344,6 @@
 .music__wellArtCard {
   width: 100%;
   overflow: hidden;
-  line-height: 0;
   border-radius: var(--quad-b);
 }
 .music__wellArtCard img {
@@ -389,18 +354,11 @@
 .music__wellName {
   grid-area: name;
   min-width: 0;
-  font-family: var(--display);
-  font-size: var(--type-h1);
-  font-weight: 700;
-  line-height: 0.94;
-  letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
 /* The shared Link sets body1 type, which would shrink the title back to body size. */
 .music__wellName a {
   min-width: 0;
-  font: inherit;
-  letter-spacing: inherit;
   overflow-wrap: anywhere;
 }
 .music__wellMeta {
@@ -413,12 +371,7 @@
 }
 .music__wellArtists {
   min-width: 0;
-  font-family: var(--display);
-  font-size: var(--type-h2);
-  font-weight: 700;
-  line-height: var(--leading-title);
   color: inherit;
-  letter-spacing: var(--tracking-label);
   white-space: nowrap;
 }
 .music__wellArtistsText {
@@ -430,12 +383,6 @@
   row-gap: 10px;
   align-items: start;
   color: inherit;
-}
-.music__wellFacts p {
-  font-size: var(--type-meta);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: var(--leading-title);
 }
 .music__wellPopularity {
   position: relative;
@@ -460,9 +407,7 @@
   column-count: 2;
   column-gap: 34px;
   display: block;
-  font-size: var(--type-body);
   grid-area: tracks;
-  line-height: var(--leading-body);
   list-style: none;
   margin: 22px 0 0;
   padding: 0;
@@ -478,11 +423,9 @@
 }
 .music__wellTrackNumber {
   align-self: start;
-  font-variant-numeric: tabular-nums;
   text-align: end;
 }
 .music__wellTrackDuration {
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .music__wellTrackSkeleton {
@@ -521,7 +464,6 @@
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: var(--type-body);
   white-space: nowrap;
 }
 .music__wellTrackArtist {

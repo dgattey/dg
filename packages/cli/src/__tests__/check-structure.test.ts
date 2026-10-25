@@ -285,6 +285,49 @@ describe('check-structure', () => {
         { line: 7, message: '--type-missing is not declared in any stylesheet' },
       ],
     );
+
+    const singleSourceViolations = checkTypeScale(
+      new Map([
+        [
+          'apps/web/src/app/collage/typography.css',
+          [
+            ':root { --type-body: 16px; }',
+            '[data-typography="prose"] { font-family: var(--body); font-size: var(--type-body); font-weight: 400; }',
+            '[data-typography="bad-display"] { font-family: var(--display); font-size: var(--type-body); font-weight: 600; }',
+            '.stats__number { font-family: var(--display); font-size: var(--type-body); font-weight: 700; }',
+          ].join('\n'),
+        ],
+        [
+          'apps/web/src/app/music/music.css',
+          '.music__albumName { font-family: var(--display); font-size: var(--type-body); }\n',
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      singleSourceViolations.map(({ file, line, rule }) => ({ file, line, rule })),
+      [
+        {
+          file: 'apps/web/src/app/collage/typography.css',
+          line: 3,
+          rule: 'css-font-weight',
+        },
+        {
+          file: 'apps/web/src/app/collage/typography.css',
+          line: 4,
+          rule: 'css-typography-no-consumer-selectors',
+        },
+        {
+          file: 'apps/web/src/app/music/music.css',
+          line: 1,
+          rule: 'css-typography-single-source',
+        },
+        {
+          file: 'apps/web/src/app/music/music.css',
+          line: 1,
+          rule: 'css-typography-single-source',
+        },
+      ],
+    );
   });
 
   it('flags a paragraph set directly under a CutLetters page title', () => {

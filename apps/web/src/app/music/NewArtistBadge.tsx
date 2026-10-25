@@ -4,7 +4,7 @@ import { Tooltip } from '@dg/ui/core/Tooltip';
 export function NewArtistBadge({ label }: { label: string }) {
   return (
     <Tooltip className="music__newArtistAnchor" placement="top" title={label}>
-      <span aria-label={label} className="music__newArtist" role="img">
+      <span aria-label={label} className="music__newArtist" data-typography="stamp" role="img">
         New!
       </span>
     </Tooltip>

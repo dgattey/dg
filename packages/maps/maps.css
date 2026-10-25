@@ -214,8 +214,6 @@ html[data-color-scheme="dark"] [data-map-scheme="dark"] {
   width: 28px;
   height: 28px;
   padding: 0;
-  font-size: 17px;
-  font-weight: 700;
   color: var(--ink-on-cream);
   cursor: pointer;
   background-color: var(--cream);

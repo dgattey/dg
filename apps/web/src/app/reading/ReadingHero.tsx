@@ -57,6 +57,7 @@ export function ReadingHero({
               edge="quad-d"
               tiltDeg={2.5}
               tone="cobalt"
+              variant="meta"
             >
               {stats.total} books · {stats.fiveStars} five-star picks
             </PaperTag>
@@ -70,9 +71,13 @@ export function ReadingHero({
           <BookCover book={book} preload={true} width={240} />
         </div>
         <div className="reading__featureBody">
-          <h2 className="reading__featureTitle">{book.title}</h2>
-          <p className="reading__author">{book.author}</p>
-          <p className="reading__meta">
+          <h2 className="reading__featureTitle" data-typography="stat-md">
+            {book.title}
+          </h2>
+          <p className="reading__author" data-typography="prose-lg">
+            {book.author}
+          </p>
+          <p className="reading__meta" data-typography="meta">
             <BookMeta book={book} withYear={true} />
           </p>
           {book.review ? (
@@ -83,7 +88,7 @@ export function ReadingHero({
               tiltDeg={0.8}
               tone="cream"
             >
-              <p>{book.review}</p>
+              <p data-typography="prose-lg">{book.review}</p>
             </PaperCard>
           ) : null}
         </div>

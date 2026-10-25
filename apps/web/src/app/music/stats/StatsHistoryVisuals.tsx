@@ -63,9 +63,13 @@ export function ActivityMatrixCard({
       edge="soft-a"
       innerClassName="stats__pad"
       tag={
-        <Stub className="stats__cardStamp" kind="ticket" tiltDeg={-3.5} tone="cobalt">
-          <span className="stats__cardStampKicker">Active {activeUnit}</span>
-          <span className="stats__cardStampValue">{formatCount(activeCellsCount)}</span>
+        <Stub className="stats__cardStamp" kind="ticket" size="sm" tiltDeg={-3.5} tone="cobalt">
+          <span className="stats__cardStampKicker" data-typography="stamp">
+            Active {activeUnit}
+          </span>
+          <span className="stats__cardStampValue" data-typography="badge">
+            {formatCount(activeCellsCount)}
+          </span>
         </Stub>
       }
       tiltDeg={-0.6}
@@ -92,7 +96,7 @@ export function ActivityMatrixCard({
         <div aria-hidden="true" className="stats__monthHeaderRow">
           <span />
           {columns.map((col) => (
-            <span className="stats__monthColHead" key={col.key}>
+            <span className="stats__monthColHead" data-typography="stamp" key={col.key}>
               <span className="stats__monthColFull">{col.full}</span>
               <span className="stats__monthColShort">{col.short}</span>
             </span>
@@ -105,6 +109,7 @@ export function ActivityMatrixCard({
               {yearFilter ? (
                 <button
                   className="stats__monthYearBtn"
+                  data-typography="badge"
                   onClick={() => onSelectYear?.(yearFilter)}
                   onMouseEnter={() => onPrefetchYear?.(yearFilter)}
                   title={`Filter by ${yearFilter}`}
@@ -114,7 +119,9 @@ export function ActivityMatrixCard({
                   <span aria-hidden="true">{row.label}</span>
                 </button>
               ) : (
-                <span className="stats__monthRowLabel">{row.label}</span>
+                <span className="stats__monthRowLabel" data-typography="badge">
+                  {row.label}
+                </span>
               )}
               {row.cells.map((cell) => {
                 const tier = matrixTier(cell.plays, maxPlays);
@@ -182,14 +189,22 @@ export function MatrixPocketStickers({ stats }: { stats: ListeningStats }) {
   return (
     <div className="stats__pocketCluster">
       <Stub className="stats__pocketStub" kind="ticket" tiltDeg={-4.6} tone="ochre">
-        <span className="stats__meta stats__totalLabel">Longest listening streak</span>
-        <span className="stats__pocketNumber">{formatCount(stats.dayStreak.days)} days</span>
-        <span className="stats__meta stats__totalSub">{streakRange}</span>
+        <span className="stats__meta stats__totalLabel" data-typography="meta">
+          Longest listening streak
+        </span>
+        <span data-typography="stat-md">{formatCount(stats.dayStreak.days)} days</span>
+        <span className="stats__meta" data-typography="caption">
+          {streakRange}
+        </span>
       </Stub>
       <Scallop className="stats__pocketSeal" tiltDeg={6.4} tone="viridian">
-        <span className="stats__meta stats__totalLabel">On a listening day</span>
-        <span className="stats__pocketSealVal">{formatCount(dailyPace)}</span>
-        <span className="stats__meta stats__totalSub">plays on average</span>
+        <span className="stats__meta stats__totalLabel" data-typography="badge">
+          On a listening day
+        </span>
+        <span data-typography="title-md">{formatCount(dailyPace)}</span>
+        <span className="stats__meta" data-typography="badge">
+          plays on average
+        </span>
       </Scallop>
       <PageTransitionLink
         className="stats__pocketLink collageLift"
@@ -197,9 +212,11 @@ export function MatrixPocketStickers({ stats }: { stats: ListeningStats }) {
         title="Listening history"
       >
         <Stub className="stats__pocketStub" kind="stamp" tiltDeg={-3.2} tone="rose">
-          <span className="stats__meta stats__totalLabel">Different songs</span>
-          <span className="stats__pocketNumber">{formatCount(stats.tracks)}</span>
-          <span className="stats__meta stats__totalSub">
+          <span className="stats__meta stats__totalLabel" data-typography="meta">
+            Different songs
+          </span>
+          <span data-typography="stat-md">{formatCount(stats.tracks)}</span>
+          <span className="stats__meta" data-typography="caption">
             by {formatCount(stats.artists)} artists →
           </span>
         </Stub>
@@ -231,8 +248,10 @@ export function SoundtrackCard({
       innerClassName="stats__pad"
       tag={
         <Scallop className="stats__cardSeal" tiltDeg={8} tone="vermilion">
-          <span className="stats__cardSealTop">#1</span>
-          <span className="stats__cardSealSub">song</span>
+          <span data-typography="badge">#1</span>
+          <span className="stats__cardSealSub" data-typography="stamp">
+            song
+          </span>
         </Scallop>
       }
       tiltDeg={0.8}
@@ -245,6 +264,7 @@ export function SoundtrackCard({
             {yearFilter ? (
               <button
                 className="stats__championYear"
+                data-typography="badge"
                 onClick={() => onSelectYear?.(yearFilter)}
                 onMouseEnter={() => onPrefetchYear?.(yearFilter)}
                 title={`Filter by ${yearFilter}`}
@@ -253,7 +273,12 @@ export function SoundtrackCard({
                 {badge}
               </button>
             ) : (
-              <span className="stats__championYear stats__championYear--static">{badge}</span>
+              <span
+                className="stats__championYear stats__championYear--static"
+                data-typography="badge"
+              >
+                {badge}
+              </span>
             )}
             <span className="stats__championEntry">
               <AlbumLink album={track.album} label={track.album.name}>
@@ -276,7 +301,11 @@ export function SoundtrackCard({
               </AlbumLink>
               <span className="stats__championMain">
                 <Tooltip title={track.name} whenTruncated>
-                  <SpotifyAnchor className="stats__championTrack" href={track.url}>
+                  <SpotifyAnchor
+                    className="stats__championTrack"
+                    href={track.url}
+                    variant={isCompact ? 'badge' : 'row-title'}
+                  >
                     {track.name}
                   </SpotifyAnchor>
                 </Tooltip>
@@ -284,9 +313,10 @@ export function SoundtrackCard({
                   artists={track.artists}
                   className="stats__meta stats__championArtist"
                   newArtists={stats.newArtists}
+                  variant="caption"
                 />
               </span>
-              <span className="stats__championPlays">
+              <span className="stats__championPlays" data-typography="badge">
                 {formatCount(track.plays)} {track.plays === 1 ? 'play' : 'plays'}
               </span>
             </span>

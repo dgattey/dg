@@ -40,13 +40,7 @@
 [data-track-title][data-variant="card"] {
   margin-bottom: 8px;
 }
-
-[data-track-title][data-variant="compact"] {
-  line-height: 1.2;
-}
-
 [data-track-artists][data-variant="compact"] {
-  line-height: 1.2;
   opacity: 0.6;
 }
 
@@ -171,7 +165,6 @@
   gap: 4px;
   width: 100%;
   min-width: 0;
-  line-height: 1.2;
 }
 
 [data-playback-status-compact-text] {

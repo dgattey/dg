@@ -62,8 +62,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   align-items: center;
   justify-content: center;
   padding: 4px;
-  font-size: 2.4em;
-  line-height: 1;
   color: var(--ink);
   text-decoration: none;
   filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
@@ -81,7 +79,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__logo > svg {
   display: block;
   width: auto;
-  height: 1.15em;
+  height: 44px;
 }
 .chrome__nowPlaying {
   min-width: 0;
@@ -130,12 +128,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   gap: 0.4em;
   align-items: center;
   padding: 0.5em 0.85em 0.55em;
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: inherit;
-  letter-spacing: var(--tracking-label);
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -253,10 +246,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   gap: 10px;
   align-items: center;
   padding: 10px 14px 10px 10px;
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: var(--on);
   text-decoration: none;
   border-radius: var(--nested-radius);
@@ -382,27 +371,17 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__nowKey {
   flex: none;
-  font-size: var(--type-meta);
-  font-weight: 600;
-  line-height: var(--leading-title);
   color: var(--now-dim);
 }
 .chrome__nowValue {
   overflow: hidden;
   text-overflow: ellipsis;
-  font-family: var(--display);
-  font-size: var(--type-body);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: var(--leading-title);
 }
 .chrome__nowCellLead {
   flex: none;
   padding-inline: 10px 4px;
 }
 .chrome__nowCellLead .chrome__nowKey {
-  font-family: var(--display);
-  font-weight: 700;
   color: var(--ink);
 }
 .chrome__nowCellLink {
@@ -505,12 +484,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   justify-self: start;
 }
 .chrome__helloDescription {
-  font-family: var(--display);
-  font-size: var(--type-title-lg);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: var(--cream);
-  letter-spacing: var(--tracking-title);
 }
 .chrome__helloDescription > * {
   display: grid;
@@ -518,12 +492,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__helloDescription :is([data-typography], p) {
   margin: 0;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
   color: inherit;
-  letter-spacing: inherit;
   text-wrap: pretty;
 }
 .chrome__helloDescription a {
@@ -543,10 +512,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   display: inline-flex;
   align-items: center;
   padding: 0.65em 0.95em 0.7em;
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: var(--cream);
   text-decoration: none;
   background: color-mix(in oklab, var(--cream) 10%, var(--viridian));
@@ -598,10 +563,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   height: 18px;
 }
 .chrome__elsewhereTitle {
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: 1;
   white-space: nowrap;
   translate: 0 -0.75px;
   transition: color 0.18s ease;
@@ -611,8 +572,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   margin-left: auto;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: var(--type-meta);
-  font-variant-numeric: tabular-nums;
   color: rgb(247 241 226 / 0.62);
   white-space: nowrap;
   transition: color 0.18s ease;
@@ -650,10 +609,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   align-items: center;
   justify-content: space-between;
   padding-top: 16px;
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 700;
-  line-height: var(--leading-title);
   color: color-mix(in oklab, var(--cream) 78%, transparent);
   border-top: var(--collage-border-width) solid color-mix(in oklab, var(--cream) 16%, transparent);
 }
@@ -716,9 +671,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   .chrome__nowCityShort {
     display: inline;
   }
-  .chrome__nowCellLast .chrome__nowValue {
-    font-size: var(--type-meta);
-  }
   .chrome__nowTip {
     grid-column: 1 / -1;
     max-width: none;
@@ -731,10 +683,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
   .chrome__nowCellLink .chrome__nowKey {
     display: none;
-  }
-  .chrome__nowCellLink .chrome__nowValue {
-    font-size: var(--type-body);
-    line-height: var(--leading-title);
   }
   .chrome__nowArtImg,
   .chrome__nowArtFallback,
@@ -754,9 +702,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     gap: 10px;
     height: 44px;
     padding: 0 10px 0 8px;
-  }
-  .chrome__elsewhereHandle {
-    font-size: var(--type-caption);
   }
   .chrome__colophon {
     gap: 8px 16px;
@@ -791,7 +736,9 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
   .chrome__logo {
     padding: 2px;
-    font-size: 1.85em;
+  }
+  .chrome__logo > svg {
+    height: 34px;
   }
   .chrome__nav {
     margin: 0 0 0 auto;
@@ -804,7 +751,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   .chrome__segment {
     gap: 0.22em;
     padding-inline: 0.25em;
-    font-size: clamp(var(--type-caption), 4vw, var(--type-meta));
   }
   .chrome__scheme {
     margin-left: 2px;

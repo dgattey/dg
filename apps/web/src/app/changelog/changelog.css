@@ -17,30 +17,10 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .changelog__statKey {
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 600;
-  line-height: var(--leading-title);
   color: var(--soft);
-}
-.changelog__statValue {
-  font-family: var(--display);
-  font-size: var(--type-title-lg);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-title);
 }
 .changelog__statSub {
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: var(--leading-title);
   color: var(--soft);
-}
-.changelog__totals > :last-child .changelog__statValue {
-  font-size: var(--type-title-md);
 }
 
 .changelog__years {
@@ -69,14 +49,12 @@
 }
 .changelog__yearHeading {
   margin: 0;
-  font: inherit;
 }
 .changelog__yearTag {
   flex-direction: column;
   gap: 2px;
   align-items: flex-start;
   padding: 12px 18px 14px;
-  font-size: var(--type-h2);
   @media (max-width: 959px) {
     flex-direction: row;
     gap: 0.6em;
@@ -93,7 +71,6 @@
 .changelog__latestPin {
   top: -16px;
   right: 24px;
-  font-size: var(--type-meta);
 }
 .changelog__cardInner {
   display: grid;
@@ -145,10 +122,6 @@
   padding: 8px 4px 0;
 }
 .changelog__polaroidTitle {
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 700;
-  line-height: var(--leading-title);
   color: var(--ink-on-cream);
 }
 .changelog__cardHeader {
@@ -166,15 +139,9 @@
 }
 .changelog__versionTag {
   padding: 0.35em 0.72em 0.4em;
-  font-size: var(--type-label);
-  font-variant-numeric: tabular-nums;
 }
 .changelog__kindBadge {
   padding: 3px 9px 4px;
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: var(--ink-on-cream);
   background: color-mix(in oklab, var(--ink-on-cream) 9%, var(--cream));
   border-radius: 7px 9px 6px 8px;
@@ -188,10 +155,6 @@
   background: var(--ochre);
 }
 .changelog__date {
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
   color: var(--soft);
 }
 
@@ -207,11 +170,6 @@
   gap: 4px;
   align-items: center;
   padding: 4px 10px 5px;
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: var(--leading-title);
   color: var(--ink-on-cream);
   text-decoration: none;
   background: color-mix(in oklab, var(--ink-on-cream) 8%, var(--cream));
@@ -232,14 +190,10 @@
   margin: 0;
 }
 .changelog__noteItem {
-  font-family: var(--body);
-  font-size: var(--type-body);
-  line-height: var(--leading-body);
   color: var(--on);
 }
 .changelog__emptyNote {
   margin: 0;
-  font-size: var(--type-body);
   color: var(--soft);
 }
 
@@ -256,17 +210,7 @@
   align-items: baseline;
   justify-content: space-between;
 }
-.changelog__compactTitle {
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: var(--leading-title);
-}
 .changelog__compactCount {
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
   color: var(--soft);
 }
 .changelog__compactList {
@@ -282,11 +226,6 @@
   gap: 6px;
   align-items: center;
   padding: 5px 11px 6px;
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: var(--leading-title);
   color: var(--ink-on-cream);
   text-decoration: none;
   background: color-mix(in oklab, var(--ink-on-cream) 7%, var(--cream));
@@ -310,7 +249,6 @@
   background: var(--vermilion);
 }
 .changelog__compactDate {
-  font-weight: 600;
   color: var(--soft);
 }
 

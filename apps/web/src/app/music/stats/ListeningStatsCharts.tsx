@@ -50,17 +50,17 @@ export function TimelineBarsCard({
       <CardHead
         aside={
           activePoint ? (
-            <span className="stats__peak">
+            <strong className="stats__peak">
               {activePoint === peak ? `Peak ${activePoint.label}` : activePoint.label}:{' '}
               {formatCount(activePoint.plays)} plays,{' '}
               {formatHours((activePoint.plays * stats.minutesPerPlay) / 60)} ·{' '}
               {formatPercent(activePoint.plays, totalPlays)}
-            </span>
+            </strong>
           ) : peak ? (
-            <span className="stats__peak">
+            <strong className="stats__peak">
               Peak {peak.label}: {formatCount(peak.plays)} plays,{' '}
               {formatHours((peak.plays * stats.minutesPerPlay) / 60)}
-            </span>
+            </strong>
           ) : null
         }
         title={title}
@@ -87,9 +87,9 @@ export function TimelineBarsCard({
                 className="stats__column stats__column--future"
                 key={point.key}
               >
-                <span className="stats__columnValue" />
+                <span className="stats__columnValue" data-typography="meta" />
                 <span aria-hidden="true" className="stats__columnBar" />
-                <span aria-hidden="true" className="stats__columnTick">
+                <span aria-hidden="true" className="stats__columnTick" data-typography="meta">
                   {showTick ? point.tick : ''}
                 </span>
               </li>
@@ -121,11 +121,11 @@ export function TimelineBarsCard({
               }}
               onMouseLeave={() => setHoveredKey(null)}
             >
-              <span className="stats__columnValue">
+              <span className="stats__columnValue" data-typography="meta">
                 {showValue ? formatCompact(point.plays) : null}
               </span>
               <span aria-hidden="true" className="stats__columnBar" style={bar(point.plays, max)} />
-              <span className="stats__columnTick">
+              <span className="stats__columnTick" data-typography="meta">
                 <span className="chrome__srOnly">{point.label}</span>
                 <span aria-hidden="true">{showTick ? point.tick : ''}</span>
               </span>
@@ -172,8 +172,12 @@ export function GenresCard({ stats }: { stats: ListeningStats }) {
       tag={
         leadGenre ? (
           <Stub className="stats__cardStamp" kind="stamp" size="sm" tiltDeg={4.4} tone="ochre">
-            <span className="stats__cardStampKicker">#1 genre</span>
-            <span className="stats__cardStampValue">{leadGenre.genre}</span>
+            <span className="stats__cardStampKicker" data-typography="stamp">
+              #1 genre
+            </span>
+            <span className="stats__cardStampValue" data-typography="badge">
+              {leadGenre.genre}
+            </span>
           </Stub>
         ) : undefined
       }
@@ -232,7 +236,9 @@ export function GenresCard({ stats }: { stats: ListeningStats }) {
               <span aria-hidden="true" className={cx('stats__genreSwatch', toneClass)} />
               <span className="stats__repeatName">
                 <Tooltip title={item.genre} whenTruncated>
-                  <span className="stats__label stats__genreName">{item.genre}</span>
+                  <span className="stats__label stats__genreName" data-typography="label">
+                    {item.genre}
+                  </span>
                 </Tooltip>
                 <ArtistLinks artists={item.artists} newArtists={stats.newArtists} />
               </span>
@@ -242,8 +248,12 @@ export function GenresCard({ stats }: { stats: ListeningStats }) {
                 style={bar(item.plays, topGenrePlays)}
               />
               <span className="stats__topCountGroup">
-                <span className="stats__count">{formatCount(item.plays)}</span>
-                <span className="stats__meta">{formatPercent(item.plays, totalGenrePlays)}</span>
+                <span className="stats__count" data-typography="title-md">
+                  {formatCount(item.plays)}
+                </span>
+                <span className="stats__meta" data-typography="caption">
+                  {formatPercent(item.plays, totalGenrePlays)}
+                </span>
               </span>
             </li>
           );

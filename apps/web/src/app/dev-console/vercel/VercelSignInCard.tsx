@@ -34,11 +34,13 @@ export async function VercelSignInCardContent({ searchParams }: VercelSignInCard
   return (
     <>
       <div className="devConsole__row devConsole__row--wide">
-        <Typography variant="h3">Vercel identity</Typography>
+        <Typography as="h3" variant="title-md">
+          Vercel identity
+        </Typography>
         <StatusChip isConnected={isSignedIn} />
       </div>
 
-      <Typography color="var(--dg-palette-text-secondary)" variant="body2">
+      <Typography color="var(--dg-palette-text-secondary)" variant="meta">
         Optional Sign in with Vercel for Flags user targeting. Any Vercel account can complete
         OAuth; segment rules decide whether you match.
       </Typography>
@@ -49,7 +51,7 @@ export async function VercelSignInCardContent({ searchParams }: VercelSignInCard
 
       {session ? (
         <div className="devConsole__stack devConsole__stack--tight">
-          <Typography variant="body2">Email: {session.email}</Typography>
+          <Typography variant="meta">Email: {session.email}</Typography>
           <Typography color="var(--dg-palette-text-secondary)" variant="caption">
             id: {session.id}
           </Typography>
@@ -83,7 +85,7 @@ export async function VercelSignInCardContent({ searchParams }: VercelSignInCard
 export function VercelSignInCard({ searchParams }: VercelSignInCardProps) {
   return (
     <DevConsoleCardShell>
-      <Suspense fallback={<Typography variant="body2">Loading identity…</Typography>}>
+      <Suspense fallback={<Typography variant="meta">Loading identity…</Typography>}>
         <VercelSignInCardContent searchParams={searchParams} />
       </Suspense>
     </DevConsoleCardShell>

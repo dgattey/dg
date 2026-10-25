@@ -45,8 +45,6 @@
   width: min(100% - 32px, 700px);
   padding: 32px;
   margin-top: 26px;
-  font-size: var(--type-body-lg);
-  line-height: var(--leading-body);
   color: var(--ink-on-cream);
   isolation: isolate;
   rotate: -1deg;
@@ -79,13 +77,10 @@
 }
 .home__intro p {
   margin: 0;
-  font-size: inherit;
-  line-height: inherit;
   text-wrap: balance;
 }
 /* Links render through Typography, which sets its own size and drops the underline. */
 .home__intro p :is(a, [data-typography]) {
-  font: inherit;
   text-decoration: underline 1px color-mix(in oklab, currentColor 40%, transparent);
   text-underline-offset: 0.2em;
 }
@@ -94,8 +89,6 @@
 }
 .home__intro :is(h1, h2, h3, h4, h5, h6) {
   margin: 0;
-  font-family: var(--display);
-  line-height: var(--leading-tight);
 }
 .home__map {
   position: relative;
@@ -215,8 +208,6 @@
   left: 14px;
   z-index: 4;
   margin: 0;
-  font-size: inherit;
-  font-weight: inherit;
   pointer-events: none;
 }
 .home__stravaAtlas {
@@ -334,11 +325,6 @@
   position-try-fallbacks: none;
 }
 /* Title and artists, each wrapped in a truncation tooltip whose surface keeps its own size. */
-.home__spotifyMetaInner
-  > :is(:nth-child(2), :nth-child(3))
-  :is(a, [data-typography]):not([role="tooltip"]) {
-  font-size: var(--type-h2);
-}
 
 .home__moreWork {
   --sp-top: 50px;
@@ -419,8 +405,6 @@
   z-index: 3;
   justify-self: start;
   margin: 0 0 18px -4px;
-  font-size: inherit;
-  font-weight: inherit;
 }
 .home__sideList {
   display: grid;
@@ -495,26 +479,12 @@
   display: grid;
   min-width: 0;
 }
-.home__sideTitle {
-  font-family: var(--display);
-  font-size: var(--type-h3);
-  font-weight: 700;
-  line-height: var(--leading-title);
-}
 .home__sideDescription {
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: var(--type-caption);
-  line-height: var(--leading-body);
   color: var(--soft);
   white-space: nowrap;
 }
-.home__sideArrow {
-  font-size: var(--type-h3);
-  font-weight: 700;
-  line-height: 1;
-}
-
 /* Five rows stay within the frames beside them as the columns narrow. */
 @media (max-width: 1300px) {
   .home__sideRow {
@@ -527,12 +497,6 @@
     height: 36px;
     padding: 4px;
     border-radius: 10px;
-  }
-  .home__sideTitle {
-    font-size: var(--type-meta);
-  }
-  .home__sideDescription {
-    line-height: var(--leading-meta);
   }
 }
 

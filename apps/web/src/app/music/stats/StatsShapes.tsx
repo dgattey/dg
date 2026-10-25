@@ -1,3 +1,4 @@
+import type { TypographyVariant } from '@dg/ui/core/Typography';
 import type { CSSProperties, ReactNode } from 'react';
 import { type ScallopSize, scallopVertices } from '../../collage/cutOutShapes';
 import { cx, paperToneVars } from '../../collage/paperVars';
@@ -25,6 +26,7 @@ export function Scallop({
   size = 'seal',
   tiltDeg = 0,
   tone,
+  variant = size === 'sticker' ? 'label' : undefined,
 }: {
   'aria-hidden'?: boolean;
   children: ReactNode;
@@ -32,6 +34,7 @@ export function Scallop({
   size?: ScallopSize;
   tiltDeg?: number;
   tone: PaperTone;
+  variant?: TypographyVariant;
 }) {
   return (
     <span
@@ -41,6 +44,7 @@ export function Scallop({
     >
       <span
         className={cx('stats__scallop', `stats__scallop--${size}`)}
+        data-typography={variant}
         style={{ '--scallop-clip': SCALLOPS[size] } as CSSProperties}
       >
         {children}

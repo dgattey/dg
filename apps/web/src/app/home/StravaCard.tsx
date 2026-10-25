@@ -45,8 +45,10 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
           </PaperTag>
         </PageTransitionLink>
         <Scallop className="home__stravaTotal" size="sticker" tiltDeg={-9} tone="rose">
-          <span className="strava__sealKey">Total</span>
-          <span className="strava__sealWhen">{formatMiles(totals.distanceMeters)} mi</span>
+          <span className="strava__sealKey" data-typography="meta">
+            Total
+          </span>
+          <span data-typography="label">{formatMiles(totals.distanceMeters)} mi</span>
         </Scallop>
       </div>
       <RoutePolaroid
@@ -56,15 +58,19 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
         tiltDeg={-2.2}
       >
         <Scallop className="home__stravaWhen" size="sticker" tiltDeg={10} tone="vermilion">
-          <span className="strava__sealKey">Latest</span>
-          <span className="strava__sealWhen">
+          <span className="strava__sealKey" data-typography="meta">
+            Latest
+          </span>
+          <span data-typography="label">
             <RelativeTime date={latest.startDate} hasTooltip={false} isCapitalized />
           </span>
         </Scallop>
       </RoutePolaroid>
       <Stub className="home__stravaTicket" kind="ticket" size="sm" tiltDeg={-4} tone="ochre">
-        <span className="strava__sealKey">This year</span>
-        <span className="strava__sealValue">{formatMiles(thisYear.distanceMeters)} mi</span>
+        <span className="strava__sealKey" data-typography="meta">
+          This year
+        </span>
+        <span data-typography="title-md">{formatMiles(thisYear.distanceMeters)} mi</span>
       </Stub>
     </div>
   );

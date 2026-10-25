@@ -52,6 +52,8 @@ export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavIt
                 </>
               }
               summaryClassName={cx('chrome__segment', onMenuPage && 'chrome__segmentCurrent')}
+              summaryTypography="label"
+              summaryTypographyXs="caption"
             >
               <PillMenuList>
                 {item.links.map((link) => {
@@ -67,6 +69,7 @@ export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavIt
                         className="chrome__musicLink"
                         href={link.url}
                         title={link.title}
+                        variant="label"
                       >
                         {Icon ? <Icon aria-hidden={true} size={20} /> : null}
                         {link.title}
@@ -84,9 +87,11 @@ export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavIt
           <PageTransitionLink
             aria-current={current ? 'page' : undefined}
             className={cx('chrome__segment', current && 'chrome__segmentCurrent')}
+            data-typography-xs="caption"
             href={item.link.url}
             key={item.link.url}
             title={item.link.title}
+            variant="label"
           >
             {item.link.title}
           </PageTransitionLink>

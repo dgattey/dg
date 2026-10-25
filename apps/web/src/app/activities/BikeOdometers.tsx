@@ -62,7 +62,7 @@ function MilesByYear({
               className="strava__bikeBar"
               style={{ '--bar': distanceMeters / most } as CSSProperties}
             />
-            <span aria-hidden="true" className="strava__bikeYearLabel">
+            <span aria-hidden="true" className="strava__bikeYearLabel" data-typography="caption">
               {formatYearTick(year)}
             </span>
           </button>
@@ -75,8 +75,12 @@ function MilesByYear({
 function BikeStat({ label, value }: { label: string; value: string }) {
   return (
     <span className="strava__bikeStat">
-      <span className="strava__bikeStatValue">{value}</span>
-      <span className="strava__bikeStatLabel">{label}</span>
+      <span className="strava__bikeStatValue" data-typography="label">
+        {value}
+      </span>
+      <span className="strava__bikeStatLabel" data-typography="caption">
+        {label}
+      </span>
     </span>
   );
 }
@@ -110,14 +114,16 @@ function BikeTicket({ bike, index }: { bike: StravaBike; index: number }) {
       <span className="strava__bikeHead">
         <span className="strava__bikeLead">
           <span className="strava__bikeTitle">
-            <span className="strava__bikeName">{bike.name}</span>
-            <span aria-live="polite" className="strava__bikeSpan">
+            <span data-typography="stat-md">{bike.name}</span>
+            <span aria-live="polite" className="strava__bikeSpan" data-typography="caption">
               {shown.span}
             </span>
           </span>
           <span className="strava__totalFigure">
-            <span className="strava__bikeMiles">{formatMiles(shown.distanceMeters)}</span>
-            <span className="strava__totalUnit">mi</span>
+            <span className="strava__bikeMiles" data-typography="stat-lg">
+              {formatMiles(shown.distanceMeters)}
+            </span>
+            <span data-typography="label">mi</span>
           </span>
         </span>
         <BikeIllustration name={bike.name} />
@@ -134,11 +140,13 @@ function BikeTicket({ bike, index }: { bike: StravaBike; index: number }) {
         rel="noopener noreferrer"
         target="_blank"
       >
-        <span className="strava__bikeLongestKey">
+        <span className="strava__bikeLongestKey" data-typography="caption">
           Longest · {formatMiles(bike.longest.distanceMeters)} mi ·{' '}
           {formatOutingDate(bike.longest.startDate)}
         </span>
-        <span className="strava__bikeLongestName">{bike.longest.name}</span>
+        <span className="strava__bikeLongestName" data-typography="row-title">
+          {bike.longest.name}
+        </span>
       </a>
     </Stub>
   );

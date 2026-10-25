@@ -67,13 +67,16 @@ export function AlbumPlayTile({
               className="music__countTag"
               tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
               tone="ochre"
+              variant="meta"
             >
               {countLabel}
             </PaperTag>
           ) : null}
         </span>
-        <span className="music__caption">
-          <strong className="music__albumName">{title}</strong>
+        <span className="music__caption" data-typography="meta">
+          <strong className="music__albumName" data-typography="title-sm">
+            {title}
+          </strong>
           <span className="music__artist">
             {artistNames}
             {newArtist ? <NewArtistBadge label={newArtist} /> : null}

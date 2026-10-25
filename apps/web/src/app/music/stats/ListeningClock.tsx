@@ -116,7 +116,7 @@ function Turntable({
       {TICK_HOURS.map((hour) => {
         const { x, y } = point(INNER + REACH + 14, hourAngle(hour));
         return (
-          <text className="stats__clockTick" key={hour} x={x} y={y}>
+          <text className="stats__clockTick" data-typography="meta" key={hour} x={x} y={y}>
             {formatHourTick(hour)}
           </text>
         );
@@ -130,6 +130,7 @@ function Turntable({
       {activeWedge ? (
         <text
           className="stats__clockValue"
+          data-typography="row-title"
           {...point(outer(activeWedge.plays) + 18, hourAngle(activeWedge.hour))}
         >
           {formatCompact(activeWedge.plays)}
@@ -213,11 +214,11 @@ export function ListeningClock({ stats }: { stats: ListeningStats }) {
                 onMouseLeave={() => setHoveredPart(null)}
               >
                 <span aria-hidden="true" className="stats__swatch" />
-                <span className="stats__shiftShare">{formatPercent(partPlays, stats.plays)}</span>
-                <span className="stats__meta">
+                <span data-typography="title-sm">{formatPercent(partPlays, stats.plays)}</span>
+                <span className="stats__meta" data-typography="meta">
                   {label}, {formatDayPartHours(startHour)}
                 </span>
-                <span className="stats__meta stats__shiftCounts">
+                <span className="stats__meta" data-typography="caption">
                   {formatCount(partPlays)} plays ·{' '}
                   {formatHours((partPlays * stats.minutesPerPlay) / 60)}
                 </span>
