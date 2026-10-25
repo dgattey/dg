@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { invariant } from '@dg/shared-core/assertions/invariant';
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import {
   ALBUM_DETAIL_BACKDROP,
   ALBUMS_BACKDROP,
@@ -10,6 +10,7 @@ import {
   NOT_FOUND_BACKDROP,
   SERVER_ERROR_BACKDROP,
 } from '../backdrops';
+import { CollageBackdrop } from '../CollageBackdrop';
 import { CutOut } from '../CutOut';
 import { CutOutSymbols } from '../CutOutSymbols';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from '../cutOutPlacements';
@@ -134,6 +135,35 @@ describe('collage cut-outs', () => {
     );
     for (const placement of CUT_OUT_PLACEMENTS.coda) {
       expect(placement.yPercent).toBeGreaterThanOrEqual(-20);
+    }
+  });
+
+  it('programmatically repeats CollageBackdrop bands to cover long page heights', () => {
+    let resizeCallback: ResizeObserverCallback | undefined;
+    const OriginalResizeObserver = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = class MockResizeObserver {
+      constructor(cb: ResizeObserverCallback) {
+        resizeCallback = cb;
+      }
+      disconnect() {}
+      observe() {}
+      unobserve() {}
+    };
+
+    try {
+      const { container } = render(<CollageBackdrop backdrop={HISTORY_BACKDROP} />);
+      expect(container.querySelectorAll('.collageBand')).toHaveLength(HISTORY_BACKDROP.repeat);
+
+      act(() => {
+        resizeCallback?.(
+          [{ contentRect: { height: 72000 } } as ResizeObserverEntry],
+          {} as ResizeObserver,
+        );
+      });
+
+      expect(container.querySelectorAll('.collageBand')).toHaveLength(60);
+    } finally {
+      globalThis.ResizeObserver = OriginalResizeObserver;
     }
   });
 });
