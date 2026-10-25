@@ -125,14 +125,14 @@ export function Tooltip({
         ? React.cloneElement(children, { 'aria-describedby': tooltipId })
         : children}
       <Typography
-        component="span"
+        as="span"
         data-placement={placement}
         data-tooltip-no-flip={whenTruncated || undefined}
         data-tooltip-surface=""
         id={tooltipId}
         ref={surfaceRef}
         role="tooltip"
-        variant="caption"
+        variant="meta"
       >
         {title}
       </Typography>

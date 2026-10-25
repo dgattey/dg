@@ -1,93 +1,176 @@
-import type { CSSProperties } from 'react';
+export type TypographyRole =
+  | 'display-hero'
+  | 'display-cut'
+  | 'display-page'
+  | 'stat-xl'
+  | 'stat-lg'
+  | 'stat-md'
+  | 'title-md'
+  | 'label'
+  | 'title-sm'
+  | 'row-title'
+  | 'badge'
+  | 'stamp'
+  | 'prose-lg'
+  | 'prose'
+  | 'meta'
+  | 'caption'
+  | 'code';
 
-type TypographyVariants = {
-  body1: CSSProperties;
-  body2: CSSProperties;
-  button: CSSProperties;
-  caption: CSSProperties;
-  code: CSSProperties;
-  fontFamily: string;
-  fontSize: number;
-  h1: CSSProperties;
-  h2: CSSProperties;
-  h3: CSSProperties;
-  h4: CSSProperties;
-  h5: CSSProperties;
-  h6: CSSProperties;
-  overline: CSSProperties;
+export type TypographyRoleSpec = {
+  family: 'var(--display)' | 'var(--body)' | 'var(--font-mono)';
+  leading: string;
+  size: string;
+  tracking?: string;
+  weight: 400 | 600 | 700;
 };
 
-/**
- * Get typography styles for the theme.
- */
-export function getTypography(): TypographyVariants {
-  return {
-    body1: {
-      fontSize: 17,
-    },
-    body2: {
-      fontSize: 17,
-    },
-    button: {
-      fontSize: 'clamp(18px, 1.6vw, 20px)',
-      fontWeight: 600,
-    },
-    caption: {
-      fontSize: 15,
-      fontWeight: 400,
-    },
-    code: {
-      borderRadius: '16px',
-      fontFamily:
-        '"Menlo","Consolas","Roboto Mono","Ubuntu Monospace","Noto Mono","Oxygen Mono","Liberation Mono",monospace,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
-      fontSize: 15,
-      lineHeight: 1.875,
-      padding: '6px 8px',
-    },
-    fontFamily: [
-      'system-ui',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      'Ubuntu',
-      'Cantarell',
-      '"Noto Sans"',
-      'sans-serif',
-      '"Apple Color Emoji"',
-      '"Segoe UI Emoji"',
-      '"Segoe UI Symbol"',
-      '"Noto Color Emoji"',
-    ].join(','),
-    fontSize: 20,
-    h1: {
-      fontSize: 'clamp(1.75rem, 1.2rem + 2.5vw, 2.125rem)',
-      fontVariant: 'all-small-caps',
-      fontWeight: 700,
-    },
-    h2: {
-      fontSize: 'clamp(1.5rem, 1.1rem + 2vw, 1.859375rem)',
-      fontWeight: 700,
-    },
-    h3: {
-      fontSize: 'clamp(1.35rem, 1.05rem + 1.5vw, 1.546875rem)',
-      fontWeight: 700,
-    },
-    h4: {
-      fontSize: 20.5,
-      fontWeight: 600,
-    },
-    h5: {
-      fontSize: 16.5,
-      fontWeight: 600,
-    },
-    h6: {
-      fontSize: 16,
-      fontWeight: 600,
-    },
-    overline: {
-      fontSize: 16,
-      fontWeight: 600,
-    },
-  };
+export const FONT_STACK_SANS = [
+  'system-ui',
+  '-apple-system',
+  'BlinkMacSystemFont',
+  '"Segoe UI"',
+  'Roboto',
+  'Ubuntu',
+  'Cantarell',
+  '"Noto Sans"',
+  'sans-serif',
+  '"Apple Color Emoji"',
+  '"Segoe UI Emoji"',
+  '"Segoe UI Symbol"',
+  '"Noto Color Emoji"',
+].join(',');
+
+export const FONT_STACK_MONO = [
+  '"Menlo"',
+  '"Consolas"',
+  '"Roboto Mono"',
+  '"Ubuntu Monospace"',
+  '"Noto Mono"',
+  '"Oxygen Mono"',
+  '"Liberation Mono"',
+  'monospace',
+  '"Apple Color Emoji"',
+  '"Segoe UI Emoji"',
+  '"Segoe UI Symbol"',
+  '"Noto Color Emoji"',
+].join(',');
+
+export const TYPOGRAPHY_ROLES: Record<TypographyRole, TypographyRoleSpec> = {
+  badge: {
+    family: 'var(--display)',
+    leading: 'var(--leading-tight)',
+    size: 'var(--type-caption)',
+    weight: 700,
+  },
+  caption: {
+    family: 'var(--body)',
+    leading: 'var(--leading-meta)',
+    size: 'var(--type-caption)',
+    weight: 600,
+  },
+  code: {
+    family: 'var(--font-mono)',
+    leading: 'var(--leading-body)',
+    size: 'var(--type-meta)',
+    weight: 400,
+  },
+  'display-cut': {
+    family: 'var(--display)',
+    leading: '0.94',
+    size: 'var(--type-display)',
+    tracking: '0.01em',
+    weight: 700,
+  },
+  'display-hero': {
+    family: 'var(--display)',
+    leading: '0.94',
+    size: 'var(--type-display)',
+    tracking: 'var(--tracking-display)',
+    weight: 700,
+  },
+  'display-page': {
+    family: 'var(--display)',
+    leading: '0.96',
+    size: 'var(--type-h1)',
+    tracking: 'var(--tracking-display)',
+    weight: 700,
+  },
+  label: {
+    family: 'var(--display)',
+    leading: 'var(--leading-tight)',
+    size: 'var(--type-label)',
+    tracking: 'var(--tracking-label)',
+    weight: 700,
+  },
+  meta: {
+    family: 'var(--body)',
+    leading: 'var(--leading-meta)',
+    size: 'var(--type-meta)',
+    weight: 600,
+  },
+  prose: {
+    family: 'var(--body)',
+    leading: 'var(--leading-body)',
+    size: 'var(--type-body)',
+    weight: 400,
+  },
+  'prose-lg': {
+    family: 'var(--body)',
+    leading: 'var(--leading-body)',
+    size: 'var(--type-body-lg)',
+    weight: 400,
+  },
+  'row-title': {
+    family: 'var(--display)',
+    leading: 'var(--leading-title)',
+    size: 'var(--type-body)',
+    weight: 700,
+  },
+  stamp: {
+    family: 'var(--display)',
+    leading: 'var(--leading-tight)',
+    size: 'var(--type-micro)',
+    tracking: '0.01em',
+    weight: 700,
+  },
+  'stat-lg': {
+    family: 'var(--display)',
+    leading: 'var(--leading-tight)',
+    size: 'var(--type-title-lg)',
+    tracking: 'var(--tracking-title)',
+    weight: 700,
+  },
+  'stat-md': {
+    family: 'var(--display)',
+    leading: 'var(--leading-tight)',
+    size: 'var(--type-title-md)',
+    tracking: 'var(--tracking-title)',
+    weight: 700,
+  },
+  'stat-xl': {
+    family: 'var(--display)',
+    leading: '0.94',
+    size: 'var(--type-display-md)',
+    tracking: 'var(--tracking-display)',
+    weight: 700,
+  },
+  'title-md': {
+    family: 'var(--display)',
+    leading: 'var(--leading-title)',
+    size: 'var(--type-h2)',
+    tracking: 'var(--tracking-label)',
+    weight: 700,
+  },
+  'title-sm': {
+    family: 'var(--display)',
+    leading: 'var(--leading-title)',
+    size: 'var(--type-h3)',
+    tracking: 'var(--tracking-label)',
+    weight: 700,
+  },
+};
+
+export function getTypography(): Record<TypographyRole, TypographyRoleSpec> {
+  return TYPOGRAPHY_ROLES;
 }

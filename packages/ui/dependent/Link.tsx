@@ -5,6 +5,7 @@ import { Typography, type TypographyVariant } from '../core/Typography';
 type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'style' | 'title'> & {
   children?: React.ReactNode;
   className?: string;
+  color?: string;
   href: string | undefined;
   isExternal?: boolean;
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
@@ -30,18 +31,20 @@ export function CursorIcon({ size = '1em' }: { size?: string }) {
 
 /**
  * Server-compatible Link component with Next.js navigation and theme styling.
+ * Inherits the parent's typography unless an explicit `variant` or `color` is passed.
  */
 export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   {
     children,
     className,
+    color,
     href,
     isExternal,
     onClick,
     style,
     title,
     transitionTypes,
-    variant = 'body1',
+    variant,
     ...rest
   },
   ref,
@@ -58,41 +61,75 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   };
 
   if (isExternal) {
+    if (variant || color) {
+      return (
+        <Typography
+          {...rest}
+          {...anchorProps}
+          as="a"
+          className={className}
+          color={color}
+          data-ui-link=""
+          href={href}
+          rel="noreferrer"
+          style={style}
+          target="_blank"
+          variant={variant}
+        >
+          {contents}
+        </Typography>
+      );
+    }
     return (
-      <Typography
+      <a
         {...rest}
         {...anchorProps}
         className={className}
-        component="a"
         data-ui-link=""
         href={href}
         rel="noreferrer"
         style={style}
         target="_blank"
-        variant={variant}
       >
         {contents}
-      </Typography>
+      </a>
+    );
+  }
+
+  if (variant || color) {
+    return (
+      <NextLink
+        {...anchorProps}
+        data-ui-link-wrapper=""
+        href={href}
+        transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
+      >
+        <Typography
+          {...rest}
+          as="span"
+          className={className}
+          color={color}
+          data-ui-link=""
+          style={style}
+          variant={variant}
+        >
+          {contents}
+        </Typography>
+      </NextLink>
     );
   }
 
   return (
     <NextLink
+      {...rest}
       {...anchorProps}
-      data-ui-link-wrapper=""
+      className={className}
+      data-ui-link=""
       href={href}
+      style={style}
       transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
     >
-      <Typography
-        {...rest}
-        className={className}
-        component="span"
-        data-ui-link=""
-        style={style}
-        variant={variant}
-      >
-        {contents}
-      </Typography>
+      {contents}
     </NextLink>
   );
 });

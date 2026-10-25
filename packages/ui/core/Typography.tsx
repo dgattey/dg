@@ -6,34 +6,28 @@ import type {
   ReactNode,
   Ref,
 } from 'react';
+import type { TypographyRole } from '../theme/typography';
 
-export type TypographyVariant =
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'h4'
-  | 'h5'
-  | 'h6'
-  | 'body1'
-  | 'body2'
-  | 'caption'
-  | 'overline'
-  | 'button'
-  | 'code';
+export type TypographyVariant = TypographyRole;
 
 const DEFAULT_ELEMENT: Record<TypographyVariant, ElementType> = {
-  body1: 'p',
-  body2: 'p',
-  button: 'span',
+  badge: 'span',
   caption: 'span',
   code: 'span',
-  h1: 'h1',
-  h2: 'h2',
-  h3: 'h3',
-  h4: 'h4',
-  h5: 'h5',
-  h6: 'h6',
-  overline: 'span',
+  'display-cut': 'h1',
+  'display-hero': 'h1',
+  'display-page': 'h1',
+  label: 'span',
+  meta: 'span',
+  prose: 'p',
+  'prose-lg': 'p',
+  'row-title': 'span',
+  stamp: 'span',
+  'stat-lg': 'span',
+  'stat-md': 'span',
+  'stat-xl': 'span',
+  'title-md': 'h2',
+  'title-sm': 'h3',
 };
 
 const PALETTE_COLOR_TOKENS: Record<string, string> = {
@@ -42,6 +36,7 @@ const PALETTE_COLOR_TOKENS: Record<string, string> = {
 };
 
 type TypographyProps<T extends ElementType = 'p'> = {
+  as?: T;
   children?: ReactNode;
   className?: string;
   color?: string;
@@ -49,23 +44,24 @@ type TypographyProps<T extends ElementType = 'p'> = {
   ref?: Ref<HTMLElement>;
   style?: CSSProperties;
   variant?: TypographyVariant;
-} & Omit<HTMLAttributes<HTMLElement>, 'children' | 'className' | 'color' | 'style'> &
+} & Omit<HTMLAttributes<HTMLElement>, 'as' | 'children' | 'className' | 'color' | 'style'> &
   Omit<
     ComponentPropsWithRef<T>,
-    'children' | 'className' | 'color' | 'component' | 'style' | 'variant'
+    'as' | 'children' | 'className' | 'color' | 'component' | 'style' | 'variant'
   >;
 
 export function Typography<T extends ElementType = 'p'>({
+  as,
   children,
   className,
   color,
   component,
   ref,
   style,
-  variant = 'body1',
+  variant = 'prose',
   ...rest
 }: TypographyProps<T>) {
-  const Component = (component ?? DEFAULT_ELEMENT[variant]) as ElementType;
+  const Component = (as ?? component ?? DEFAULT_ELEMENT[variant]) as ElementType;
   const resolvedColor = color ? (PALETTE_COLOR_TOKENS[color] ?? color) : undefined;
   const mergedStyle = resolvedColor
     ? ({ '--typography-color': resolvedColor, ...style } as CSSProperties)

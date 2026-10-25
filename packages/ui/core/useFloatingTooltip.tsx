@@ -148,10 +148,10 @@ export function useFloatingTooltip({
     ? createPortal(
         <Typography
           aria-hidden
-          component="span"
+          as="span"
           data-placement={placement}
           ref={floatingRef}
-          variant="caption"
+          variant="meta"
           {...{ [PORTAL_ATTRIBUTE]: true }}
         >
           {title}
