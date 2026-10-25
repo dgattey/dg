@@ -8,8 +8,6 @@ import { PaperCard } from '../../collage/PaperCard';
 import { type PaperPillOption, PaperPills } from '../../collage/PaperPills';
 import { PaperTag } from '../../collage/PaperTag';
 
-const SKELETON_TEXT_CLASS = 'music__skeleton music__skeletonText';
-
 type CardOffsetStyle = CSSProperties & {
   '--card-offset': string;
   '--card-offset-mobile': string;
@@ -59,10 +57,10 @@ export function CollageAlbumPaper({
 function SkeletonFace() {
   return (
     <>
-      <Skeleton className="music__skeleton music__art" variant="rounded" />
+      <Skeleton className="music__art" variant="rounded" />
       <div className="music__caption">
-        <Skeleton className={SKELETON_TEXT_CLASS} width="82%" />
-        <Skeleton className={SKELETON_TEXT_CLASS} width="58%" />
+        <Skeleton width="82%" />
+        <Skeleton width="58%" />
       </div>
     </>
   );
@@ -121,7 +119,7 @@ export function CollageHistorySkeleton() {
               tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
               tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
             >
-              <Skeleton className={SKELETON_TEXT_CLASS} width={120} />
+              <Skeleton width={120} />
             </PaperTag>
           </div>
           <div className="music__historySkeletonGrid">
