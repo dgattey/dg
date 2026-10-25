@@ -2,9 +2,8 @@ import 'server-only';
 
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { log } from '@dg/shared-core/logging/log';
-import { isRecord } from '@dg/shared-core/types/typeguards';
 import { upsertAndCacheToken } from '../clients/refreshedAccessToken';
-import { createExpirationDate } from '../spotify/spotifyClient';
+import { validateSpotifyTokenResponse } from '../spotify/spotifyClient';
 
 const SPOTIFY_TOKEN_NAME = 'spotify';
 
@@ -58,29 +57,7 @@ export async function exchangeSpotifyCodeForToken(
     throw new Error('Failed to exchange Spotify code for token');
   }
 
-  if (!isRecord(rawTokenData)) {
-    throw new Error('Invalid Spotify token response');
-  }
-
-  const tokenType = rawTokenData.token_type;
-  const accessToken = rawTokenData.access_token;
-  const refreshToken = rawTokenData.refresh_token;
-  const expiresIn = rawTokenData.expires_in;
-
-  if (tokenType !== 'Bearer') {
-    throw new Error(`Invalid token type from Spotify ${String(tokenType)}`);
-  }
-  if (typeof accessToken !== 'string') {
-    throw new Error('Missing access token from Spotify');
-  }
-  if (typeof refreshToken !== 'string') {
-    throw new Error('Missing refresh token from Spotify');
-  }
-  if (typeof expiresIn !== 'number') {
-    throw new Error('Missing expires_in from Spotify');
-  }
-
-  const expiryAt = createExpirationDate(expiresIn);
+  const { accessToken, expiryAt, refreshToken } = validateSpotifyTokenResponse(rawTokenData);
 
   log.info('Persisting token to DB', { accessToken, expiryAt, refreshToken });
   const token = await upsertAndCacheToken({

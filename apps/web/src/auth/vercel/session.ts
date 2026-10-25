@@ -1,4 +1,5 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac } from 'node:crypto';
+import { timingSafeEqualStrings } from '@dg/services/auth/devConsoleBasicAuth';
 
 /** HttpOnly session cookie used for Flags `identify` entity attributes. */
 export const VERCEL_SESSION_COOKIE = 'vercel_flags_session';
@@ -70,16 +71,7 @@ export function parseVercelSessionCookie(
   const signature = value.slice(separator + 1);
   const expected = createHmac('sha256', secret).update(payload).digest('base64url');
 
-  try {
-    const signatureBuffer = Buffer.from(signature);
-    const expectedBuffer = Buffer.from(expected);
-    if (
-      signatureBuffer.length !== expectedBuffer.length ||
-      !timingSafeEqual(signatureBuffer, expectedBuffer)
-    ) {
-      return null;
-    }
-  } catch {
+  if (!timingSafeEqualStrings(signature, expected)) {
     return null;
   }
 

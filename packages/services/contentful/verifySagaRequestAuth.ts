@@ -1,6 +1,7 @@
 import 'server-only';
 
 import crypto from 'node:crypto';
+import { timingSafeEqualStrings } from '../auth/devConsoleBasicAuth';
 
 export const SAGA_TIMESTAMP_HEADER = 'x-saga-timestamp' as const;
 export const SAGA_SIGNATURE_HEADER = 'x-saga-signature' as const;
@@ -18,12 +19,6 @@ type SagaRequestAuthResult =
         | 'missing_credentials'
         | 'missing_secret';
     };
-
-const safeEq = (a: string, b: string): boolean => {
-  const bufA = Buffer.from(a, 'utf8');
-  const bufB = Buffer.from(b, 'utf8');
-  return bufA.byteLength === bufB.byteLength && crypto.timingSafeEqual(bufA, bufB);
-};
 
 export function computeSagaHmacSignature(opts: {
   method?: string;
@@ -83,10 +78,11 @@ export function verifySagaRequestAuth(opts: {
     if (!/^[0-9a-f]{64}$/.test(hex)) return { ok: false, reason: 'invalid_hmac_signature' };
     const ok = secrets.some(
       (secret) =>
-        safeEq(
+        timingSafeEqualStrings(
           hex,
           computeSagaHmacSignature({ method, pathname, rawBody, secret, timestamp: ts }),
-        ) || safeEq(hex, computeSagaHmacSignature({ rawBody, secret, timestamp: ts })),
+        ) ||
+        timingSafeEqualStrings(hex, computeSagaHmacSignature({ rawBody, secret, timestamp: ts })),
     );
     return ok ? { method: 'hmac', ok: true } : { ok: false, reason: 'invalid_hmac_signature' };
   }
@@ -98,7 +94,7 @@ export function verifySagaRequestAuth(opts: {
       ?.trim() ?? '';
   if (!authorizationHeader?.trim()) return { ok: false, reason: 'missing_credentials' };
   if (!token) return { ok: false, reason: 'invalid_bearer_token' };
-  return secrets.some((s) => safeEq(token, s))
+  return secrets.some((s) => timingSafeEqualStrings(token, s))
     ? { method: 'bearer', ok: true }
     : { ok: false, reason: 'invalid_bearer_token' };
 }

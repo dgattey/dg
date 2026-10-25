@@ -1,4 +1,3 @@
-import { timingSafeEqual } from 'node:crypto';
 import { refreshFavoriteAlbumsSnapshotWithLogging } from '@dg/services/spotify/refreshFavoriteAlbumsSnapshot';
 import { syncSpotifyHistoryWithLogging } from '@dg/services/spotify/syncSpotifyHistory';
 import { log } from '@dg/shared-core/logging/log';
@@ -10,23 +9,7 @@ import {
   getCachedLatestPlayedAt,
   shouldRefreshFavoriteAlbums,
 } from '../../../../services/spotifySync';
-
-const BEARER_PREFIX = 'Bearer ';
-
-const isAuthorized = (request: NextRequest) => {
-  const secret = process.env.CRON_SECRET?.trim();
-  const authHeader = request.headers.get('authorization');
-  if (!secret || !authHeader?.startsWith(BEARER_PREFIX)) {
-    return false;
-  }
-  const provided = authHeader.slice(BEARER_PREFIX.length);
-  const providedBuffer = Buffer.from(provided, 'utf8');
-  const expectedBuffer = Buffer.from(secret, 'utf8');
-  if (providedBuffer.length !== expectedBuffer.length) {
-    return false;
-  }
-  return timingSafeEqual(providedBuffer, expectedBuffer);
-};
+import { isCronAuthorized } from '../../apiResponses';
 
 type SyncResponse = {
   status: number;
@@ -43,7 +26,7 @@ type SyncResponse = {
 };
 
 export async function handleSpotifySync(request: NextRequest): Promise<SyncResponse> {
-  if (!isAuthorized(request)) {
+  if (!isCronAuthorized(request)) {
     log.warn('Unauthorized sync request', {
       hasAuthHeader: request.headers.has('authorization'),
     });
