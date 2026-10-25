@@ -53,10 +53,6 @@
 .streets__seal .strava__totalNumber {
   white-space: nowrap;
 }
-.streets__callouts .stats__ticket > .stats__face {
-  min-height: 0;
-  padding: 16px 28px 18px 40px;
-}
 .streets__calloutLine {
   font-family: var(--display);
   font-size: var(--type-title-md);

@@ -62,7 +62,7 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
           </span>
         </Scallop>
       </RoutePolaroid>
-      <Stub className="home__stravaTicket" kind="ticket" tiltDeg={-4} tone="ochre">
+      <Stub className="home__stravaTicket" kind="ticket" size="sm" tiltDeg={-4} tone="ochre">
         <span className="strava__sealKey">This year</span>
         <span className="strava__sealValue">{formatMiles(thisYear.distanceMeters)} mi</span>
       </Stub>

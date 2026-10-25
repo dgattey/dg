@@ -148,6 +148,12 @@ const UNIT_CONSTANT_OWNERS = new Set([
   'apps/web/src/app/activities/stravaFormat.ts',
   'packages/shared-core/formatting/formattedDistance.ts',
 ]);
+const SOCIAL_CARD_VARIANT_ADAPTERS = new Set([
+  'apps/web/src/app/collage/socialCardVariants.ts',
+  'apps/web/src/app/collage/stravaSocialCardVariant.ts',
+]);
+const ROUTE_CLASS_OR_IMPORT_IN_SHARED =
+  /\b(?:stats|strava|streets|reading|changelog|music|home|siteMap|devConsole|error)__[a-zA-Z0-9_-]+|from\s+['"]\.\.\/(?:music|activities|reading|changelog|site-map|dev-console|home)\//;
 
 export function checkNoDuplicateImplementations(
   relPath: string,
@@ -174,6 +180,16 @@ export function checkNoDuplicateImplementations(
   const checkCountFormatter =
     relPath !== 'packages/shared-core/formatting/formattedDistance.ts' &&
     content.includes('Intl.NumberFormat');
+  const checkFilterBar =
+    relPath.startsWith('apps/web/src/') &&
+    relPath !== 'apps/web/src/app/collage/FilterBar.tsx' &&
+    content.includes('pillStrip');
+  const checkSharedComponentBoundary =
+    (relPath.startsWith('packages/ui/') ||
+      relPath.startsWith('packages/maps/') ||
+      (relPath.startsWith('apps/web/src/app/collage/') &&
+        !SOCIAL_CARD_VARIANT_ADAPTERS.has(relPath))) &&
+    ROUTE_CLASS_OR_IMPORT_IN_SHARED.test(content);
 
   if (
     !checkHoverMenu &&
@@ -181,7 +197,9 @@ export function checkNoDuplicateImplementations(
     !checkCronAuth &&
     !checkTimingSafe &&
     !checkUnitConstants &&
-    !checkCountFormatter
+    !checkCountFormatter &&
+    !checkFilterBar &&
+    !checkSharedComponentBoundary
   ) {
     return [];
   }
@@ -243,6 +261,24 @@ export function checkNoDuplicateImplementations(
         message:
           'Use formatCount from @dg/shared-core/formatting/formattedDistance instead of instantiating a duplicate bare Intl.NumberFormat("en-US")',
         rule: 'no-duplicate-count-formatter',
+      });
+    }
+    if (checkFilterBar && /\bpillStrip\b/.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Use FilterBar from apps/web/src/app/collage/FilterBar.tsx instead of applying .pillStrip directly',
+        rule: 'no-duplicate-filter-bar',
+      });
+    }
+    if (checkSharedComponentBoundary && ROUTE_CLASS_OR_IMPORT_IN_SHARED.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Shared components in collage/, packages/ui/, and packages/maps/ must not import from route directories or reference route-specific classes',
+        rule: 'no-consumer-leakage-in-shared-component',
       });
     }
   }

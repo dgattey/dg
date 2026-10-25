@@ -1,15 +1,15 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import { Image } from '@dg/ui/dependent/Image';
 import type { CSSProperties } from 'react';
-import { PaperCard } from './PaperCard';
-import { PaperTag } from './PaperTag';
-import { cx } from './paperVars';
+import { PaperCard } from '../collage/PaperCard';
+import { PaperTag } from '../collage/PaperTag';
+import { cx } from '../collage/paperVars';
 import {
   type ProjectFrameStyle,
   projectFrameAspectRatio,
   projectTagMeta,
   projectTagTone,
-} from './projectSlots';
+} from '../collage/projectSlots';
 
 type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';
 

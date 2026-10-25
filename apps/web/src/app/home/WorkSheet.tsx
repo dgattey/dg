@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { CutOut } from '../collage/CutOut';
+import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
+import { type SlottedProject, workSheetFrames, workSheetGridAreas } from '../collage/projectSlots';
 import { CollageProjectFrame } from './CollageProjectFrame';
-import { CutOut } from './CutOut';
-import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
-import { type SlottedProject, workSheetFrames, workSheetGridAreas } from './projectSlots';
 
 export function WorkSheet({
   projects,

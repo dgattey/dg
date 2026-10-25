@@ -2,6 +2,7 @@
 
 import type { StatsRangeKey } from '@dg/shared-core/dates/statsRange';
 import { musicStatsRoute } from '@dg/shared-core/routes/app';
+import { FilterBar } from '../../collage/FilterBar';
 import { type PaperPillOption, PaperPills } from '../../collage/PaperPills';
 import { YearMenu } from '../../collage/YearMenu';
 import { MusicNav } from '../MusicNav';
@@ -34,7 +35,7 @@ export function StatsToolbar({
   };
 
   return (
-    <div className="stats__toolbar pillStrip">
+    <FilterBar className="stats__toolbar" variant="spread">
       <MusicNav current={musicStatsRoute} />
       <PaperPills
         className="stats__rangePills"
@@ -54,6 +55,6 @@ export function StatsToolbar({
           />
         ) : null}
       </PaperPills>
-    </div>
+    </FilterBar>
   );
 }

@@ -16,6 +16,7 @@ import {
   use,
   useState,
 } from 'react';
+import { FilterBar } from '../collage/FilterBar';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { PillMenu, PillMenuList, PillMenuOption } from '../collage/PillMenu';
@@ -176,7 +177,7 @@ export function StravaFilters({
         sportOutings,
       }}
     >
-      <div className="strava__filters pillStrip">
+      <FilterBar className="strava__filters" variant="stack">
         {sports.length > 1 ? (
           <PaperPills
             label="Sport"
@@ -248,7 +249,7 @@ export function StravaFilters({
             ) : null}
           </PillMenu>
         </PaperPills>
-      </div>
+      </FilterBar>
       <VisibleRoutes value={filtered ? new Set(visible.map(({ id }) => id)) : null}>
         {children}
       </VisibleRoutes>

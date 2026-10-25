@@ -43,9 +43,7 @@
  * The header paints above sticky filter bars so its dropdown wins; clamping its backdrop
  * scrim to the header box keeps the blur from spilling over pinned filter pills below it.
  */
-.collageRoot:has(
-  :is(.reading__filters, .stats__toolbar, .music__sort, .strava__filters, .changelog__toolbar)
-) .chrome__header::before {
+.collageRoot:has([data-filter-bar]) .chrome__header::before {
   height: 100%;
 }
 html:active-view-transition-type(page-open, page-close) .chrome__header {

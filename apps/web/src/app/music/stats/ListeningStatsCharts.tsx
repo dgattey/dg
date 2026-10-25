@@ -171,7 +171,7 @@ export function GenresCard({ stats }: { stats: ListeningStats }) {
       innerClassName="stats__pad"
       tag={
         leadGenre ? (
-          <Stub className="stats__cardStamp" kind="stamp" tiltDeg={4.4} tone="ochre">
+          <Stub className="stats__cardStamp" kind="stamp" size="sm" tiltDeg={4.4} tone="ochre">
             <span className="stats__cardStampKicker">#1 genre</span>
             <span className="stats__cardStampValue">{leadGenre.genre}</span>
           </Stub>

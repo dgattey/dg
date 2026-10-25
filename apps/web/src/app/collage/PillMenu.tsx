@@ -137,7 +137,7 @@ export function PillMenuOption({
 /** Picks in a `HoverMenu` or `PillMenu` panel, one per row. */
 export function PillMenuList({ children, label }: { children: ReactNode; label?: string }) {
   return (
-    <ul aria-label={label} className="chrome__musicList pillMenu__list">
+    <ul aria-label={label} className="chrome__musicList">
       {children}
     </ul>
   );

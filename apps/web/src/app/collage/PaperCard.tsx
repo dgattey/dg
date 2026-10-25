@@ -31,3 +31,14 @@ export function PaperCard({
     </div>
   );
 }
+
+/** A tilted cream status card for loading or empty route states. */
+export function PaperStatus({ children, className }: { children: ReactNode; className?: string }) {
+  return (
+    <PaperCard className={cx('collageStatus', className)} edge="quad-c" tiltDeg={-1} tone="cream">
+      <p className="collageStatusText" role="status">
+        {children}
+      </p>
+    </PaperCard>
+  );
+}

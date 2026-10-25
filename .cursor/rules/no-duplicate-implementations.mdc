@@ -1,19 +1,20 @@
 ---
-description: Maintain one canonical implementation for every UI component, menu, formatter, and service helper
+description: Maintain one canonical implementation for every UI component, menu, formatter, and service helper, and never leak consumer selectors or imports into shared systems
 alwaysApply: true
 ---
 
-# No duplicate implementations
+# No duplicate implementations & shared boundary discipline
 
-Never maintain parallel implementations of the same UI component, menu behavior, formatter, or service helper. Before writing a component or helper, search `packages/*` and `apps/web/src/**` for an existing one and extend it in place.
+Never maintain parallel implementations of the same UI component, menu behavior, formatter, or service helper, and never leak consumer/route implementation details into shared systems (`apps/web/src/app/collage/`, `packages/ui/`, `packages/maps/`).
 
 ## Canonical implementations
 
 ### Collage UI and interactive controls
 
-- **Cards, tags, buttons, and filter pills:** `PaperCard`, `PaperTag`, `PaperButton`, `PaperPills`, and `PaperStrip` in `apps/web/src/app/collage/`
+- **Cards, status cards, tags, buttons, and filter pills:** `PaperCard`, `PaperStatus`, `PaperTag`, `PaperButton`, `PaperPills`, `PaperStrip`, and `FilterBar` in `apps/web/src/app/collage/`
+- **Sticky filter bars:** `FilterBar` (`variant="default" | "spread" | "start" | "stack"`) in `apps/web/src/app/collage/FilterBar.tsx` (never apply `.pillStrip` directly in route components or list route filter classes in `pills.css` / `chrome.css`)
 - **Dropdown and hover menus:** `HoverMenu`, `PillMenu`, `PillMenuList`, `PillMenuOption`, and `YearMenu` in `apps/web/src/app/collage/PillMenu.tsx` and `apps/web/src/app/collage/YearMenu.tsx` (never wire `bindHoverMenu` or `<details className="chrome__music">` directly in route or layout components)
-- **Cutouts, seals, tickets, and stamps:** `CutOut`, `CutLetters`, `Scallop`, `Stub`, and `scallopVertices` in `apps/web/src/app/collage/` and `apps/web/src/app/music/stats/StatsShapes.tsx`
+- **Cutouts, seals, tickets, and stamps:** `CutOut`, `CutLetters`, and `scallopVertices` in `apps/web/src/app/collage/`, plus `Scallop` (`size="seal" | "sticker"`) and `Stub` (`kind="ticket" | "stamp"`, `size="default" | "compact" | "sm" | "xs"`) in `apps/web/src/app/music/stats/StatsShapes.tsx`
 - **Side project marks:** `SideProjectMark` in `apps/web/src/app/home/GatteySitesCard.tsx`
 - **Loading skeletons:** `Skeleton` in `@dg/ui/core/Skeleton` (never define route-local `SkeletonLine` components or raw `data-skeleton` elements)
 - **Maps:** `@dg/maps` (`MapCard`, `RoutePrint`, `RoutePeek`, `RouteAtlasMap`)
@@ -31,8 +32,16 @@ Never maintain parallel implementations of the same UI component, menu behavior,
 - **Cron Bearer authentication:** `isCronAuthorized` in `apps/web/src/app/api/apiResponses.ts`
 - **OAuth token validation and persistence:** `validateSpotifyTokenResponse` in `@dg/services/spotify/spotifyClient`, `validateRawDataToToken` in `@dg/services/strava/stravaClient`, and `upsertAndCacheToken` in `@dg/services/clients/refreshedAccessToken`
 
+## No consumer leakage in shared systems
+
+1. **Zero route-specific selectors in shared stylesheets (`no-consumer-selectors-in-shared-css`):**
+   - Shared stylesheets (`apps/web/src/app/collage/*.css`, `packages/**/*.css`) must never reference route-specific class prefixes (`.stats__*`, `.strava__*`, `.streets__*`, `.reading__*`, `.changelog__*`, `.music__*`, `.home__*`, `.siteMap__*`, `.devConsole__*`, `.error__*`).
+   - Instead, expose a shared component or `variant` / `size` prop (e.g. `<FilterBar variant="spread">`, `<Typography variant="stat-lg">`, `<Stub size="sm">`, `<PaperStatus>`) and style the shared data attribute or class in one place.
+2. **Zero route-specific imports or classes in shared components (`no-consumer-leakage-in-shared-component`):**
+   - Shared components in `apps/web/src/app/collage/`, `packages/ui/`, and `packages/maps/` must never import from route directories (`../music/`, `../activities/`, `../reading/`, `../changelog/`, `../site-map/`, `../dev-console/`, `../home/`) or render route-specific class names. Route-specific components and stylesheets belong inside their route directory (`apps/web/src/app/<route>/`).
+
 ## Rules when refactoring or adding features
 
-1. **Extend the canonical module instead of copying it.** If a route needs a new option on `Skeleton`, `HoverMenu`, or a formatter, add that option to the shared implementation.
+1. **Extend the canonical module instead of copying it.** If a route needs a new option on `FilterBar`, `Stub`, `Scallop`, `Skeleton`, `HoverMenu`, or a formatter, add a `variant` or `size` prop to the shared implementation.
 2. **Migrate callers and delete legacy code in the same PR.** Never leave an older component or helper alongside its replacement.
-3. **Encode structural guards in `packages/cli/src/check-structure.ts`.** When unifying a recurring duplicate pattern, add a fast check in `@dg/cli` so `pnpm exec turbo check` blocks regressions in CI.
+3. **Encode structural guards in `packages/cli/src/check-structure.ts`.** When unifying a recurring duplicate pattern or boundary rule, add a fast check in `@dg/cli` so `pnpm exec turbo check` blocks regressions in CI.

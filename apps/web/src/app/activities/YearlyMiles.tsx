@@ -76,6 +76,7 @@ export function YearlyMiles({ years }: { years: ReadonlyArray<StravaYearTotals> 
                 <Stub
                   className="strava__yearTicket"
                   kind="ticket"
+                  size="sm"
                   tiltDeg={pick(YEAR_TILTS, index, 0)}
                   tone={pick(YEAR_TONES, index, 'ochre')}
                 >

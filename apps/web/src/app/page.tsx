@@ -1,4 +1,4 @@
-import './collage/home.css';
+import './home/home.css';
 import './collage/print.css';
 import './music/stats/statsShapes.css';
 import './activities/stravaPieces.css';

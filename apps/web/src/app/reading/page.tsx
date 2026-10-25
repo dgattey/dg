@@ -1,5 +1,6 @@
 import 'server-only';
 import '../collage/pills.css';
+import '../music/stats/statsShapes.css';
 import './reading.css';
 
 import { readingRoute } from '@dg/shared-core/routes/app';
@@ -9,7 +10,7 @@ import { getBooks } from '../../services/contentful';
 import { READING_BACKDROP } from '../collage/backdrops';
 import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
-import { PaperCard } from '../collage/PaperCard';
+import { PaperStatus } from '../collage/PaperCard';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { ReadingShelf } from './ReadingShelf';
 
@@ -21,18 +22,10 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-function ReadingStatus({ children }: { children: string }) {
-  return (
-    <PaperCard className="reading__status" tiltDeg={-1} tone="cream">
-      <p role="status">{children}</p>
-    </PaperCard>
-  );
-}
-
 async function ReadingContent() {
   const books = await getBooks();
   if (books.length === 0) {
-    return <ReadingStatus>No books yet.</ReadingStatus>;
+    return <PaperStatus>No books yet.</PaperStatus>;
   }
   return <ReadingShelf books={books} />;
 }
@@ -46,7 +39,7 @@ export default function ReadingPage() {
     <section aria-label={TITLE} className="collageBackdropHost reading__layout">
       <CollageBackdrop backdrop={READING_BACKDROP} />
       <CutLetters className="collagePageTitle" text={TITLE} />
-      <Suspense fallback={<ReadingStatus>Loading books…</ReadingStatus>}>
+      <Suspense fallback={<PaperStatus>Loading books…</PaperStatus>}>
         <ReadingContent />
       </Suspense>
     </section>

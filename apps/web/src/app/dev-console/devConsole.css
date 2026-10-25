@@ -46,9 +46,6 @@
   flex-direction: column;
   gap: 16px;
 }
-.devConsole__cardContent [data-typography] {
-  color: inherit;
-}
 .devConsole__row {
   display: flex;
   gap: 8px;

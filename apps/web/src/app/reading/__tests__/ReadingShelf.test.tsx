@@ -177,7 +177,7 @@ describe('ReadingShelf', () => {
   it('publishes the sticky filter bar height so year placards stop below it', () => {
     render(<ReadingShelf books={SHELF_BOOKS} />);
 
-    const filters = screen.getByRole('button', { name: /^5 stars/ }).closest('.reading__filters');
+    const filters = screen.getByRole('button', { name: /^5 stars/ }).closest('[data-filter-bar]');
     expect(filters?.parentElement).toHaveStyle({ '--reading-filters-height': '58px' });
   });
 

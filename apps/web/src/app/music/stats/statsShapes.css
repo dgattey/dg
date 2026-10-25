@@ -1,9 +1,11 @@
 /* Listening stats cut paper: stubs, stamps, seals, the record, the podium, and the clock. */
 
-.stats__cut {
-  --soft: color-mix(in oklab, var(--on) 68%, var(--pc));
+:where(.stats__cut) {
   position: relative;
   display: inline-grid;
+}
+.stats__cut {
+  --soft: color-mix(in oklab, var(--on) 68%, var(--pc));
   color: var(--on);
   filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
   rotate: var(--r, 0deg);
@@ -18,12 +20,13 @@
 
 /* Concert stub: a notch bitten from each side and a perforated tear line by the stub. */
 .stats__ticket {
+  --notch: 12px;
   display: grid;
   background: var(--pc);
   border-radius: 8px;
   mask:
-    radial-gradient(circle 12px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 12px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
+    radial-gradient(circle var(--notch) at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
 }
 .stats__ticket > .stats__face {
   min-height: 132px;
@@ -53,6 +56,45 @@
   min-height: 124px;
   padding: 16px 20px;
   border: 1.5px solid color-mix(in oklab, var(--on) 32%, transparent);
+}
+[data-stub-size="compact"] .stats__ticket > .stats__face {
+  min-height: 0;
+  padding: 16px 24px 18px 40px;
+}
+[data-stub-size="compact"] .stats__stamp > .stats__face {
+  min-height: 0;
+  padding: 14px 16px;
+}
+[data-stub-size="sm"] .stats__ticket {
+  --notch: 7px;
+}
+[data-stub-size="sm"] .stats__ticket > .stats__face {
+  min-height: 0;
+  padding: 9px 18px 10px 32px;
+}
+[data-stub-size="sm"] .stats__ticket > .stats__face::before {
+  inset-block: 6px;
+  left: 16px;
+}
+[data-stub-size="sm"] .stats__stamp {
+  --bite: 4px;
+}
+[data-stub-size="sm"] .stats__stamp > .stats__face {
+  gap: 2px;
+  min-height: 0;
+  padding: 8px 14px;
+  text-align: center;
+}
+[data-stub-size="xs"] .stats__ticket {
+  --notch: 6px;
+}
+[data-stub-size="xs"] .stats__ticket > .stats__face {
+  min-height: 0;
+  padding: 7px 12px 7px 22px;
+}
+[data-stub-size="xs"] .stats__ticket > .stats__face::before {
+  inset-block: 6px;
+  left: 11px;
 }
 
 /* Scalloped seal: the edge comes from the polygon, the dashed ring from a rubber stamp. */
@@ -388,18 +430,7 @@
   z-index: 2;
 }
 .stats__rankSticker .stats__ticket > .stats__face {
-  min-height: 0;
-  padding: 7px 12px 7px 22px;
   font: 700 var(--type-label) / var(--leading-title) var(--display);
-}
-.stats__rankSticker .stats__ticket > .stats__face::before {
-  inset-block: 6px;
-  left: 11px;
-}
-.stats__rankSticker .stats__ticket {
-  mask:
-    radial-gradient(circle 6px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 6px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
 }
 .stats__rankCircle {
   display: grid;
@@ -448,7 +479,7 @@
 }
 .stats__cardStamp .stats__stamp,
 .stats__cardStamp .stats__ticket,
-.stats__cardStamp .stats__face {
+.stats__cardStamp :is(.stats__stamp, .stats__ticket) > .stats__face {
   min-width: 0;
 }
 .paperWrap:has(> .stats__pin) .stats__heading {
@@ -460,27 +491,11 @@
 .paperWrap:has(> .stats__cardSeal) :is(.stats__head, .stats__ritualsLead) {
   padding-right: 108px;
 }
-.stats__cardStamp .stats__stamp {
-  --bite: 4px;
-}
-.stats__cardStamp .stats__stamp > .stats__face {
-  gap: 2px;
-  min-height: 0;
-  padding: 8px 14px;
-  text-align: center;
-}
-.stats__cardStamp .stats__ticket {
-  mask:
-    radial-gradient(circle 7px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 7px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
-}
 .stats__cardStamp .stats__ticket > .stats__face {
   gap: 2px;
-  min-height: 0;
   padding: 9px 14px 9px 24px;
 }
 .stats__cardStamp .stats__ticket > .stats__face::before {
-  inset-block: 6px;
   left: 12px;
 }
 .stats__cardStampKicker {

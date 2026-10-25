@@ -8,17 +8,17 @@ import {
 } from '../../services/contentful';
 import { getLastKnownSong } from '../../services/spotify';
 import { getStravaHistory } from '../../services/strava';
-import { CollageProjectFrame } from '../collage/CollageProjectFrame';
 import { CutOut } from '../collage/CutOut';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
-import { MoreWorkSheet } from '../collage/MoreWorkSheet';
 import { assignProjectSlots, CODA_FRAME_STYLE } from '../collage/projectSlots';
-import { WorkSheet } from '../collage/WorkSheet';
 import { SpotifyCollageCard } from '../spotify/SpotifyCollageCard';
+import { CollageProjectFrame } from './CollageProjectFrame';
 import { GatteySitesCard } from './GatteySitesCard';
 import { IntroCard } from './IntroCard';
 import { MapCardSlot } from './MapCardSlot';
+import { MoreWorkSheet } from './MoreWorkSheet';
 import { StravaCard } from './StravaCard';
+import { WorkSheet } from './WorkSheet';
 
 async function IntroCardSlot() {
   const [introBlock, linkedInLink] = await Promise.all([
