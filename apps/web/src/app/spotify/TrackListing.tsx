@@ -8,6 +8,7 @@ import { Link } from '@dg/ui/dependent/Link';
 import { type CSSProperties, Fragment, type ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
+import { ALBUM_INK_COLORS, type AlbumColors, type AlbumInk } from './extractAlbumGradient';
 import { MusicNotes } from './MusicNotes';
 import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
@@ -18,20 +19,18 @@ const COLLAGE_COMPACT_BOUNCE = 3;
 
 type ListingVariant = 'card' | 'compact';
 
-const CONTRASTING_COLORS = {
-  dark: {
-    primary: 'rgba(255, 255, 255, 0.7)',
-    primaryShadow: '0 1px 3px rgba(0, 0, 0, 0.25)',
-    secondary: 'rgba(255, 255, 255, 0.5)',
-    secondaryShadow: '0 1px 3px rgba(0, 0, 0, 0.18)',
-  },
-  light: {
-    primary: 'rgba(0, 0, 0, 0.7)',
-    primaryShadow: '0 1px 3px rgba(255, 255, 255, 0.25)',
-    secondary: 'rgba(0, 0, 0, 0.5)',
-    secondaryShadow: '0 1px 3px rgba(255, 255, 255, 0.18)',
-  },
-} as const;
+function inkText(ink: AlbumInk) {
+  const { r, g, b } = ALBUM_INK_COLORS[ink];
+  const halo = ink === 'dark' ? '0 1px 1px rgb(253 250 242 / 0.35)' : '0 1px 2px rgb(0 0 0 / 0.35)';
+  return {
+    primary: `rgb(${r} ${g} ${b})`,
+    primaryShadow: halo,
+    secondary: `rgb(${r} ${g} ${b} / 0.82)`,
+    secondaryShadow: halo,
+  };
+}
+
+const INK_TEXT = { dark: inkText('dark'), light: inkText('light') };
 
 function AlbumArtWithNotes({
   bounceIntensity,
@@ -162,10 +161,12 @@ const CARD_PAPER: CSSProperties & Record<`--${string}`, string> = {
 };
 
 export function TrackListing({
+  albumColors,
   track,
   variant = 'card',
   disableLinks,
 }: {
+  albumColors?: AlbumColors | null;
   track: Track;
   variant?: ListingVariant;
   disableLinks?: boolean;
@@ -222,11 +223,9 @@ export function TrackListing({
     );
   }
 
-  const gradient = track.albumGradient;
-  const colors = track.albumGradientContrastSetting
-    ? CONTRASTING_COLORS[track.albumGradientContrastSetting]
-    : null;
-  const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
+  const { primary, secondary, primaryShadow, secondaryShadow } = albumColors
+    ? INK_TEXT[albumColors.ink]
+    : {};
 
   return (
     <div className="home__spotify" data-slot="sp">
@@ -261,21 +260,20 @@ export function TrackListing({
         </div>
       </AlbumArtWithNotes>
       <div className="home__spotifyCard">
-        <AlbumGradientBackdrop gradient={gradient} variant="glow" />
+        <AlbumGradientBackdrop gradient={albumColors?.mesh} variant="glow" />
         <PaperCard
           className="home__spotifyMeta"
           edge="quad-b"
           innerClassName="home__spotifyMetaPaper"
           style={CARD_PAPER}
         >
-          <AlbumGradientBackdrop gradient={gradient} variant="surface" />
+          <AlbumGradientBackdrop gradient={albumColors?.surface} variant="surface" />
           <div className="home__spotifyMetaInner">
             <PlaybackStatus
               color={primary}
               isPlaying={track.isPlaying}
               listingVariant="card"
               playedAt={track.playedAt}
-              service="Spotify"
               textShadow={primaryShadow}
             />
             <TrackMeta

@@ -158,10 +158,9 @@ describe('Footer', () => {
     render(<ServerTimeProvider serverTime={1_760_000_000_000}>{ui}</ServerTimeProvider>);
 
     expect(screen.getByText('Now')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Playing Innerbloom · RÜFÜS DU SOL' })).toHaveAttribute(
-      'href',
-      'https://open.spotify.com/track/innerbloom',
-    );
+    expect(
+      screen.getByRole('link', { name: 'Now playing Innerbloom · RÜFÜS DU SOL' }),
+    ).toHaveAttribute('href', 'https://open.spotify.com/track/innerbloom');
     expect(screen.getByRole('link', { name: 'Last ride Morning ride · 24.1 mi' })).toHaveAttribute(
       'href',
       'https://www.strava.com/activities/12345',
@@ -245,6 +244,21 @@ describe('Footer', () => {
     expect(footerEl?.contains(nowWrap)).toBe(false);
   });
 
+  it('labels a finished track with when it played, matching the header and card', async () => {
+    mockGetLastKnownSong.mockResolvedValue({
+      ...SAMPLE_TRACK,
+      isPlaying: false,
+      playedAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+    });
+
+    const ui = await Footer();
+    render(<ServerTimeProvider serverTime={1_760_000_000_000}>{ui}</ServerTimeProvider>);
+
+    expect(
+      screen.getByRole('link', { name: 'Played 3 hours ago Innerbloom · RÜFÜS DU SOL' }),
+    ).toBeInTheDocument();
+  });
+
   it('shows the full track in a tooltip only when the strip cuts it off', async () => {
     const user = userEvent.setup();
     mockGetLastKnownSong.mockResolvedValue({
@@ -257,7 +271,7 @@ describe('Footer', () => {
     render(<ServerTimeProvider serverTime={1_760_000_000_000}>{ui}</ServerTimeProvider>);
 
     const summary = 'Together (feat. Nikki Nair, Jessy Lanza & Prentiss) · RÜFÜS DU SOL';
-    const trackLink = screen.getByRole('link', { name: `Playing ${summary}` });
+    const trackLink = screen.getByRole('link', { name: `Now playing ${summary}` });
     const anchor = trackLink.parentElement;
     const value = within(trackLink).getByText(summary);
     if (!anchor) {
