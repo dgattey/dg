@@ -21,8 +21,6 @@ const TRACK: Track = {
     releaseDate: '2026-01-01',
     url: 'https://open.spotify.com/album',
   },
-  albumGradient: 'linear-gradient(165deg, #2d3246 0%, #5c2824 100%)',
-  albumGradientContrastSetting: 'dark',
   albumImage: { height: 640, url: 'https://images.test/album.jpg', width: 640 },
   artists: [{ id: 'marina', name: 'MARINA', url: 'https://open.spotify.com/artist/marina' }],
   id: 'track',
@@ -30,6 +28,8 @@ const TRACK: Track = {
   name: 'Perfect Light',
   url: 'https://open.spotify.com/track',
 };
+
+const MESH = 'linear-gradient(165deg, #2d3246 0%, #5c2824 100%)';
 
 describe('SpotifyHeaderCard and TrackListing', () => {
   it.each([
@@ -66,7 +66,11 @@ describe('SpotifyHeaderCard and TrackListing', () => {
   it('emanates music notes and forwards data-track-title on the full card when playing', () => {
     const { container } = render(
       <ServerTimeProvider serverTime={1_760_000_000_000}>
-        <TrackListing track={TRACK} variant="card" />
+        <TrackListing
+          albumColors={{ ink: 'light', mesh: MESH, surface: MESH }}
+          track={TRACK}
+          variant="card"
+        />
       </ServerTimeProvider>,
     );
 
