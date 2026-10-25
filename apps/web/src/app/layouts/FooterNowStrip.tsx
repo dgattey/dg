@@ -10,6 +10,7 @@ import { Image } from '@dg/ui/dependent/Image';
 import { FaIcon, faStrava } from '@dg/ui/icons/FaIcon';
 import { useEffect, useState } from 'react';
 import { useNowPlaying } from '../spotify/NowPlayingContext';
+import { PlaybackStatusText } from '../spotify/PlaybackStatusText';
 
 const sfTimeFormatter = new Intl.DateTimeFormat('en-US', {
   hour: 'numeric',
@@ -81,7 +82,13 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
                   <span />
                 </span>
               )}
-              <span className="chrome__nowKey">Playing</span>
+              <span className="chrome__nowKey">
+                <PlaybackStatusText
+                  hasTooltip={false}
+                  isPlaying={track.isPlaying}
+                  playedAt={track.playedAt}
+                />
+              </span>
               <span className="chrome__nowValue">{trackSummary}</span>
             </a>
           </Tooltip>

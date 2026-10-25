@@ -275,7 +275,6 @@ export function TrackListing({
               isPlaying={track.isPlaying}
               listingVariant="card"
               playedAt={track.playedAt}
-              service="Spotify"
               textShadow={primaryShadow}
             />
             <TrackMeta

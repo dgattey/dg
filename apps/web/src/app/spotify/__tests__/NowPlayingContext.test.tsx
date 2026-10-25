@@ -67,7 +67,7 @@ describe('NowPlayingProvider', () => {
       expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
       expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
       expect(
-        screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
+        screen.getByRole('link', { name: 'Now playing Track fresh · Artist fresh' }),
       ).toHaveAttribute('href', 'https://open.spotify.com/fresh');
     });
   });
@@ -98,7 +98,7 @@ describe('NowPlayingProvider', () => {
     expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
     expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
     expect(
-      screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
+      screen.getByRole('link', { name: 'Now playing Track fresh · Artist fresh' }),
     ).toBeInTheDocument();
 
     act(() => {
@@ -109,7 +109,7 @@ describe('NowPlayingProvider', () => {
       expect(screen.getByTestId('compact')).toHaveTextContent('Track next');
       expect(screen.getByTestId('card')).toHaveTextContent('Track next');
       expect(
-        screen.getByRole('link', { name: 'Playing Track next · Artist next' }),
+        screen.getByRole('link', { name: 'Now playing Track next · Artist next' }),
       ).toBeInTheDocument();
     });
   });
@@ -158,7 +158,7 @@ describe('NowPlayingProvider', () => {
       expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
       expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
       expect(
-        screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
+        screen.getByRole('link', { name: 'Now playing Track fresh · Artist fresh' }),
       ).toBeInTheDocument();
     });
   });
@@ -225,7 +225,7 @@ describe('NowPlayingProvider', () => {
       expect(screen.getByTestId('compact')).toHaveTextContent('Track next');
       expect(screen.getByTestId('card')).toHaveTextContent('Track next');
       expect(
-        screen.getByRole('link', { name: 'Playing Track next · Artist next' }),
+        screen.getByRole('link', { name: 'Now playing Track next · Artist next' }),
       ).toBeInTheDocument();
     });
 
@@ -245,7 +245,7 @@ describe('NowPlayingProvider', () => {
       expect(screen.getByTestId('compact')).toHaveTextContent('Track third');
       expect(screen.getByTestId('card')).toHaveTextContent('Track third');
       expect(
-        screen.getByRole('link', { name: 'Playing Track third · Artist third' }),
+        screen.getByRole('link', { name: 'Now playing Track third · Artist third' }),
       ).toBeInTheDocument();
     });
 

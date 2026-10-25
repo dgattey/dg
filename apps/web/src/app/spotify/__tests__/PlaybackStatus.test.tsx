@@ -51,15 +51,19 @@ describe('PlaybackStatus', () => {
     expect(container).toHaveTextContent(sentence);
   });
 
-  it('names the service instead of a relative time when given one', () => {
-    const { rerender } = render(<PlaybackStatus isPlaying={true} service="Spotify" />, {
-      wrapper: TestWrapper,
-    });
-    expect(screen.getByText('Now playing on Spotify')).toBeInTheDocument();
+  it('shows the same wording on the card and the compact pill', () => {
+    const playedAt = '2026-02-10T09:00:00Z';
+    const { container: card } = render(
+      <PlaybackStatus listingVariant="card" playedAt={playedAt} />,
+      { wrapper: TestWrapper },
+    );
+    const { container: compact } = render(
+      <PlaybackStatus listingVariant="compact" playedAt={playedAt} />,
+      { wrapper: TestWrapper },
+    );
 
-    rerender(<PlaybackStatus playedAt="2026-02-10T09:00:00Z" service="Spotify" />);
-    expect(screen.getByText('Recently played on Spotify')).toBeInTheDocument();
-    expect(screen.queryByText('3 hours ago')).not.toBeInTheDocument();
+    expect(card).toHaveTextContent('Played 3 hours ago');
+    expect(compact).toHaveTextContent('Played 3 hours ago');
   });
 
   it('prefers isPlaying over playedAt when both are present', () => {
