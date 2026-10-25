@@ -113,7 +113,7 @@
 }
 
 [data-atlas-tiles] > div {
-  background-color: transparent;
+  background-color: transparent !important;
 }
 
 [data-route-map] {
@@ -175,9 +175,9 @@ html[data-color-scheme="dark"] [data-map-scheme="dark"] {
 }
 
 [data-map-tile-layer] > div {
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: transparent !important;
 }
 
 [data-route-map-scrim] {

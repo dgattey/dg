@@ -64,7 +64,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   align-items: center;
   justify-content: center;
   padding: 4px;
-  font-size: 2.75em;
+  font-size: 2.4em;
   line-height: 1;
   color: var(--ink);
   text-decoration: none;
@@ -83,7 +83,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__logo > svg {
   display: block;
   width: auto;
-  height: 1.25em;
+  height: 1.15em;
 }
 .chrome__nowPlaying {
   min-width: 0;
@@ -793,7 +793,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
   .chrome__logo {
     padding: 2px;
-    font-size: 2.1em;
+    font-size: 1.85em;
   }
   .chrome__nav {
     margin: 0 0 0 auto;

@@ -39,8 +39,9 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
                 animate={false}
                 attribution={false}
                 center={frame.center}
+                defaultHeight={size.height}
+                defaultWidth={size.width}
                 dprs={[1, 2]}
-                height={size.height}
                 key={`${Math.round(size.width)}x${Math.round(size.height)}`}
                 mouseEvents={false}
                 provider={(x, y, tileZoom, dpr) =>
@@ -48,7 +49,6 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
                 }
                 tileComponent={SmoothTile}
                 touchEvents={false}
-                width={size.width}
                 zoom={zoom}
                 zoomSnap={false}
               />
