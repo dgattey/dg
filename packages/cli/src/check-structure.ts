@@ -14,7 +14,11 @@ import {
   checkUnusedCssRules,
 } from './check-css.js';
 import { checkCssGeometry } from './check-css-geometry.js';
-import { checkNoPageSubtitles, isTestFile } from './check-page-titles.js';
+import {
+  checkNoDuplicateImplementations,
+  checkNoPageSubtitles,
+  isTestFile,
+} from './check-page-titles.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 const MAX_TEST_FILE_LINES = 500;
@@ -87,6 +91,7 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
   const violations = [
     ...checkNoBiomeSuppressions(relPath, content, lines),
     ...checkContentfulFallbacks(relPath, content, lines),
+    ...checkNoDuplicateImplementations(relPath, content, lines),
   ];
 
   const lineCount = lines.length;

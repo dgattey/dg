@@ -14,10 +14,6 @@ export function MenuChevron() {
   return <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />;
 }
 
-/**
- * Shared `<details>` dropdown that opens on mouse hover or click, closes on
- * Escape, outside press, or item pick, and wraps its panel in a `PaperCard`.
- */
 export function HoverMenu({
   children,
   className,

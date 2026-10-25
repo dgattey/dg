@@ -9,10 +9,6 @@ const SCALLOP_SPECS: Record<ScallopSize, { bumps: number; depthRatio: number }> 
   sticker: { bumps: 12, depthRatio: 0.1 },
 };
 
-/**
- * Polar vertices for a scalloped circle around `(center, center)` with `outerRadius`,
- * shared by CSS `polygon(...)` clip paths and Satori SVG `<path>` social cards.
- */
 export function scallopVertices(
   size: ScallopSize,
   center: number,

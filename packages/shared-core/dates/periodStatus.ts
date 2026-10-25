@@ -45,12 +45,10 @@ const utcMonthDayYearFormat = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
 });
 
-/** `2017` → `’17`. */
 export function formatYearTick(year: number): string {
   return `\u2019${String(year).slice(-2)}`;
 }
 
-/** Formats an ISO timestamp as `Oct 15, 2024` (or `Oct 15` when `withYear: false`) in UTC. */
 export function formatUtcShortDate(
   isoDate: string | null | undefined,
   options?: { withYear?: boolean },
