@@ -1,7 +1,8 @@
 'use client';
 
 import type { StravaBike, StravaBikeYear } from '@dg/content-models/strava/StravaHistory';
-import { periodStatus } from '@dg/shared-core/dates/periodStatus';
+import { formatYearTick, periodStatus } from '@dg/shared-core/dates/periodStatus';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { useNow } from '@dg/ui/core/ServerTimeContext';
 import { type CSSProperties, useState } from 'react';
 import { PaperTag } from '../collage/PaperTag';
@@ -9,13 +10,7 @@ import { cx } from '../collage/paperVars';
 import type { PaperTone } from '../collage/types';
 import { Stub } from '../music/stats/StatsShapes';
 import { BikeIllustration } from './BikeIllustrations';
-import {
-  formatCompactFeet,
-  formatCount,
-  formatHours,
-  formatMiles,
-  formatOutingDate,
-} from './stravaFormat';
+import { formatCompactFeet, formatHours, formatMiles, formatOutingDate } from './stravaFormat';
 
 const BIKE_TONES = ['cobalt', 'ochre', 'rose'] as const satisfies ReadonlyArray<PaperTone>;
 const BIKE_TILTS = [-1.6, 1.2, -1] as const;
@@ -68,7 +63,7 @@ function MilesByYear({
               style={{ '--bar': distanceMeters / most } as CSSProperties}
             />
             <span aria-hidden="true" className="strava__bikeYearLabel">
-              ’{String(year).slice(-2)}
+              {formatYearTick(year)}
             </span>
           </button>
         );

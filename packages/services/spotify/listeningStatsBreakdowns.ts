@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { formatYearTick } from '@dg/shared-core/dates/periodStatus';
 import type { StatsRange } from '@dg/shared-core/dates/statsRange';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import type {
@@ -34,8 +35,6 @@ const SHIFT_COLUMNS = [
   { full: 'Evening', key: 'evening', short: '6p', startHour: 18 },
   { full: 'Late night', key: 'lateNight', short: '12a', startHour: 0 },
 ] as const;
-
-const yearTick = (year: number): string => `\u2019${String(year).slice(-2)}`;
 
 function addDaysIso(dayIso: string, deltaDays: number): string {
   const ms = Date.parse(`${dayIso}T12:00:00Z`) + deltaDays * 86_400_000;
@@ -117,7 +116,7 @@ export function buildRangeBreakdowns({
         label: `${entry.year}`,
         phase: phaseOf(`${entry.year}`, now),
         plays: entry.plays,
-        tick: yearTick(entry.year),
+        tick: formatYearTick(entry.year),
         yearFilter: entry.year,
       })),
       title: 'Plays per year',
@@ -137,7 +136,7 @@ export function buildRangeBreakdowns({
         };
       }),
       key: `${year}`,
-      label: yearTick(year),
+      label: formatYearTick(year),
       yearFilter: year,
     }));
     const tracksByYear = new Map(bucketTopTracks.map((row) => [Number(row.bucket), row]));

@@ -32,6 +32,39 @@ function calendarDay(now: number, timeZone: string): CalendarDay {
 const compare = (a: number, b: number): PeriodStatus =>
   a < b ? 'past' : a > b ? 'future' : 'current';
 
+const utcMonthDayFormat = new Intl.DateTimeFormat('en-US', {
+  day: 'numeric',
+  month: 'short',
+  timeZone: 'UTC',
+});
+
+const utcMonthDayYearFormat = new Intl.DateTimeFormat('en-US', {
+  day: 'numeric',
+  month: 'short',
+  timeZone: 'UTC',
+  year: 'numeric',
+});
+
+/** `2017` → `’17`. */
+export function formatYearTick(year: number): string {
+  return `\u2019${String(year).slice(-2)}`;
+}
+
+/** Formats an ISO timestamp as `Oct 15, 2024` (or `Oct 15` when `withYear: false`) in UTC. */
+export function formatUtcShortDate(
+  isoDate: string | null | undefined,
+  options?: { withYear?: boolean },
+): string | null {
+  if (!isoDate) {
+    return null;
+  }
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return (options?.withYear === false ? utcMonthDayFormat : utcMonthDayYearFormat).format(date);
+}
+
 /**
  * Classifies a bucket key (`2026`, `2026-10`, `2026-10-w3` for days 15–21, or
  * `2026-10-24`, with any trailing suffix ignored) against `now` in `timeZone`.

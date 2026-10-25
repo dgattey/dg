@@ -1,6 +1,7 @@
 'use client';
 
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { type CSSProperties, useState } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
@@ -8,7 +9,6 @@ import { PaperTag } from '../../collage/PaperTag';
 import { cx } from '../../collage/paperVars';
 import {
   formatCompact,
-  formatCount,
   formatHours,
   formatPercent,
   formatRangeSuffix,

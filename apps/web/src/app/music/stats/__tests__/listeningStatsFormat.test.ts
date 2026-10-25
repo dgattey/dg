@@ -13,7 +13,6 @@ import {
   formatPlaysHeading,
   formatRangeSuffix,
   formatStreakTotal,
-  formatYearTick,
   peakHours,
   playsInDayPart,
 } from '../listeningStatsFormat';
@@ -145,8 +144,7 @@ describe('dayPartOf', () => {
 });
 
 describe('axis labels', () => {
-  it('formats year ticks and month bounds', () => {
-    expect(formatYearTick(2017)).toBe('\u201917');
+  it('formats month bounds', () => {
     expect(formatMonth('2011-07')).toBe('Jul 2011');
   });
 });

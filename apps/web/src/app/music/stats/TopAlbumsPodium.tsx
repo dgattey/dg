@@ -1,9 +1,10 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import type { CSSProperties } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx, paperSurfaceVars } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
-import { formatCount, formatRangeSuffix } from './listeningStatsFormat';
+import { formatRangeSuffix } from './listeningStatsFormat';
 import { Cover } from './StatsCardParts';
 import { AlbumLink, ArtistLinks } from './StatsLinks';
 import { Scallop, Stub, Vinyl } from './StatsShapes';

@@ -1,6 +1,7 @@
 'use client';
 
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { useState } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
@@ -10,7 +11,6 @@ import {
   type DayPart,
   dayPartOf,
   formatCompact,
-  formatCount,
   formatDayPartHours,
   formatHour,
   formatHourRange,

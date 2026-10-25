@@ -7,15 +7,12 @@ import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
-import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
-import {
-  formatReleaseDate,
-  RELEASE_KIND_LABELS,
-  RELEASE_KIND_TONES,
-} from '../changelog/changelogHelpers';
+import { formatUtcShortDate, SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
+import { RELEASE_KIND_LABELS, RELEASE_KIND_TONES } from '../changelog/changelogHelpers';
 import { SITE_NAME } from '../metadata';
 import { groupAdjacentAlbumPlays } from '../music/groupAdjacentAlbumPlays';
-import { formatCount, formatPercent } from '../music/stats/listeningStatsFormat';
+import { formatPercent } from '../music/stats/listeningStatsFormat';
 import { extractBookYear, featuredBook, shelfStats, sortBooks } from '../reading/readingHelpers';
 import { SITE_MAP_AGENT_SURFACES, SITE_MAP_PAGES } from '../site-map/siteMapCatalog';
 import type { ChangelogCardRelease, ChangelogCardVariant } from './ChangelogSocialCard';
@@ -215,7 +212,7 @@ export function buildReadingCardVariant(books: ReadonlyArray<RenderableBook>): R
 
 function toChangelogCardRelease(release: ChangelogRelease): ChangelogCardRelease {
   return {
-    dateLabel: formatReleaseDate(release.publishedAt),
+    dateLabel: formatUtcShortDate(release.publishedAt),
     kindLabel: RELEASE_KIND_LABELS[release.kind],
     kindTone: RELEASE_KIND_TONES[release.kind],
     notes: release.notes.map(stripUnsupportedGlyphs).filter(Boolean),

@@ -1,11 +1,12 @@
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
+import { formatUtcShortDate } from '@dg/shared-core/dates/periodStatus';
 import { Image } from '@dg/ui/dependent/Image';
 import type { CollageCardTreatment } from '../collage/collageCardTreatment';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { cx } from '../collage/paperVars';
 import type { PaperEdge, PaperTone } from '../collage/types';
-import { type BookCardKind, formatFinishedDate } from './readingHelpers';
+import type { BookCardKind } from './readingHelpers';
 
 type CardLook = { coverWidth: number; edge: PaperEdge; tiltScale: number };
 
@@ -51,7 +52,7 @@ export function BookCover({
 /** Stars and finished date as inline pieces, for a meta line or a stamp. */
 export function BookMeta({ book, withYear }: { book: RenderableBook; withYear: boolean }) {
   const finished =
-    book.readingStatus === 'read' ? formatFinishedDate(book.readDateFinished, { withYear }) : null;
+    book.readingStatus === 'read' ? formatUtcShortDate(book.readDateFinished, { withYear }) : null;
   return (
     <>
       {book.rating === null ? null : (

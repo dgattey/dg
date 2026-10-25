@@ -114,26 +114,3 @@ export function shelfSections(books: ReadonlyArray<RenderableBook>): Array<Shelf
   }
   return sections;
 }
-
-const MONTH_DAY = new Intl.DateTimeFormat('en-US', {
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'UTC',
-});
-const MONTH_DAY_YEAR = new Intl.DateTimeFormat('en-US', {
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'UTC',
-  year: 'numeric',
-});
-
-export function formatFinishedDate(
-  isoDate: string | null,
-  { withYear }: { withYear: boolean },
-): string | null {
-  const date = isoDate ? new Date(isoDate) : null;
-  if (!date || Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return (withYear ? MONTH_DAY_YEAR : MONTH_DAY).format(date);
-}

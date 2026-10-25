@@ -1,6 +1,7 @@
 'use client';
 
 import type { ListeningStats, StatsMatrixCell } from '@dg/services/spotify/fetchListeningStats';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { musicRoute } from '@dg/shared-core/routes/app';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
@@ -8,7 +9,7 @@ import { Image } from '@dg/ui/dependent/Image';
 import { type CSSProperties, useState } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
-import { formatCount, formatDay, formatHours } from './listeningStatsFormat';
+import { formatDay, formatHours } from './listeningStatsFormat';
 import { CardHead } from './StatsCardParts';
 import { AlbumLink, ArtistLinks, SpotifyAnchor } from './StatsLinks';
 import { Scallop, Stub } from './StatsShapes';

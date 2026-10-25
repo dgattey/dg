@@ -1,4 +1,4 @@
-import { periodStatus, SITE_TIME_ZONE } from '../periodStatus';
+import { formatUtcShortDate, formatYearTick, periodStatus, SITE_TIME_ZONE } from '../periodStatus';
 import { parseStatsRange, parseStatsRangeKey, statsRangeKey } from '../statsRange';
 
 // Sat Oct 24 2026, 06:00 UTC, which is still Fri Oct 23 in Los Angeles.
@@ -51,5 +51,13 @@ describe('statsRange', () => {
 
     expect(parseStatsRangeKey('2024')).toBe('2024');
     expect(parseStatsRangeKey('bogus')).toBe('all');
+  });
+
+  it('formats year ticks and UTC short dates', () => {
+    expect(formatYearTick(2017)).toBe('\u201917');
+    expect(formatUtcShortDate('2026-09-16T00:00:00Z')).toBe('Sep 16, 2026');
+    expect(formatUtcShortDate('2025-01-04T00:00:00Z', { withYear: false })).toBe('Jan 4');
+    expect(formatUtcShortDate(null)).toBeNull();
+    expect(formatUtcShortDate('not-a-date')).toBeNull();
   });
 });

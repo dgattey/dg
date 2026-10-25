@@ -1,4 +1,5 @@
 import type { ListeningStats, StatsAlbumRef } from '@dg/services/spotify/fetchListeningStats';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
@@ -7,7 +8,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
-import { formatCount, formatDay, formatPercent } from './listeningStatsFormat';
+import { formatDay, formatPercent } from './listeningStatsFormat';
 import { AlbumLink, ArtistLinks, SpotifyAnchor } from './StatsLinks';
 import { Scallop, Stub } from './StatsShapes';
 
