@@ -3,9 +3,12 @@ import {
   cleanWhitespace,
   DEFAULT_LOCALE,
   extractPlainTextFromRichText,
+  isBackfilledBookReadDate,
   isDuplicateTitle,
+  isReadingStatus,
   normalizeAuthor,
   parseIsbn13Number,
+  type ReadingStatus,
 } from './bookDomain';
 import type { GoodreadsBookItem } from './goodreadsRss';
 
@@ -22,6 +25,7 @@ export type NormalizedContentfulBookEntry = {
   rawFields: Record<string, unknown>;
   readDateFinished: string | null;
   readDateStarted: string | null;
+  readingStatus: ReadingStatus | null;
   reviewDescription: unknown;
   reviewText: string | null;
   title: string;
@@ -37,6 +41,7 @@ export type MergedBookFields = {
   rating: number | null;
   readDateFinished: string | null;
   readDateStarted: string | null;
+  readingStatus: ReadingStatus;
   reviewDescription: unknown;
   reviewText: string | null;
   title: string;
@@ -70,6 +75,7 @@ export function normalizeContentfulBookEntry(
   const rawIsbn = unwrapField(fields.isbn, locale);
   const rawRating = unwrapField(fields.rating, locale);
   const rawCover = unwrapField(fields.coverImage, locale);
+  const rawReadingStatus = cleanWhitespace(getStr('readingStatus'));
   const reviewDescription = unwrapField(fields.reviewDescription, locale);
   const notes = unwrapField(fields.notes, locale);
 
@@ -94,6 +100,7 @@ export function normalizeContentfulBookEntry(
     rawFields: fields,
     readDateFinished: getStr('readDateFinished'),
     readDateStarted: getStr('readDateStarted'),
+    readingStatus: isReadingStatus(rawReadingStatus) ? rawReadingStatus : null,
     reviewDescription,
     reviewText: extractPlainTextFromRichText(reviewDescription) || null,
     title: cleanWhitespace(getStr('title') ?? ''),
@@ -152,6 +159,7 @@ const CREATE_FIELDS = [
   'author',
   'isbn',
   'rating',
+  'readingStatus',
   'readDateStarted',
   'readDateFinished',
   'reviewDescription',
@@ -174,6 +182,7 @@ export function computeBookDiff(
         rating: gr.rating ?? null,
         readDateFinished: gr.readDateFinished ?? null,
         readDateStarted: gr.readDateStarted ?? null,
+        readingStatus: gr.status,
         reviewDescription: gr.reviewDescription ?? null,
         reviewText: gr.reviewText ?? null,
         title: gr.title,
@@ -184,32 +193,32 @@ export function computeBookDiff(
   const author = ex.author || gr.author;
   const isbn = ex.isbn ?? gr.isbn ?? null;
   const reviewUpdated = Boolean(gr.reviewText) && gr.reviewText !== ex.reviewText;
-  const hasExplicitReadDate = gr.hasExplicitReadDate ?? Boolean(gr.readDateFinished);
+  const backfilledDates = isBackfilledBookReadDate(ex);
+  const exFinished = backfilledDates ? null : ex.readDateFinished;
+  const exStarted = backfilledDates ? null : ex.readDateStarted;
 
-  const readDateFinished =
-    hasExplicitReadDate && gr.readDateFinished
-      ? !ex.readDateFinished ||
-        ex.readDateFinished.slice(0, 10) !== gr.readDateFinished.slice(0, 10)
-        ? gr.readDateFinished
-        : ex.readDateFinished
-      : (ex.readDateFinished ?? gr.readDateFinished ?? null);
-
-  const sameDaySyntheticStart =
-    !gr.readDateStarted &&
-    Boolean(
-      ex.readDateStarted &&
-        ex.readDateFinished &&
-        ex.readDateStarted.slice(0, 10) === ex.readDateFinished.slice(0, 10),
-    );
-  const readDateStarted = sameDaySyntheticStart
-    ? null
-    : (ex.readDateStarted ?? gr.readDateStarted ?? null);
+  const readDateFinished = gr.readDateFinished
+    ? !exFinished || exFinished.slice(0, 10) !== gr.readDateFinished.slice(0, 10)
+      ? gr.readDateFinished
+      : exFinished
+    : exFinished;
+  const readDateStarted = gr.readDateStarted
+    ? (exStarted ?? gr.readDateStarted)
+    : gr.readDateFinished && exStarted?.slice(0, 10) === gr.readDateFinished.slice(0, 10)
+      ? null
+      : exStarted;
+  const readingStatus: ReadingStatus = readDateFinished
+    ? 'read'
+    : readDateStarted
+      ? 'reading'
+      : gr.status;
 
   const changedFields = [
     title !== ex.title && 'title',
     author !== ex.author && 'author',
     isbn !== ex.isbn && 'isbn',
     Boolean(gr.rating && gr.rating !== ex.rating) && 'rating',
+    readingStatus !== ex.readingStatus && 'readingStatus',
     reviewUpdated && 'reviewDescription',
     (readDateFinished ?? null) !== (ex.readDateFinished ?? null) && 'readDateFinished',
     (readDateStarted ?? null) !== (ex.readDateStarted ?? null) && 'readDateStarted',
@@ -228,6 +237,7 @@ export function computeBookDiff(
       rating: gr.rating ?? ex.rating ?? null,
       readDateFinished,
       readDateStarted,
+      readingStatus,
       reviewDescription: reviewUpdated ? gr.reviewDescription : ex.reviewDescription,
       reviewText: reviewUpdated ? gr.reviewText : ex.reviewText,
       title,
@@ -248,7 +258,10 @@ export function buildCmaBookFields(
   merged: MergedBookFields,
   locale = DEFAULT_LOCALE,
 ): Record<string, Record<string, unknown>> {
-  const fields: Record<string, Record<string, unknown>> = { title: { [locale]: merged.title } };
+  const fields: Record<string, Record<string, unknown>> = {
+    readingStatus: { [locale]: merged.readingStatus },
+    title: { [locale]: merged.title },
+  };
   if (merged.author) fields.author = { [locale]: merged.author };
   if (typeof merged.isbn === 'number' && Number.isFinite(merged.isbn))
     fields.isbn = { [locale]: merged.isbn };

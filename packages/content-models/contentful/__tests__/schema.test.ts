@@ -190,6 +190,34 @@ describe('contentful schemas', () => {
     expect(deriveReadingStatus({ readDateFinished: null, readDateStarted: null })).toBe(
       'notStarted',
     );
+    expect(
+      deriveReadingStatus({
+        readDateFinished: null,
+        readDateStarted: null,
+        readingStatus: 'read',
+      }),
+    ).toBe('read');
+
+    expect(
+      toRenderableBook({
+        author: 'S.E. Hinton',
+        rating: 5,
+        readDateFinished: null,
+        readDateStarted: null,
+        readingStatus: 'read',
+        sys: { id: 'book-outsiders' },
+        title: 'The Outsiders',
+      }),
+    ).toEqual({
+      author: 'S.E. Hinton',
+      id: 'book-outsiders',
+      rating: 5,
+      readDateFinished: null,
+      readingStatus: 'read',
+      review: null,
+      thumbnail: null,
+      title: 'The Outsiders',
+    });
 
     expect(toRenderableBook(input.bookCollection.items[0])).toEqual({
       author: 'Frank Herbert',

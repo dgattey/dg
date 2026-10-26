@@ -3,6 +3,7 @@ import {
   cleanWhitespace,
   DEFAULT_SHELVES,
   decodeCoverImageBase64,
+  isBackfilledBookReadDate,
   isDuplicateTitle,
   isUsableGoodreadsCoverUrl,
   MAX_COVER_IMAGE_BYTES,
@@ -237,6 +238,7 @@ describe('goodreadsRss & contentfulBook', () => {
     expect(diff.action).toBe('update');
     expect(diff.changedFields).toEqual([
       'rating',
+      'readingStatus',
       'reviewDescription',
       'readDateFinished',
       'readDateStarted',
@@ -245,6 +247,7 @@ describe('goodreadsRss & contentfulBook', () => {
     expect(diff.merged.notesText).toBe('Keep these private notes intact.');
     const cmaFields = buildCmaBookFields(diff.merged);
     expect(cmaFields.rating).toEqual({ 'en-US': 5 });
+    expect(cmaFields.readingStatus).toEqual({ 'en-US': 'read' });
     expect(cmaFields.notes).toEqual({ 'en-US': existingNotesDoc });
     expect(cleanWhitespace(' a  b ')).toBe('a b');
     expect(normalizeReviewText('a\n\nb')).toBe('a\n\nb');
@@ -258,7 +261,7 @@ describe('goodreadsRss & contentfulBook', () => {
     expect(_typeCheck[1].title).toBe('Dune');
   });
 
-  it('does not copy user_date_added into readDateStarted on read books, clears synthetic same-day start dates, and preserves manual finish dates', () => {
+  it('keeps undated Goodreads read books undated with readingStatus="read", clears legacy backfilled dates, and preserves manual finish dates', () => {
     const undatedXml = `<rss><channel><item>
       <book_id>231804</book_id><title><![CDATA[The Outsiders]]></title><author_name>S.E. Hinton</author_name>
       <isbn13>9780140385724</isbn13><user_rating>5</user_rating>
@@ -270,8 +273,7 @@ describe('goodreadsRss & contentfulBook', () => {
     const [outsiders] = parseGoodreadsRssXml(undatedXml, 'read');
     if (!outsiders) throw new Error('expected parsed undated item');
     expect(outsiders.status).toBe('read');
-    expect(outsiders.hasExplicitReadDate).toBe(false);
-    expect(outsiders.readDateFinished).toBe('2023-07-24T18:46:49Z');
+    expect(outsiders.readDateFinished).toBeNull();
     expect(outsiders.readDateStarted).toBeNull();
 
     const backfilledEntry = normalizeContentfulBookEntry({
@@ -287,14 +289,17 @@ describe('goodreadsRss & contentfulBook', () => {
       sys: { id: '7E3C0190-93BB-403C-BCF5-D92EA76DDB85', publishedVersion: 2, version: 3 },
     });
 
+    expect(isBackfilledBookReadDate(backfilledEntry)).toBe(true);
     const diff = computeBookDiff(outsiders, backfilledEntry);
     expect(diff.action).toBe('update');
-    expect(diff.changedFields).toEqual(['readDateStarted']);
-    expect(diff.merged.readDateFinished).toBe('2023-07-24T06:00:00Z');
+    expect(diff.changedFields).toEqual(['readingStatus', 'readDateFinished', 'readDateStarted']);
+    expect(diff.merged.readingStatus).toBe('read');
+    expect(diff.merged.readDateFinished).toBeNull();
     expect(diff.merged.readDateStarted).toBeNull();
 
     const mergedRaw = mergeCmaBookFields(backfilledEntry.rawFields, diff.merged);
-    expect(mergedRaw.readDateFinished).toEqual({ 'en-US': '2023-07-24T06:00:00Z' });
+    expect(mergedRaw.readingStatus).toEqual({ 'en-US': 'read' });
+    expect(mergedRaw).not.toHaveProperty('readDateFinished');
     expect(mergedRaw).not.toHaveProperty('readDateStarted');
 
     // Manual override in Saga/Contentful (e.g. 2011) is preserved when Goodreads user_read_at is empty
@@ -305,6 +310,7 @@ describe('goodreadsRss & contentfulBook', () => {
         isbn: { 'en-US': 9780140385724 },
         rating: { 'en-US': 5 },
         readDateFinished: { 'en-US': '2011-05-15T00:00:00Z' },
+        readingStatus: { 'en-US': 'read' },
         title: { 'en-US': 'The Outsiders' },
       },
       sys: { id: '7E3C0190-93BB-403C-BCF5-D92EA76DDB85', publishedVersion: 2, version: 3 },

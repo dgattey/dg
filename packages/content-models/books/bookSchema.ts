@@ -17,6 +17,8 @@ import {
   MIN_BOOK_RATING,
   parseGoodreadsDate,
   parseIsbn13Number,
+  READING_STATUS_VALUES,
+  type ReadingStatus,
 } from './bookDomain';
 
 export type BookMutationInput = {
@@ -31,6 +33,7 @@ export type BookMutationInput = {
   rating?: number | null;
   readDateFinished?: string | null;
   readDateStarted?: string | null;
+  readingStatus?: ReadingStatus | null;
   reviewPlainText?: string | null;
   title: string;
 };
@@ -132,6 +135,10 @@ const coverImageBase64Schema = v.pipe(
   }),
 );
 const coverImageContentTypeSchema = v.picklist(ALLOWED_COVER_IMAGE_CONTENT_TYPES, contentTypeErr);
+const readingStatusSchema = v.picklist(
+  READING_STATUS_VALUES,
+  `Book readingStatus must be one of: ${READING_STATUS_VALUES.join(', ')}`,
+);
 
 const bookMutationInputSchema = v.pipe(
   v.looseObject(
@@ -147,6 +154,7 @@ const bookMutationInputSchema = v.pipe(
       rating: optNull(ratingSchema),
       readDateFinished: isoDate('readDateFinished'),
       readDateStarted: isoDate('readDateStarted'),
+      readingStatus: optNull(readingStatusSchema),
       reviewPlainText: maxStr('reviewPlainText', MAX_BOOK_REVIEW_LENGTH),
       title: titleSchema,
     },

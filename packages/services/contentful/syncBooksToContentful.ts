@@ -7,6 +7,7 @@ import {
   decodeCoverImageBase64,
   isUsableGoodreadsCoverUrl,
   normalizeReviewText,
+  type ReadingStatus,
   upgradeGoodreadsCoverUrl,
 } from '@dg/content-models/books/bookDomain';
 import {
@@ -155,6 +156,18 @@ export async function upsertBookToContentful(
     coverImageUrl = await cma.fetchAssetUrl(coverImageId).catch(() => null);
   }
 
+  const readDateFinished = pick(b.readDateFinished, b.readDateFinished, ex?.readDateFinished);
+  const readDateStarted = pick(b.readDateStarted, b.readDateStarted, ex?.readDateStarted);
+  const readingStatus: ReadingStatus =
+    b.readingStatus ??
+    (readDateFinished
+      ? 'read'
+      : readDateStarted
+        ? 'reading'
+        : b.readDateFinished === null && b.readDateStarted === null
+          ? 'notStarted'
+          : (ex?.readingStatus ?? 'notStarted'));
+
   const merged: MergedBookFields = {
     author: author || ex?.author || '',
     coverImageId,
@@ -162,8 +175,9 @@ export async function upsertBookToContentful(
     notes,
     notesText,
     rating: pick(b.rating, b.rating, ex?.rating),
-    readDateFinished: pick(b.readDateFinished, b.readDateFinished, ex?.readDateFinished),
-    readDateStarted: pick(b.readDateStarted, b.readDateStarted, ex?.readDateStarted),
+    readDateFinished,
+    readDateStarted,
+    readingStatus,
     reviewDescription,
     reviewText,
     title: b.title,

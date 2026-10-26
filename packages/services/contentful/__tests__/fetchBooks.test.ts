@@ -79,8 +79,19 @@ describe('fetchBooks', () => {
               sys: { id: 'dispossessed-1' },
               title: 'The Dispossessed',
             },
+            {
+              author: 'S.E. Hinton',
+              coverImage: null,
+              rating: 5,
+              readDateFinished: null,
+              readDateStarted: null,
+              readingStatus: 'read',
+              reviewDescription: null,
+              sys: { id: 'outsiders-1' },
+              title: 'The Outsiders',
+            },
           ],
-          total: 3,
+          total: 4,
         },
       });
 
@@ -123,6 +134,16 @@ describe('fetchBooks', () => {
         thumbnail: null,
         title: 'The Dispossessed',
       },
+      {
+        author: 'S.E. Hinton',
+        id: 'outsiders-1',
+        rating: 5,
+        readDateFinished: null,
+        readingStatus: 'read',
+        review: null,
+        thumbnail: null,
+        title: 'The Outsiders',
+      },
     ]);
   });
 
@@ -163,7 +184,7 @@ describe('Contentful GraphQL query schema validation', () => {
     expect(violations).toEqual([]);
   });
 
-  it('rejects nonexistent Book fields such as thumbnail or readingStatus', () => {
+  it('rejects nonexistent Book fields such as thumbnail', () => {
     const invalidDoc = parse(`
       query BrokenBooks {
         bookCollection {
@@ -177,9 +198,6 @@ describe('Contentful GraphQL query schema validation', () => {
       }
     `);
     const messages = validate(schema, invalidDoc).map((error) => error.message);
-    expect(messages).toEqual([
-      'Cannot query field "readingStatus" on type "Book".',
-      'Cannot query field "thumbnail" on type "Book".',
-    ]);
+    expect(messages).toEqual(['Cannot query field "thumbnail" on type "Book".']);
   });
 });

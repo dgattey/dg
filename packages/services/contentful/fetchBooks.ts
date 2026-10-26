@@ -22,7 +22,13 @@ const PAGE_SIZE = 200;
 const QUERY = gql`
   query Books($limit: Int!, $skip: Int!) {
     bookCollection(
-      where: { OR: [{ readDateFinished_exists: true }, { readDateStarted_exists: true }] }
+      where: {
+        OR: [
+          { readingStatus_in: ["read", "reading"] }
+          { readDateFinished_exists: true }
+          { readDateStarted_exists: true }
+        ]
+      }
       order: [readDateFinished_DESC, readDateStarted_DESC, title_ASC]
       limit: $limit
       skip: $skip
@@ -35,6 +41,7 @@ const QUERY = gql`
         title
         author
         rating
+        readingStatus
         readDateStarted
         readDateFinished
         reviewDescription {
