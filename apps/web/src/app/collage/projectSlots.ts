@@ -172,17 +172,39 @@ function gridAreas(rows: readonly [string, string], gap: number) {
   };
 }
 
+const WORK_RAIL_ROWS = [
+  'sp sp sp sp c1 c1 c1 c1 c1 c1 c1 c1',
+  'lt lt lt lt c1 c1 c1 c1 c1 c1 c1 c1',
+  'tk tk tk tk . . . . . . . .',
+  'bm bm bm bm bm . ws ws ws ws ws ws',
+] as const;
+
+/**
+ * Wide grids run Now playing, the latest ride, the ticket pair, and the big map
+ * down a left rail beside the two frames. The big map takes one more column, and
+ * its row starts below the first frame's, so the extra column never meets it.
+ * The second frame shares only the big map's row, so the two can center on each other.
+ * Compact grids share two rows between the frames and the whole Strava card.
+ */
 export function workSheetGridAreas(slots: { c1: boolean; ws: boolean }): {
   areas: string;
-  rowGapPx: number;
+  compactAreas: string;
+  compactRowGapPx: number;
 } {
-  return gridAreas(
+  const compact = gridAreas(
     [
       slots.c1 ? '"c1 c1 c1 c1 c1 c1 c1 c1 . sp sp sp"' : fullRow('sp'),
       slots.ws ? '"st st st st st . ws ws ws ws ws ws"' : fullRow('st'),
     ],
     52,
   );
+  return {
+    areas: WORK_RAIL_ROWS.map(
+      (row) => `"${row.replace(/c1|ws/g, (area) => (slots[area as keyof typeof slots] ? area : '.'))}"`,
+    ).join(' '),
+    compactAreas: compact.areas,
+    compactRowGapPx: compact.rowGapPx,
+  };
 }
 
 export function moreWorkGridAreas(slots: { cn: boolean; gn: boolean; js: boolean; mg: boolean }): {

@@ -22,7 +22,8 @@ export function WorkSheet({
   });
   const gridStyle: CSSProperties & Record<`--${string}`, string> = {
     '--grid-areas': grid.areas,
-    '--grid-row-gap': `${grid.rowGapPx}px`,
+    '--grid-areas-compact': grid.compactAreas,
+    '--grid-row-gap-compact': `${grid.compactRowGapPx}px`,
   };
 
   return (
