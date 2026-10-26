@@ -121,20 +121,29 @@ export function RouteAtlasMap({
   if (!decodedRef.current || decodedRef.current.routes !== routes) {
     decodedRef.current = { decoded: decodeRoutes(routes), routes };
   }
-  const visibleKey = visibleKeyOf(visible);
   const pathsRef = useRef<{
     paths: Array<FramedPath>;
     routes: typeof routes;
+    visible: typeof visible;
     visibleKey: string;
   } | null>(null);
   if (
     !pathsRef.current ||
     pathsRef.current.routes !== routes ||
-    pathsRef.current.visibleKey !== visibleKey
+    pathsRef.current.visible !== visible
   ) {
-    const decoded = decodedRef.current.decoded;
-    const filtered = visible ? decoded.filter(({ id }) => visible.has(id)) : decoded;
-    pathsRef.current = { paths: mercatorPaths(filtered), routes, visibleKey };
+    const visibleKey = visibleKeyOf(visible);
+    if (
+      !pathsRef.current ||
+      pathsRef.current.routes !== routes ||
+      pathsRef.current.visibleKey !== visibleKey
+    ) {
+      const decoded = decodedRef.current.decoded;
+      const filtered = visible ? decoded.filter(({ id }) => visible.has(id)) : decoded;
+      pathsRef.current = { paths: mercatorPaths(filtered), routes, visible, visibleKey };
+    } else {
+      pathsRef.current.visible = visible;
+    }
   }
 
   const defaultFrame = frameAround(activeBounds, {
