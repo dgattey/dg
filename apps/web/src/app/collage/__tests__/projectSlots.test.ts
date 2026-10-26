@@ -121,7 +121,7 @@ describe('projectSlots', () => {
     ]);
   });
 
-  it('starts the wider big map below the first frame and blanks missing frames', () => {
+  it('starts the wider big map below the first frame, pairs the second frame with it, and blanks missing frames', () => {
     const rows = (areas: string) =>
       areas.match(/"[^"]+"/g)?.map((row) => row.slice(1, -1).split(' '));
     const full = workSheetGridAreas({ c1: true, ws: true });
@@ -132,6 +132,7 @@ describe('projectSlots', () => {
     expect(wide[bigMapRow]?.filter((area) => area === 'bm').length).toBeGreaterThan(
       wide.find((row) => row.includes('lt'))?.filter((area) => area === 'lt').length ?? 0,
     );
+    expect(wide.flatMap((row, index) => (row.includes('ws') ? [index] : []))).toEqual([bigMapRow]);
     expect(full.compactRowGapPx).toBe(52);
 
     const bare = workSheetGridAreas({ c1: false, ws: false });

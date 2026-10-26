@@ -136,6 +136,7 @@
     / calc(var(--cw) * 2) var(--ch);
 }
 .home__workGrid {
+  --atlas-drop: 44px;
   grid-template-areas: var(--grid-areas);
   column-gap: var(--gap);
 }
@@ -143,8 +144,10 @@
 .home__workGrid > [data-slot="c1"] {
   margin-top: 96px;
 }
+/* Shares the big map's row and drop, so the two cards' middles line up. */
 .home__workGrid > [data-slot="ws"] {
-  align-self: end;
+  align-self: center;
+  margin-top: var(--atlas-drop);
 }
 .home__codaGrid {
   grid-template-areas: ". . . li li li li . . . . .";
@@ -208,7 +211,7 @@
   z-index: 1;
   grid-area: bm;
   width: calc(100% - var(--rail-inset));
-  margin-top: 44px;
+  margin-top: var(--atlas-drop);
 }
 .home__stravaAtlasLink,
 .home__stravaAtlasLink:hover {
@@ -548,6 +551,7 @@
   /* Settles beside the Strava card's middle instead of leaving a gap below it. */
   .home__workGrid > [data-slot="ws"] {
     align-self: center;
+    margin-top: 0;
   }
   .home__spotifySlot {
     margin-top: calc(-1 * var(--sp-top) - 168px);
