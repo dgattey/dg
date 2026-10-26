@@ -5,7 +5,7 @@ import {
   type CoverageCity,
   type StreetCoverage,
 } from '@dg/content-models/strava/StreetCoverage';
-import { type CSSProperties, useId, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useId, useRef, useState } from 'react';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperStrip } from '../collage/PaperPills';
@@ -21,28 +21,18 @@ const CITIES = {
   sd: { name: 'San Diego', short: 'SD' },
   sf: { name: 'San Francisco', short: 'SF' },
 } as const satisfies Record<CoverageCity, { name: string; short: string }>;
-/** Lower bounds of each fill tier, cream through viridian. */
 const TIER_FLOORS = [0, 0.1, 0.25, 0.5, 0.75] as const;
 
 const tierOf = (share: number) => TIER_FLOORS.filter((floor) => share >= floor).length - 1;
 
-/** The neighborhood a map event landed on, read from the shape's `data-index`. */
 const neighborhoodAt = (target: EventTarget) => {
   const index = target instanceof Element ? target.getAttribute('data-index') : null;
   return index === null ? null : Number(index);
 };
 
-const milesOf = ({
-  riddenMeters,
-  streetMeters,
-}: Pick<NeighborhoodCoverage, 'riddenMeters' | 'streetMeters'>) =>
-  `${formatMiles(riddenMeters)} of ${formatMiles(streetMeters)} mi`;
+const milesOf = (item: Pick<NeighborhoodCoverage, 'riddenMeters' | 'streetMeters'>) =>
+  `${formatMiles(item.riddenMeters)} of ${formatMiles(item.streetMeters)} mi`;
 
-/**
- * A paper-cut map of the neighborhoods, filled by how much of each is ridden,
- * with the routes traced over the land and under the cuts between pieces.
- * Pointer only: the leaderboard beside it is the keyboard and screen reader path.
- */
 function NeighborhoodMap({
   focused,
   neighborhoods,
@@ -66,9 +56,7 @@ function NeighborhoodMap({
       className="streets__map"
       onClick={(event) => {
         const index = neighborhoodAt(event.target);
-        if (index !== null) {
-          onPick(index);
-        }
+        if (index !== null) onPick(index);
       }}
       onPointerLeave={() => onHover(null)}
       onPointerOver={(event) => onHover(neighborhoodAt(event.target))}
@@ -169,37 +157,61 @@ export function StreetCoverageSection({
   const city = cities.includes(chosenCity) ? chosenCity : (cities[0] ?? chosenCity);
   const coverage = byCity[city];
   const { name: cityName, short: cityShort } = CITIES[city];
-  const cacheRef = useRef<{
+  const sectionRef = useRef<HTMLElement>(null);
+  const summaryRef = useRef<{
     coverage: StreetCoverage;
-    outings: typeof outings;
-    routes: string;
     span: typeof span;
     sport: typeof sport;
     summary: ReturnType<typeof summarizeCoverage>;
   } | null>(null);
   if (
-    !cacheRef.current ||
-    cacheRef.current.outings !== outings ||
-    cacheRef.current.coverage !== coverage ||
-    cacheRef.current.sport !== sport ||
-    cacheRef.current.span !== span
+    !summaryRef.current ||
+    summaryRef.current.coverage !== coverage ||
+    summaryRef.current.sport !== sport ||
+    summaryRef.current.span !== span
   ) {
-    cacheRef.current = {
+    summaryRef.current = {
       coverage,
-      outings,
-      routes: coverageRoutePath(outings, coverage),
       span,
       sport,
       summary: summarizeCoverage(coverage, sport, span),
     };
   }
-  const { routes, summary } = cacheRef.current;
-  if (summary.city.streetMeters === 0) {
-    return null;
-  }
+  const routesCacheRef = useRef<{
+    coverage: StreetCoverage;
+    outings: typeof outings;
+    routes: string;
+  } | null>(null);
+  const computeRoutes = () => {
+    if (
+      !routesCacheRef.current ||
+      routesCacheRef.current.outings !== outings ||
+      routesCacheRef.current.coverage !== coverage
+    ) {
+      routesCacheRef.current = { coverage, outings, routes: coverageRoutePath(outings, coverage) };
+    }
+    return routesCacheRef.current.routes;
+  };
+  const isNearViewport =
+    !sectionRef.current ||
+    typeof window === 'undefined' ||
+    sectionRef.current.getBoundingClientRect().top <= window.innerHeight + 120;
+  const routes = isNearViewport ? computeRoutes() : (routesCacheRef.current?.routes ?? '');
+  const [, setDeferredTick] = useState(0);
+  useEffect(() => {
+    if (routesCacheRef.current?.outings === outings && routesCacheRef.current.coverage === coverage)
+      return;
+    const timer = setTimeout(() => {
+      computeRoutes();
+      setDeferredTick((t) => t + 1);
+    }, 180);
+    return () => clearTimeout(timer);
+  });
+  const { summary } = summaryRef.current;
+  if (summary.city.streetMeters === 0) return null;
   const [top] = summary.ranked;
   return (
-    <section aria-label={`${cityName} streets`} className="streets">
+    <section aria-label={`${cityName} streets`} className="streets" ref={sectionRef}>
       <ul className="streets__callouts">
         <li className="streets__seal">
           <Scallop tiltDeg={-5} tone="cobalt">
