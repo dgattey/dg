@@ -5,7 +5,7 @@ import { PortraitPrint } from '../PortraitPrint';
 const image: RenderableAsset = {
   height: 800,
   title: 'Drew',
-  url: 'https://images.example/portrait.jpg',
+  url: 'https://images.ctfassets.net/example/portrait.jpg',
   width: 600,
 };
 
@@ -23,7 +23,12 @@ describe('PortraitPrint', () => {
 
     expect(link).toHaveAttribute('href', 'https://linkedin.com/in/x');
     expect(link).toContainElement(portrait);
-    expect(portrait).toHaveAttribute('src', expect.stringContaining(encodeURIComponent(image.url)));
+    expect(portrait).toHaveAttribute(
+      'src',
+      expect.stringMatching(
+        /^https:\/\/images\.ctfassets\.net\/example\/portrait\.jpg\?w=\d+&q=75&fm=avif$/,
+      ),
+    );
     expect(link).toHaveTextContent('AboutDylan');
     expect(link.querySelector('.cutOut')).toBeNull();
     expect(
@@ -39,7 +44,9 @@ describe('PortraitPrint', () => {
     expect(screen.queryByRole('link', { name: 'About on LinkedIn' })).toBeNull();
     expect(screen.getByRole('img', { name: 'Drew' })).toHaveAttribute(
       'src',
-      expect.stringContaining(encodeURIComponent(image.url)),
+      expect.stringMatching(
+        /^https:\/\/images\.ctfassets\.net\/example\/portrait\.jpg\?w=\d+&q=75&fm=avif$/,
+      ),
     );
     expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Dylan')).toBeInTheDocument();

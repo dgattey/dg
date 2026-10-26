@@ -370,59 +370,66 @@ describe('check-structure', () => {
   });
 
   it('flags duplicate implementations of hover menus, skeletons, cron auth, timing-safe comparison, unit constants, and count formatters', () => {
+    const rulesFor = (file: string, code: string) =>
+      checkFileStructure(file, code).map(({ rule }) => rule);
+
     assert.deepEqual(
-      checkFileStructure(
+      rulesFor(
         'apps/web/src/app/layouts/CollageMusicLinks.tsx',
         'export const x = (node: HTMLDetailsElement | null) => bindHoverMenu(node);\n',
-      ).map(({ rule }) => rule),
+      ),
       ['no-duplicate-hover-menu'],
     );
-
     assert.deepEqual(
-      checkFileStructure(
+      rulesFor(
         'apps/web/src/app/music/albums/AlbumDetailBodySkeleton.tsx',
         'function SkeletonLine() { return <span data-skeleton="" />; }\n',
-      ).map(({ rule }) => rule),
+      ),
       ['no-duplicate-skeleton'],
     );
-
     assert.deepEqual(
-      checkFileStructure(
+      rulesFor(
         'apps/web/src/app/api/releases/route.ts',
         'export const s = process.env.CRON_SECRET;\n',
-      ).map(({ rule }) => rule),
+      ),
       ['no-duplicate-cron-auth'],
     );
-
     assert.deepEqual(
-      checkFileStructure(
+      rulesFor(
         'apps/web/src/auth/vercel/session.ts',
         'export const eq = (a: Buffer, b: Buffer) => timingSafeEqual(a, b);\n',
-      ).map(({ rule }) => rule),
+      ),
       ['no-duplicate-timing-safe-equal'],
     );
-
     assert.deepEqual(
-      checkFileStructure(
+      rulesFor(
         'apps/web/src/app/activities/stravaComparisons.ts',
         'const METERS_PER_MILE = 1609.344;\nconst f = new Intl.NumberFormat("en-US");\nexport { METERS_PER_MILE, f };\n',
-      ).map(({ rule }) => rule),
+      ),
       ['no-duplicate-unit-constants', 'no-duplicate-count-formatter'],
     );
-
     assert.deepEqual(
-      checkFileStructure(
+      rulesFor(
         'apps/web/src/app/reading/ReadingShelf.tsx',
         '\'use client\';\nexport const bar = <div className="reading__filters pillStrip" />;\n',
-      ).map(({ rule }) => rule),
+      ),
       ['reading-shelf-server-component', 'no-duplicate-filter-bar'],
     );
-
     assert.deepEqual(
-      checkFileStructure(
+      rulesFor(
+        'apps/web/src/app/changelog/ChangelogReleaseCard.tsx',
+        'import Image from \'next/image\';\nexport const X = () => <Image alt="" src="/a" />;\n',
+      ),
+      ['no-raw-next-image'],
+    );
+    assert.deepEqual(rulesFor('apps/web/next.config.ts', 'export default { images: {} };\n'), [
+      'custom-image-loader',
+    ]);
+    assert.deepEqual(
+      rulesFor(
         'apps/web/src/app/collage/SocialCardScallop.tsx',
         "import { scallopVertices } from '../music/stats/StatsShapes';\nexport const x = 'home__frameCard';\n",
-      ).map(({ rule }) => rule),
+      ),
       ['no-consumer-leakage-in-shared-component', 'no-consumer-leakage-in-shared-component'],
     );
 
