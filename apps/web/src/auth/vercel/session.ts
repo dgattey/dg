@@ -1,4 +1,4 @@
-import { createHmac } from 'node:crypto';
+import { createHash, createHmac } from 'node:crypto';
 import { timingSafeEqualStrings } from '@dg/services/auth/devConsoleBasicAuth';
 
 /** HttpOnly session cookie authenticating the site owner on `/dev-console`. */
@@ -6,13 +6,9 @@ export const VERCEL_SESSION_COOKIE = 'vercel_session';
 
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
-const OWNER_VERCEL_USER_ID = 'Zd6kYbHOXbM1fi2NHCmuSSDP';
 const OWNER_VERCEL_USERNAME = 'dgattey';
-const OWNER_VERCEL_EMAILS: ReadonlySet<string> = new Set([
-  'dylan.gattey@gmail.com',
-  'dylan@gattey.com',
-  'hi@dylangattey.com',
-]);
+const OWNER_VERCEL_USER_ID_SHA256 =
+  'b987ca62dc2823f50930e5932b58086b38e9645606029632e1a6232344e8b05a';
 
 export type VercelSessionUser = {
   id: string;
@@ -28,21 +24,23 @@ function getSigningSecret(): string | undefined {
   return process.env.VERCEL_APP_CLIENT_SECRET;
 }
 
+function sha256Hex(value: string): string {
+  return createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
 /**
- * Returns true when the Vercel OAuth identity belongs to the site owner (Dylan).
+ * Returns true when the Vercel OAuth identity belongs to the site owner,
+ * matched by public handle (`dgattey`) or the SHA-256 digest of the owner's
+ * Vercel user ID so raw personal identifiers never live in source control.
  */
 export function isAuthorizedVercelUser(user: {
-  email?: string | null;
   id?: string | null;
   username?: string | null;
 }): boolean {
-  if (user.id === OWNER_VERCEL_USER_ID) {
-    return true;
-  }
   if (user.username && user.username.toLowerCase() === OWNER_VERCEL_USERNAME) {
     return true;
   }
-  if (user.email && OWNER_VERCEL_EMAILS.has(user.email.toLowerCase())) {
+  if (user.id && timingSafeEqualStrings(sha256Hex(user.id), OWNER_VERCEL_USER_ID_SHA256)) {
     return true;
   }
   return false;
@@ -50,11 +48,11 @@ export function isAuthorizedVercelUser(user: {
 
 /**
  * Signs a session payload as `base64url(json).base64url(hmac-sha256)`.
- * Returns null when `VERCEL_APP_CLIENT_SECRET` is not configured or the user is not authorized.
+ * Returns null when `VERCEL_APP_CLIENT_SECRET` is not configured.
  */
 export function signSession(user: VercelSessionUser, nowMs: number = Date.now()): string | null {
   const secret = getSigningSecret();
-  if (!secret || !isAuthorizedVercelUser(user)) {
+  if (!secret) {
     return null;
   }
 
@@ -71,7 +69,7 @@ export function signSession(user: VercelSessionUser, nowMs: number = Date.now())
 
 /**
  * Verifies and parses a signed Vercel session cookie value.
- * Returns null when missing, unsigned, tampered, expired, unauthorized, or secret is unset.
+ * Returns null when missing, unsigned, tampered, expired, or secret is unset.
  */
 export function parseVercelSessionCookie(
   value: string | undefined,
@@ -109,8 +107,7 @@ export function parseVercelSessionCookie(
       !user.id ||
       !user.email ||
       typeof user.exp !== 'number' ||
-      user.exp <= nowMs ||
-      !isAuthorizedVercelUser(user)
+      user.exp <= nowMs
     ) {
       return null;
     }

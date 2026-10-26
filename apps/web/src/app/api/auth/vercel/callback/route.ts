@@ -147,7 +147,6 @@ export async function GET(request: NextRequest) {
 
     if (
       !isAuthorizedVercelUser({
-        email: userInfo.email,
         id: userInfo.sub,
         username: userInfo.preferred_username,
       })
