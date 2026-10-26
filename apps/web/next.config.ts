@@ -180,6 +180,7 @@ const nextConfig: NextConfig = {
       './.next/server/assets/Familjen-Grotesk-*.ttf',
     ],
   },
+  partialPrefetching: true,
   reactCompiler: true,
   reactStrictMode: true,
   redirects() {
