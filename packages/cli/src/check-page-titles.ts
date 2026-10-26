@@ -112,6 +112,33 @@ export function checkFooterCurtainReveal(
       rule: 'css-footer-curtain',
     });
   }
+  const bleedRule = cssRules(collage).find(
+    (r) => !r.media && r.selectors.includes('.collageBleed'),
+  );
+  if (bleedRule && declaration(bleedRule.body, '--sheet-inset') !== '0px') {
+    violations.push({
+      file: collageFile,
+      line: lineAt(collage, bleedRule.index),
+      message:
+        'Set `--sheet-inset: 0px` on `.collageBleed` so full-bleed sections do not reflow `.collageMeasure` width during the footer reveal',
+      rule: 'css-footer-curtain',
+    });
+  }
+  for (const rule of cssRules(chrome)) {
+    if (
+      rule.media &&
+      rule.selectors.includes('.chrome__nowPlaying') &&
+      declaration(rule.body, 'order')?.startsWith('-')
+    ) {
+      violations.push({
+        file: chromeFile,
+        line: lineAt(chrome, rule.index),
+        message:
+          'Keep `.chrome__nowPlaying` below `.chrome__bar` on mobile instead of ordering it above the logo and navigation strip',
+        rule: 'css-mobile-header-order',
+      });
+    }
+  }
   return violations;
 }
 

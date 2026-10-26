@@ -11,6 +11,9 @@ function setSheetProgress(
   if (sheet.style.getPropertyValue('--footer-progress') !== value) {
     sheet.style.setProperty('--footer-progress', value);
   }
+  if (document.documentElement.style.getPropertyValue('--footer-progress') !== value) {
+    document.documentElement.style.setProperty('--footer-progress', value);
+  }
   if (occluded) {
     if (footer.dataset.occluded !== 'true') {
       footer.dataset.occluded = 'true';
@@ -26,6 +29,13 @@ export function syncFooterRevealProgress() {
   if (!sheet || !footer) {
     return;
   }
+  const footerHeight = footer.offsetHeight;
+  if (footerHeight > 0) {
+    const heightPx = `${footerHeight}px`;
+    if (document.documentElement.style.getPropertyValue('--footer-height') !== heightPx) {
+      document.documentElement.style.setProperty('--footer-height', heightPx);
+    }
+  }
   if (sheet.dataset.footerProgressLock) {
     setSheetProgress(
       sheet,
@@ -35,7 +45,6 @@ export function syncFooterRevealProgress() {
     );
     return;
   }
-  const footerHeight = footer.offsetHeight;
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   if (footerHeight <= 0 || maxScroll <= 0 || window.scrollY <= 0) {
     setSheetProgress(sheet, footer, '0', footerHeight > 0 && maxScroll > 0);

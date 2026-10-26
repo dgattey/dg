@@ -226,6 +226,10 @@ h6 {
 }
 
 @media (max-width: 820px) {
+  [data-typography-md="title-sm"] {
+    font-size: var(--type-h3);
+    line-height: var(--leading-title);
+  }
   [data-typography-md="meta"] {
     font-size: var(--type-meta);
   }

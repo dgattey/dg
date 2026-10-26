@@ -14,13 +14,16 @@ export function SiteHeaderHeight() {
     if (!header) {
       return;
     }
+    const bar = header.querySelector<HTMLElement>('.chrome__bar');
     const publish = () => {
-      const headerBox = header.getBoundingClientRect();
+      const rawHeaderBox = header.getBoundingClientRect();
+      const boxEl = rawHeaderBox.height > 0 ? header : (bar ?? header);
+      const headerBox = boxEl.getBoundingClientRect();
       const rowTops = [...header.querySelectorAll<HTMLElement>('[data-sticky-header-row]')].map(
         (piece) => piece.getBoundingClientRect().top - pixels(getComputedStyle(piece).marginTop),
       );
       const tuck =
-        rowTops.length > 0
+        rawHeaderBox.height > 0 && rowTops.length > 0
           ? Math.max(
               0,
               Math.round(
@@ -37,6 +40,9 @@ export function SiteHeaderHeight() {
     publish();
     const observer = new ResizeObserver(publish);
     observer.observe(header);
+    if (bar) {
+      observer.observe(bar);
+    }
     return () => observer.disconnect();
   }, []);
 

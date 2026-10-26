@@ -135,6 +135,7 @@ html:has(.collageRoot) body {
 }
 
 .collageBleed {
+  --sheet-inset: 0px;
   position: relative;
   left: 50%;
   width: 100vw;
@@ -453,10 +454,17 @@ html[data-color-scheme="dark"] .cutNightOnly {
   }
   .collageRoot .collageGridStack > * {
     grid-area: auto;
+    align-self: stretch;
     margin-top: 0;
   }
 }
 @media (max-width: 600px) {
+  .collagePin {
+    max-width: calc(100% - 12px);
+  }
+  .collagePin small {
+    white-space: normal;
+  }
   .cutOut {
     --cut-max-size: 44vw;
   }
@@ -467,6 +475,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
 }
 @media (max-width: 480px) {
   .collageMain {
-    padding-block-start: 32px;
+    padding-block-start: 16px;
   }
 }

@@ -641,9 +641,9 @@
     margin: 36px 32% 44px 8%;
   }
   .stats__heroStamp {
-    top: -32px;
-    left: -30px;
-    width: 120px;
+    top: -28px;
+    left: -18px;
+    width: 114px;
   }
   .stats__runnersUp {
     gap: 28px 18px;
@@ -654,6 +654,14 @@
   }
   .stats__runnerArt {
     width: min(100%, 140px);
+  }
+  .stats__rankSticker {
+    top: -12px;
+    left: -6px;
+  }
+  .stats__rankCircle {
+    width: 48px;
+    height: 48px;
   }
   .stats__dayBody {
     grid-template-columns: minmax(0, 1fr);

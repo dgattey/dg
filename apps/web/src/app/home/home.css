@@ -6,12 +6,10 @@
 .home__coda {
   position: relative;
   padding-block: var(--sp-top) var(--sp-bottom);
-  isolation: isolate;
 }
 .home__hello {
   --sp-top: 14px;
   --sp-bottom: 70px;
-  z-index: 1;
 }
 .home__helloGrid {
   grid-template-areas:
@@ -122,7 +120,6 @@
   --sp-bottom: 92px;
   --cw: 372px;
   --ch: 290px;
-  z-index: 2;
   margin-top: -30px;
   color: var(--cream);
 }
@@ -360,7 +357,6 @@
 .home__moreWork {
   --sp-top: 50px;
   --sp-bottom: 56px;
-  z-index: 3;
   color: var(--ink);
 }
 .home__moreWorkField {
@@ -381,7 +377,6 @@
 .home__coda {
   --sp-top: 30px;
   --sp-bottom: 90px;
-  z-index: 4;
   color: var(--ink);
 }
 
@@ -579,10 +574,10 @@
     padding-top: 16px;
   }
   .home__intro {
-    --mat-offset: 9px;
-    width: calc(100% - var(--mat-offset));
+    --mat-offset: 8px;
+    width: calc(100% - var(--mat-offset) - 6px);
     padding: 22px;
-    margin: 8px 0 0;
+    margin: 8px 0 0 3px;
   }
   .home__portraitSlot {
     justify-self: center;
@@ -600,11 +595,32 @@
     max-width: 480px;
     padding-top: 12px;
   }
+  .home__stravaAtlas {
+    grid-column: 1 / -1;
+  }
+  .home__stravaLatest {
+    grid-column: 1 / -1;
+    margin-top: 12px;
+  }
   .home__stravaTotal {
-    right: -6px;
+    top: -28px;
+    right: 4px;
+    width: 112px;
   }
   .home__stravaWhen {
-    width: 128px;
+    top: -22px;
+    left: 4px;
+    width: 124px;
+  }
+  .home__workGrid > [data-slot="ws"] {
+    align-self: stretch;
+  }
+  .home__tagTopLeft,
+  .home__tagBottomLeft {
+    left: 6px;
+  }
+  .home__tagBottomRight {
+    right: 6px;
   }
   /* Leads the sheet, offset right so it overlaps the map's corner, not its tag. */
   .collageRoot .collageGridStack > .home__spotifySlot {

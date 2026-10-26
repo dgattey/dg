@@ -544,7 +544,7 @@
     margin-bottom: 22px;
   }
 }
-@media (max-width: 390px) {
+@media (max-width: 680px) {
   .music__section {
     row-gap: 10px;
   }

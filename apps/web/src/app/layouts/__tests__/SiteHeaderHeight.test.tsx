@@ -98,4 +98,32 @@ describe('SiteHeaderHeight', () => {
       '--site-header-tuck': '34px',
     });
   });
+
+  it('measures the sticky .chrome__bar when the header wrapper uses display: contents on mobile', () => {
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function rectFor(
+      this: HTMLElement,
+    ) {
+      if (this.classList.contains('chrome__bar')) {
+        return new DOMRect(0, 0, 361, 56);
+      }
+      return new DOMRect(0, 0, 0, 0);
+    });
+
+    render(
+      <>
+        <SiteHeaderHeight />
+        <header data-sticky-header>
+          <div className="chrome__bar">
+            <div data-sticky-header-row />
+            <nav data-sticky-header-row />
+          </div>
+        </header>
+      </>,
+    );
+
+    expect(document.documentElement).toHaveStyle({
+      '--site-header-height': '56px',
+      '--site-header-tuck': '0px',
+    });
+  });
 });

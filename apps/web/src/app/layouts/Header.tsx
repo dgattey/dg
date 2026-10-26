@@ -17,19 +17,21 @@ export async function Header() {
     <>
       <SiteHeaderHeight />
       <header className="collageMeasure chrome__header" data-sticky-header={true}>
-        <div className="chrome__brand" data-sticky-header-row={true}>
-          <Logo />
+        <div className="collageMeasure chrome__bar">
+          <div className="chrome__brand" data-sticky-header-row={true}>
+            <Logo />
+          </div>
+          <div className="chrome__spacer" />
+          <nav className="chrome__nav" data-sticky-header-row={true}>
+            <div className="chrome__strip collageLift">
+              <CollageMusicLinks items={items} />
+              <CollageColorSchemeFieldset />
+            </div>
+          </nav>
         </div>
-        <div className="chrome__nowPlaying collageLift">
+        <div className="collageMeasure chrome__nowPlaying collageLift">
           <LastKnownSpotifyHeaderCard />
         </div>
-        <div className="chrome__spacer" />
-        <nav className="chrome__nav" data-sticky-header-row={true}>
-          <div className="chrome__strip collageLift">
-            <CollageMusicLinks items={items} />
-            <CollageColorSchemeFieldset />
-          </div>
-        </nav>
       </header>
     </>
   );

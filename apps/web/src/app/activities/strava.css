@@ -825,7 +825,20 @@
     display: none;
   }
   .strava__atlas .strava__atlasBacking {
-    inset: 18px -10px -12px 10px;
+    inset: 14px -4px -10px 6px;
+  }
+  .strava__latestSeal {
+    top: -20px;
+    right: 2px;
+    width: 88px;
+  }
+  .strava__longestTag {
+    left: 4px;
+  }
+  .strava__longestSeal {
+    top: -18px;
+    right: 2px;
+    width: 114px;
   }
   .strava__routeCount {
     right: 24px;
@@ -845,6 +858,6 @@
     position: static;
     justify-self: end;
     width: 116px;
-    margin-top: -12px;
+    margin: -12px 6px 0 0;
   }
 }

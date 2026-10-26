@@ -217,7 +217,23 @@
 }
 
 @media (max-width: 600px) {
+  .streets__callouts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: center;
+  }
+  .streets__seal {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 196px;
+  }
   .streets__head {
     flex-direction: column;
+  }
+  .streets__name {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 }

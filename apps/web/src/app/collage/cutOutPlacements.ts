@@ -62,7 +62,7 @@ export function definePlacements(rows: ReadonlyArray<PlacementRow>): Array<CutOu
 
 export const CUT_OUT_PLACEMENTS = {
   coda: definePlacements([
-    ['coda-monstera', 'monstera', 'olive', 460, 14, 4, -20, 'all', 0],
+    ['coda-monstera', 'monstera', 'olive', 460, 14, 4, -20, 'desktop', 0],
     ['coda-banana', 'banana', 'viridian', 380, -30, 30, 8, 'desktop', 0],
     [
       'coda-bird',
@@ -111,8 +111,8 @@ export const CUT_OUT_PLACEMENTS = {
     ['hello-star-right', 'star4', 'ochre', 44, 10, 92, 40, 'desktop', 1],
   ]),
   moreWork: definePlacements([
-    ['more-monstera', 'monstera', 'viridian', 640, 150, 72, -12, 'all', 0],
-    ['more-gerbe', 'gerbe', 'vermilion', 380, 24, 38, -16, 'all', 0],
+    ['more-monstera', 'monstera', 'viridian', 640, 150, 72, -12, 'desktop', 0],
+    ['more-gerbe', 'gerbe', 'vermilion', 380, 24, 38, -16, 'desktop', 0],
     ['more-star-upper', 'star5', 'star', 44, -12, 48, 4, 'desktop', 1],
     ['more-pods', 'pods', 'ultramarine', 230, 22, 27, 36, 'all', 1],
     ['more-trefoil', 'trefoil', 'rose', 150, -16, 45, 44, 'desktop', 1],

@@ -277,6 +277,15 @@
     width: min(54%, 180px);
     margin-inline-start: 8px;
   }
+  .reading__card--review,
+  .reading__card--feature {
+    rotate: calc(var(--r, 0deg) * 0.35);
+  }
+  .reading__seal {
+    top: -10px;
+    right: -10px;
+    width: 48px;
+  }
   .reading__layout .reading__card .reading__reviewInner {
     grid-template-areas:
       "print head"
