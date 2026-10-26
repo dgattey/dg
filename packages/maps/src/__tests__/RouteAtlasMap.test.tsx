@@ -1,7 +1,13 @@
 import { renderToString } from 'react-dom/server';
 import { VisibleRoutes } from '../../VisibleRoutes';
+import {
+  applyRelativeTransform,
+  buildWorkerRoutes,
+  computeTransformBasis,
+  unprojectMercatorRef,
+} from '../AtlasRoutesCanvas';
 import { RouteAtlasMap } from '../RouteAtlasMap';
-import type { GeoBounds, MapRoute } from '../routeFrame';
+import { decodeRoutes, type GeoBounds, type MapRoute, mercatorRefPoint } from '../routeFrame';
 import { encodePolyline } from '../routeGeometry';
 
 const BOUNDS: GeoBounds = [
@@ -29,7 +35,7 @@ const ROUTES: ReadonlyArray<MapRoute> = [
 ];
 
 describe('RouteAtlasMap', () => {
-  it('renders offline placeholder tiles, Mercator route paths, and zoom controls when tileSource is offline', () => {
+  it('renders offline placeholder tiles, Mercator route paths, canvas overlay, and zoom controls when tileSource is offline', () => {
     const html = renderToString(
       <RouteAtlasMap
         bounds={BOUNDS}
@@ -41,6 +47,7 @@ describe('RouteAtlasMap', () => {
 
     expect(html).toContain('aria-label="Route atlas"');
     expect(html).toContain('aria-label="Zoom in"');
+    expect(html).toContain('data-atlas-canvas=""');
     expect(html).toContain('data-tone="cobalt"');
     expect(html).toContain('data-tone="vermilion"');
     expect(html).toContain('data:image/svg+xml,');
@@ -70,5 +77,25 @@ describe('RouteAtlasMap', () => {
     expect(html).toContain('vector-effect="non-scaling-stroke"');
     expect(html).toMatch(/scale\(\d+\.\d{6}\)/);
     expect(html).toMatch(/d="M\d{5,}/);
+  });
+
+  it('projects, unprojects, and computes relative GPU gesture transform matrices', () => {
+    const sf: [number, number] = [37.7749, -122.4194];
+    const ref = mercatorRefPoint(sf);
+    const roundTripped = unprojectMercatorRef(ref);
+    expect(roundTripped[0]).toBeCloseTo(sf[0], 4);
+    expect(roundTripped[1]).toBeCloseTo(sf[1], 4);
+
+    const base = computeTransformBasis(sf, 11, 800, 600);
+    const zoomed = computeTransformBasis(sf, 12, 800, 600);
+    const target = { style: { transform: 'initial' } } as unknown as HTMLElement;
+    applyRelativeTransform(target, base, base);
+    expect(target.style.transform).toBe('');
+    applyRelativeTransform(target, zoomed, base);
+    expect(target.style.transform).toContain('scale(2.00000)');
+
+    const workerRoutes = buildWorkerRoutes(decodeRoutes(ROUTES));
+    expect(workerRoutes).toHaveLength(2);
+    expect(workerRoutes[0]?.legs[0]?.length).toBeGreaterThan(1);
   });
 });

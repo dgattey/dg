@@ -5,7 +5,7 @@ import {
   type CoverageCity,
   type StreetCoverage,
 } from '@dg/content-models/strava/StreetCoverage';
-import { type CSSProperties, useEffect, useId, useRef, useState } from 'react';
+import { type CSSProperties, useId, useRef, useState } from 'react';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperStrip } from '../collage/PaperPills';
@@ -157,61 +157,35 @@ export function StreetCoverageSection({
   const city = cities.includes(chosenCity) ? chosenCity : (cities[0] ?? chosenCity);
   const coverage = byCity[city];
   const { name: cityName, short: cityShort } = CITIES[city];
-  const sectionRef = useRef<HTMLElement>(null);
-  const summaryRef = useRef<{
+  const cacheRef = useRef<{
     coverage: StreetCoverage;
+    outings: typeof outings;
+    routes: string;
     span: typeof span;
     sport: typeof sport;
     summary: ReturnType<typeof summarizeCoverage>;
   } | null>(null);
   if (
-    !summaryRef.current ||
-    summaryRef.current.coverage !== coverage ||
-    summaryRef.current.sport !== sport ||
-    summaryRef.current.span !== span
+    !cacheRef.current ||
+    cacheRef.current.outings !== outings ||
+    cacheRef.current.coverage !== coverage ||
+    cacheRef.current.sport !== sport ||
+    cacheRef.current.span !== span
   ) {
-    summaryRef.current = {
+    cacheRef.current = {
       coverage,
+      outings,
+      routes: coverageRoutePath(outings, coverage),
       span,
       sport,
       summary: summarizeCoverage(coverage, sport, span),
     };
   }
-  const routesCacheRef = useRef<{
-    coverage: StreetCoverage;
-    outings: typeof outings;
-    routes: string;
-  } | null>(null);
-  const computeRoutes = () => {
-    if (
-      !routesCacheRef.current ||
-      routesCacheRef.current.outings !== outings ||
-      routesCacheRef.current.coverage !== coverage
-    ) {
-      routesCacheRef.current = { coverage, outings, routes: coverageRoutePath(outings, coverage) };
-    }
-    return routesCacheRef.current.routes;
-  };
-  const isNearViewport =
-    !sectionRef.current ||
-    typeof window === 'undefined' ||
-    sectionRef.current.getBoundingClientRect().top <= window.innerHeight + 120;
-  const routes = isNearViewport ? computeRoutes() : (routesCacheRef.current?.routes ?? '');
-  const [, setDeferredTick] = useState(0);
-  useEffect(() => {
-    if (routesCacheRef.current?.outings === outings && routesCacheRef.current.coverage === coverage)
-      return;
-    const timer = setTimeout(() => {
-      computeRoutes();
-      setDeferredTick((t) => t + 1);
-    }, 180);
-    return () => clearTimeout(timer);
-  });
-  const { summary } = summaryRef.current;
+  const { routes, summary } = cacheRef.current;
   if (summary.city.streetMeters === 0) return null;
   const [top] = summary.ranked;
   return (
-    <section aria-label={`${cityName} streets`} className="streets" ref={sectionRef}>
+    <section aria-label={`${cityName} streets`} className="streets">
       <ul className="streets__callouts">
         <li className="streets__seal">
           <Scallop tiltDeg={-5} tone="cobalt">

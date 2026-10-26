@@ -252,6 +252,10 @@ export function AtlasRoutesCanvas({
       }
       onReady?.();
     };
+    worker.onerror = () => {
+      for (const cb of onReadyCallbacksRef.current.values()) cb();
+      onReadyCallbacksRef.current.clear();
+    };
 
     return () => {
       worker.terminate();

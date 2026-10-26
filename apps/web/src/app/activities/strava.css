@@ -100,11 +100,30 @@
   pointer-events: none;
   content: "";
   background:
-    radial-gradient(circle at 6px 6px, transparent 5.5px, var(--cream) 6px) 0 0 / 6px 6px no-repeat,
-    radial-gradient(circle at 0 6px, transparent 5.5px, var(--cream) 6px) 100% 0 / 6px 6px no-repeat,
-    radial-gradient(circle at 6px 0, transparent 5.5px, var(--cream) 6px) 0 100% / 6px 6px no-repeat,
-    radial-gradient(circle at 0 0, transparent 5.5px, var(--cream) 6px) 100% 100% / 6px 6px
-    no-repeat;
+    radial-gradient(
+      circle at var(--print-radius) var(--print-radius),
+      transparent calc(var(--print-radius) - 0.5px),
+      var(--pc, var(--cream)) var(--print-radius)
+    )
+    0 0 / var(--print-radius) var(--print-radius) no-repeat,
+    radial-gradient(
+      circle at 0 var(--print-radius),
+      transparent calc(var(--print-radius) - 0.5px),
+      var(--pc, var(--cream)) var(--print-radius)
+    )
+    100% 0 / var(--print-radius) var(--print-radius) no-repeat,
+    radial-gradient(
+      circle at var(--print-radius) 0,
+      transparent calc(var(--print-radius) - 0.5px),
+      var(--pc, var(--cream)) var(--print-radius)
+    )
+    0 100% / var(--print-radius) var(--print-radius) no-repeat,
+    radial-gradient(
+      circle at 0 0,
+      transparent calc(var(--print-radius) - 0.5px),
+      var(--pc, var(--cream)) var(--print-radius)
+    )
+    100% 100% / var(--print-radius) var(--print-radius) no-repeat;
 }
 .strava__atlasBlank,
 .strava__printBlank {

@@ -18,19 +18,17 @@ function rasterizeSvgDataUri(svgUri: string): Promise<string> {
   const promise = new Promise<string>((resolve) => {
     const img = new Image(256, 256);
     img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = 256;
-        canvas.height = 256;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0, 256, 256);
-          const pngUri = canvas.toDataURL('image/png');
-          rasterTileCache.set(svgUri, pngUri);
-          resolve(pngUri);
-          return;
-        }
-      } catch {}
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, 256, 256);
+        const pngUri = canvas.toDataURL('image/png');
+        rasterTileCache.set(svgUri, pngUri);
+        resolve(pngUri);
+        return;
+      }
       resolve(svgUri);
     };
     img.onerror = () => resolve(svgUri);
@@ -40,8 +38,7 @@ function rasterizeSvgDataUri(svgUri: string): Promise<string> {
   return promise;
 }
 
-/** Lazy for network tiles, so a hidden scheme's tiles never load until that scheme shows. */
-export function SmoothTile({ tile }: TileComponentProps) {
+export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
   const isSvgData = tile.url.startsWith('data:image/svg+xml,');
   const [rasterUrl, setRasterUrl] = useState<string | null>(() =>
     isSvgData ? (rasterTileCache.get(tile.url) ?? null) : null,
@@ -62,10 +59,6 @@ export function SmoothTile({ tile }: TileComponentProps) {
     };
   }, [isSvgData, tile.url]);
 
-  if (!tile.active) {
-    return <></>;
-  }
-  const isDataUri = tile.url.startsWith('data:');
   const resolvedUrl = isSvgData
     ? (rasterUrl ?? rasterTileCache.get(tile.url) ?? tile.url)
     : tile.url;
@@ -76,14 +69,15 @@ export function SmoothTile({ tile }: TileComponentProps) {
     '--tile-w': `${tile.width}px`,
   } as CSSProperties;
   return (
-    <div data-active="true" data-map-tile="" style={tileVars}>
+    <div data-active={tile.active ? 'true' : undefined} data-map-tile="" style={tileVars}>
       <img
         alt=""
         data-map-tile-img=""
-        decoding={isDataUri ? undefined : 'async'}
-        loading={isDataUri ? undefined : 'lazy'}
+        decoding="async"
+        loading="lazy"
+        onLoad={tileLoaded}
         src={resolvedUrl}
-        srcSet={tile.srcSet || undefined}
+        srcSet={tile.srcSet}
       />
     </div>
   );

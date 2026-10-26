@@ -50,6 +50,10 @@
   opacity: 0;
 }
 
+[data-map-tile]:not([data-active="true"]) {
+  display: none;
+}
+
 [data-map-tile][data-active="true"] {
   opacity: 1;
 }
