@@ -4,22 +4,36 @@ import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 import { CACHE_TAGS } from '../../../services/cacheTags';
-import { jsonError } from '../apiResponses';
+import { isCronAuthorized, jsonError } from '../apiResponses';
 
 const isStravaChallengeRequest = (query: URLSearchParams) =>
   query.has('hub.challenge') || query.has('hub.mode') || query.has('hub.verify_token');
+
+const isContentfulWebhookPayload = (body: unknown) => {
+  if (!body || typeof body !== 'object' || !('sys' in body)) {
+    return false;
+  }
+
+  const { sys } = body;
+  return Boolean(sys && typeof sys === 'object' && 'type' in sys && typeof sys.type === 'string');
+};
+
+const isContentfulWebhookRequest = (request: NextRequest, body: unknown) =>
+  Boolean(
+    request.headers.get('x-contentful-topic')?.trim() ||
+      request.headers.get('x-contentful-webhook-name')?.trim(),
+  ) || isContentfulWebhookPayload(body);
 
 const isStravaWebhookPayload = (body: unknown) => {
   if (!body || typeof body !== 'object') {
     return false;
   }
 
-  const record = body as Record<string, unknown>;
   return (
-    'aspect_type' in record ||
-    'object_id' in record ||
-    'object_type' in record ||
-    'subscription_id' in record
+    'aspect_type' in body ||
+    'object_id' in body ||
+    'object_type' in body ||
+    'subscription_id' in body
   );
 };
 
@@ -51,6 +65,24 @@ export function GET(request: NextRequest): NextResponse {
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const body = await request.json().catch(() => null);
   log.info('Received webhook POST', { body });
+
+  if (isContentfulWebhookRequest(request, body)) {
+    if (!isCronAuthorized(request)) {
+      log.warn('Unauthorized Contentful webhook request', {
+        hasAuthHeader: request.headers.has('authorization'),
+        topic: request.headers.get('x-contentful-topic'),
+        webhookName: request.headers.get('x-contentful-webhook-name'),
+      });
+      return jsonError('Unauthorized', 401);
+    }
+
+    revalidateTag(CACHE_TAGS.contentful, 'max');
+    revalidateTag(CACHE_TAGS.changelog, 'max');
+    return NextResponse.json(
+      { ok: true, revalidated: [CACHE_TAGS.contentful, CACHE_TAGS.changelog] },
+      { status: 200 },
+    );
+  }
 
   if (body === null) {
     return jsonError('Bad Request', 400);

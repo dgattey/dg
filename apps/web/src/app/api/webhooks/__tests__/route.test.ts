@@ -37,9 +37,16 @@ const mockIsValidSubscriptionId = jest.mocked(stravaWebhooks.isValidSubscription
 const mockRevalidateTag = jest.mocked(revalidateTag);
 
 describe('Webhook Route', () => {
+  const originalCronSecret = process.env.CRON_SECRET;
+
+  beforeAll(() => {
+    process.env.CRON_SECRET = 'test-secret';
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(log, 'info').mockImplementation(() => undefined);
+    jest.spyOn(log, 'warn').mockImplementation(() => undefined);
     jest.spyOn(log, 'error').mockImplementation(() => undefined);
     // Reset the mock to return true for valid subscription ID by default
     mockIsValidSubscriptionId.mockResolvedValue(true);
@@ -49,15 +56,134 @@ describe('Webhook Route', () => {
     jest.restoreAllMocks();
   });
 
+  afterAll(() => {
+    process.env.CRON_SECRET = originalCronSecret;
+  });
+
   describe('POST handler', () => {
-    const createRequest = (body: unknown): NextRequest => {
+    const createRequest = (body: unknown, headers: Record<string, string> = {}): NextRequest => {
       const request = new NextRequest(`https://example.com${webhooksRoute}`, {
         body: JSON.stringify(body),
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...headers },
         method: 'POST',
       });
       return request;
     };
+
+    describe('Contentful webhook events', () => {
+      it('revalidates contentful and changelog tags when authorized with X-Contentful-Topic', async () => {
+        const body = {
+          sys: { id: 'entry-1', type: 'Entry' },
+        };
+
+        const response = await POST(
+          createRequest(body, {
+            Authorization: 'Bearer test-secret',
+            'X-Contentful-Topic': 'ContentManagement.Entry.publish',
+          }),
+        );
+
+        expect(response.status).toBe(200);
+        await expect(response.json()).resolves.toEqual({
+          ok: true,
+          revalidated: ['contentful', 'changelog'],
+        });
+        expect(mockRevalidateTag).toHaveBeenCalledTimes(2);
+        expect(mockRevalidateTag).toHaveBeenCalledWith('contentful', 'max');
+        expect(mockRevalidateTag).toHaveBeenCalledWith('changelog', 'max');
+        expect(mockSyncWebhook).not.toHaveBeenCalled();
+      });
+
+      it('revalidates contentful and changelog tags when authorized with X-Contentful-Webhook-Name and empty body', async () => {
+        const request = new NextRequest(`https://example.com${webhooksRoute}`, {
+          headers: {
+            Authorization: 'Bearer test-secret',
+            'X-Contentful-Webhook-Name': 'Vercel cache revalidation',
+          },
+          method: 'POST',
+        });
+
+        const response = await POST(request);
+
+        expect(response.status).toBe(200);
+        await expect(response.json()).resolves.toEqual({
+          ok: true,
+          revalidated: ['contentful', 'changelog'],
+        });
+        expect(mockRevalidateTag).toHaveBeenCalledWith('contentful', 'max');
+        expect(mockRevalidateTag).toHaveBeenCalledWith('changelog', 'max');
+        expect(mockSyncWebhook).not.toHaveBeenCalled();
+      });
+
+      it('revalidates contentful and changelog tags when authorized with a Contentful sys payload', async () => {
+        const response = await POST(
+          createRequest(
+            { sys: { id: 'asset-1', type: 'Asset' } },
+            { Authorization: 'Bearer test-secret' },
+          ),
+        );
+
+        expect(response.status).toBe(200);
+        await expect(response.json()).resolves.toEqual({
+          ok: true,
+          revalidated: ['contentful', 'changelog'],
+        });
+        expect(mockRevalidateTag).toHaveBeenCalledWith('contentful', 'max');
+        expect(mockRevalidateTag).toHaveBeenCalledWith('changelog', 'max');
+      });
+
+      it('returns 401 when X-Contentful-Topic is present without a Bearer token', async () => {
+        const response = await POST(
+          createRequest(
+            { sys: { id: 'entry-1', type: 'Entry' } },
+            { 'X-Contentful-Topic': 'ContentManagement.Entry.publish' },
+          ),
+        );
+
+        expect(response.status).toBe(401);
+        await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' });
+        expect(mockRevalidateTag).not.toHaveBeenCalled();
+        expect(mockSyncWebhook).not.toHaveBeenCalled();
+      });
+
+      it('returns 401 when X-Contentful-Topic is present with an invalid Bearer token', async () => {
+        const response = await POST(
+          createRequest(
+            { sys: { id: 'entry-1', type: 'Entry' } },
+            {
+              Authorization: 'Bearer wrong-secret',
+              'X-Contentful-Topic': 'ContentManagement.Entry.publish',
+            },
+          ),
+        );
+
+        expect(response.status).toBe(401);
+        await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' });
+        expect(mockRevalidateTag).not.toHaveBeenCalled();
+        expect(mockSyncWebhook).not.toHaveBeenCalled();
+      });
+
+      it('fails closed with 401 when CRON_SECRET is missing', async () => {
+        delete process.env.CRON_SECRET;
+        try {
+          const response = await POST(
+            createRequest(
+              { sys: { id: 'entry-1', type: 'Entry' } },
+              {
+                Authorization: 'Bearer undefined',
+                'X-Contentful-Topic': 'ContentManagement.Entry.publish',
+              },
+            ),
+          );
+
+          expect(response.status).toBe(401);
+          await expect(response.json()).resolves.toEqual({ error: 'Unauthorized' });
+          expect(mockRevalidateTag).not.toHaveBeenCalled();
+        } finally {
+          process.env.CRON_SECRET = 'test-secret';
+        }
+      });
+    });
 
     describe('valid activity webhook events', () => {
       it('processes create event and returns 200', async () => {
