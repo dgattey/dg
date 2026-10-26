@@ -251,7 +251,7 @@ describe('check-css-geometry', () => {
         ],
         [
           'apps/web/src/app/collage/collage.css',
-          '[data-role="side-project-mark"] img { max-height: 100%; }',
+          '[data-role="side-project-mark"] { background: var(--cream); }',
         ],
       ]),
     );

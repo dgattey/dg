@@ -325,9 +325,9 @@ export function checkHomepageConsistency(
   );
   check(
     false,
-    '[data-role="side-project-mark"] img',
-    (b) => Boolean(declaration(b, 'border-radius')?.includes('--mark-pad')),
-    'Use --mark-pad',
+    '[data-role="side-project-mark"]',
+    (b) => !declaration(b, 'background') && !declaration(b, 'box-shadow'),
+    'Keep side-project marks containerless',
   );
   return violations;
 }

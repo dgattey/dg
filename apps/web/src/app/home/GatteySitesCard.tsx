@@ -16,16 +16,16 @@ type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
 };
 
-function trimTransparentMargin(img: HTMLImageElement) {
-  const { naturalHeight: height, naturalWidth: width } = img;
-  if (width === 0 || height === 0) return;
+function measureAndScale(source: HTMLImageElement, target: HTMLImageElement) {
+  const { naturalHeight: height, naturalWidth: width } = source;
+  if (width === 0 || height === 0) return false;
   try {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.drawImage(img, 0, 0);
+    if (!ctx) return true;
+    ctx.drawImage(source, 0, 0);
     const { data } = ctx.getImageData(0, 0, width, height);
     let minX = width;
     let minY = height;
@@ -41,18 +41,28 @@ function trimTransparentMargin(img: HTMLImageElement) {
         }
       }
     }
-    if (maxX < minX || maxY < minY) return;
-    const ratio = Math.max(maxX - minX + 1, maxY - minY + 1) / Math.max(width, height);
-    if (ratio > 0 && ratio < 0.96) {
-      img.style.setProperty('--mark-scale', (1 / ratio).toFixed(3));
+    if (maxX >= minX && maxY >= minY) {
+      const ratio = Math.max(maxX - minX + 1, maxY - minY + 1) / Math.max(width, height);
+      if (ratio > 0 && ratio < 0.96) {
+        target.style.setProperty('--mark-scale', (1 / ratio).toFixed(3));
+      }
     }
-  } catch {}
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function syncMarkScale(node: HTMLSpanElement | null) {
   const img = node?.querySelector('img');
   if (!img) return;
-  const apply = () => trimTransparentMargin(img);
+  const apply = () => {
+    if (measureAndScale(img, img)) return;
+    const probe = new window.Image();
+    probe.crossOrigin = 'anonymous';
+    probe.addEventListener('load', () => measureAndScale(probe, img), { once: true });
+    probe.src = img.currentSrc || img.src;
+  };
   if (img.complete && img.naturalWidth > 0) {
     apply();
     return;

@@ -114,7 +114,7 @@
 }
 .siteMap__appRow {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   gap: 16px;
   align-items: center;
   height: 100%;

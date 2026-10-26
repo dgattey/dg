@@ -171,23 +171,16 @@ html:has(.collageRoot) body {
 }
 
 /*
- * Side-project marks sit on one quiet inset tile across the homepage and site map,
- * clipping to a concentric inner radius and scaling away any baked-in transparent margins.
+ * Side-project marks sit directly on the cream row without an extra container frame,
+ * scaling away any baked-in transparent margins so every app icon shares one visual size.
  */
 [data-role="side-project-mark"] {
-  --mark-size: 42px;
-  --mark-pad: 5px;
-  --mark-radius: 12px;
+  --mark-size: 36px;
   position: relative;
   display: grid;
   place-items: center;
   width: var(--mark-size);
   height: var(--mark-size);
-  padding: var(--mark-pad);
-  overflow: hidden;
-  background: color-mix(in srgb, var(--ink-on-cream) 6%, var(--cream));
-  border-radius: var(--mark-radius);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-on-cream) 12%, transparent);
   transform: scale(1);
 }
 [data-role="side-project-mark"] img {
@@ -195,7 +188,6 @@ html:has(.collageRoot) body {
   width: 100%;
   height: 100%;
   max-height: 100%;
-  border-radius: calc(var(--mark-radius) - var(--mark-pad));
   scale: var(--mark-scale, 1);
 }
 
