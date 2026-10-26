@@ -149,6 +149,18 @@ export function checkFooterCurtainReveal(
         'No negative `order` on `.chrome__nowPlaying`',
       );
     }
+    if (
+      r.media &&
+      r.selectors.includes('.chrome__colophonNav') &&
+      declaration(r.body, 'grid-template-columns')?.includes('repeat(3')
+    ) {
+      flag(
+        true,
+        r.index,
+        'css-footer-colophon-pills',
+        'Size `.chrome__colophonNav` pills to content instead of `repeat(3, ...)`',
+      );
+    }
   }
   return violations;
 }
