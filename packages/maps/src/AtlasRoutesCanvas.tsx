@@ -12,11 +12,7 @@ import {
 
 const MERCATOR_REF_SCALE = 256 * 2 ** MERCATOR_REF_ZOOM;
 
-export type TransformBasis = {
-  scale: number;
-  tx: number;
-  ty: number;
-};
+export type TransformBasis = { scale: number; tx: number; ty: number };
 
 export type WorkerRouteEntry = {
   id: number;
@@ -32,11 +28,7 @@ export function computeTransformBasis(
 ): TransformBasis {
   const centerRef = mercatorRefPoint(center);
   const scale = 2 ** (zoom - MERCATOR_REF_ZOOM);
-  return {
-    scale,
-    tx: width / 2 - centerRef.x * scale,
-    ty: height / 2 - centerRef.y * scale,
-  };
+  return { scale, tx: width / 2 - centerRef.x * scale, ty: height / 2 - centerRef.y * scale };
 }
 
 export function applyRelativeTransform(
@@ -44,9 +36,7 @@ export function applyRelativeTransform(
   live: TransformBasis,
   base: TransformBasis,
 ) {
-  if (!element) {
-    return;
-  }
+  if (!element) return;
   const relScale = live.scale / base.scale;
   const relTx = live.tx - base.tx * relScale;
   const relTy = live.ty - base.ty * relScale;
@@ -60,17 +50,11 @@ export function applyRelativeTransform(
 export function unprojectMercatorRef({ x, y }: { x: number; y: number }): Point {
   const nx = Math.max(0, Math.min(1, x / MERCATOR_REF_SCALE));
   const ny = Math.max(0.05, Math.min(0.95, y / MERCATOR_REF_SCALE));
-  const longitude = nx * 360 - 180;
-  const latitudeRadians = Math.atan(Math.sinh(Math.PI * (1 - 2 * ny)));
-  return [(latitudeRadians * 180) / Math.PI, longitude];
+  return [(Math.atan(Math.sinh(Math.PI * (1 - 2 * ny))) * 180) / Math.PI, nx * 360 - 180];
 }
 
 export function buildWorkerRoutes(decoded: ReadonlyArray<DecodedRoute>): Array<WorkerRouteEntry> {
-  return decoded.map((route) => ({
-    id: route.id,
-    legs: mercatorLegsOf(route),
-    tone: route.tone,
-  }));
+  return decoded.map((r) => ({ id: r.id, legs: mercatorLegsOf(r), tone: r.tone }));
 }
 
 function resolveCssVarColor(styles: CSSStyleDeclaration, varName: string, dark: boolean): string {
@@ -95,14 +79,10 @@ function packLeg(leg) {
   const coords = new Int32Array(len * 2);
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   for (let i = 0; i < len; i++) {
-    const x = leg[i][0];
-    const y = leg[i][1];
-    coords[i * 2] = x;
-    coords[i * 2 + 1] = y;
-    if (x < minX) minX = x;
-    if (x > maxX) maxX = x;
-    if (y < minY) minY = y;
-    if (y > maxY) maxY = y;
+    const x = leg[i][0], y = leg[i][1];
+    coords[i * 2] = x; coords[i * 2 + 1] = y;
+    if (x < minX) minX = x; if (x > maxX) maxX = x;
+    if (y < minY) minY = y; if (y > maxY) maxY = y;
   }
   return { minX, maxX, minY, maxY, coords };
 }
@@ -110,11 +90,7 @@ function packLeg(leg) {
 self.onmessage = (event) => {
   const msg = event.data;
   if (msg.type === 'routes') {
-    allRoutes = msg.routes.map((r) => ({
-      id: r.id,
-      tone: r.tone,
-      chunks: r.legs.map(packLeg),
-    }));
+    allRoutes = msg.routes.map((r) => ({ id: r.id, tone: r.tone, chunks: r.legs.map(packLeg) }));
     return;
   }
   if (msg.type !== 'render') return;
@@ -207,7 +183,6 @@ type AtlasRoutesCanvasProps = {
   height: number;
   hostRef: RefObject<HTMLElement | null>;
   liveBasisRef: RefObject<TransformBasis>;
-  onCanvasReady: () => void;
   preRenderRef: RefObject<((center: Point, zoom: number) => void) | null>;
   tones: ReadonlyArray<string>;
   visible: ReadonlySet<number> | null;
@@ -225,7 +200,6 @@ export function AtlasRoutesCanvas({
   height,
   hostRef,
   liveBasisRef,
-  onCanvasReady,
   preRenderRef,
   tones,
   visible,
@@ -238,25 +212,23 @@ export function AtlasRoutesCanvas({
   const reqIdRef = useRef(0);
   const sentRoutesRef = useRef<ReadonlyArray<WorkerRouteEntry> | null>(null);
   const lastRenderKeyRef = useRef('');
-  const readyCalledRef = useRef(false);
+  const paletteCacheRef = useRef<{
+    casingColor: string;
+    dark: boolean;
+    toneColors: Record<string, string>;
+    tones: ReadonlyArray<string>;
+  } | null>(null);
 
   useEffect(() => {
-    if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') {
-      return;
-    }
-    const blob = new Blob([WORKER_SCRIPT], { type: 'application/javascript' });
-    const url = URL.createObjectURL(blob);
+    if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') return;
+    const url = URL.createObjectURL(new Blob([WORKER_SCRIPT], { type: 'application/javascript' }));
     const worker = new Worker(url);
     workerRef.current = worker;
 
     worker.onmessage = (event: MessageEvent) => {
       const { bitmap, dpr, height: bh, id, scale, tx, ty, width: bw } = event.data;
-      if (id < reqIdRef.current) {
-        bitmap?.close?.();
-        return;
-      }
       const canvas = canvasRef.current;
-      if (!canvas) {
+      if (id < reqIdRef.current || !canvas) {
         bitmap?.close?.();
         return;
       }
@@ -270,12 +242,12 @@ export function AtlasRoutesCanvas({
       const nextBasis = { scale, tx, ty };
       basisRef.current = nextBasis;
       applyRelativeTransform(canvas, liveBasisRef.current, nextBasis);
-      if (!readyCalledRef.current) {
-        readyCalledRef.current = true;
-        if (hostRef.current) {
-          hostRef.current.dataset.canvasReady = 'true';
+      const host = hostRef.current;
+      if (host && host.dataset.canvasReady !== 'true') {
+        host.dataset.canvasReady = 'true';
+        for (const path of host.querySelectorAll('[data-atlas-overlay] path')) {
+          path.setAttribute('d', '');
         }
-        onCanvasReady();
       }
     };
 
@@ -286,14 +258,12 @@ export function AtlasRoutesCanvas({
       sentRoutesRef.current = null;
       lastRenderKeyRef.current = '';
     };
-  }, [basisRef, canvasRef, hostRef, liveBasisRef, onCanvasReady]);
+  }, [basisRef, canvasRef, hostRef, liveBasisRef]);
 
   const dispatchRender = (targetCenter: Point, targetZoom: number) => {
     const worker = workerRef.current;
     const canvas = canvasRef.current;
-    if (!worker || !canvas || width <= 0 || height <= 0) {
-      return;
-    }
+    if (!worker || !canvas || width <= 0 || height <= 0) return;
     if (sentRoutesRef.current !== workerRoutes) {
       sentRoutesRef.current = workerRoutes;
       worker.postMessage({ routes: workerRoutes, type: 'routes' });
@@ -306,27 +276,28 @@ export function AtlasRoutesCanvas({
     }
     lastRenderKeyRef.current = renderKey;
 
-    const root = canvas.closest('.collageRoot') ?? document.documentElement;
-    const styles = getComputedStyle(root);
-    const casingColor = resolveCssVarColor(styles, dark ? '--black' : '--cream', dark);
-    const toneColors: Record<string, string> = {};
-    for (const tone of tones) {
-      toneColors[tone] = resolveCssVarColor(styles, `--${tone}`, dark);
+    if (
+      !paletteCacheRef.current ||
+      paletteCacheRef.current.dark !== dark ||
+      paletteCacheRef.current.tones !== tones
+    ) {
+      const styles = getComputedStyle(canvas.closest('.collageRoot') ?? document.documentElement);
+      const casingColor = resolveCssVarColor(styles, dark ? '--black' : '--cream', dark);
+      const toneColors = Object.fromEntries(
+        tones.map((tone) => [tone, resolveCssVarColor(styles, `--${tone}`, dark)]),
+      );
+      paletteCacheRef.current = { casingColor, dark, toneColors, tones };
     }
-
+    const { casingColor, toneColors } = paletteCacheRef.current;
     const zoomFactor = Math.max(0, Math.min(1, (targetZoom - 4) / (15 - 4)));
-    const casingWidth = 2 + zoomFactor * 5;
-    const lineWidth = 1 + zoomFactor * 2.5;
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-
     reqIdRef.current += 1;
     worker.postMessage({
       casingColor,
-      casingWidth,
-      dpr,
+      casingWidth: 2 + zoomFactor * 5,
+      dpr: Math.min(2, window.devicePixelRatio || 1),
       height,
       id: reqIdRef.current,
-      lineWidth,
+      lineWidth: 1 + zoomFactor * 2.5,
       scale: basis.scale,
       toneColors,
       tx: basis.tx,
@@ -338,7 +309,6 @@ export function AtlasRoutesCanvas({
   };
 
   preRenderRef.current = dispatchRender;
-
   useEffect(() => {
     dispatchRender(center, zoom);
   });

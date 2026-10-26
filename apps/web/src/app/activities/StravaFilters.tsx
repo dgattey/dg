@@ -166,7 +166,6 @@ export function StravaFilters({
     span.kind === 'all' ? sportOutings : sportOutings.filter((outing) => inSpan(span, outing));
   const filtered = sport !== 'all' || span.kind !== 'all';
   const visibleSetRef = useRef<{
-    filtered: boolean;
     outings: typeof outings;
     set: ReadonlySet<number> | null;
     span: Span;
@@ -176,16 +175,10 @@ export function StravaFilters({
     !visibleSetRef.current ||
     visibleSetRef.current.outings !== outings ||
     visibleSetRef.current.sport !== sport ||
-    visibleSetRef.current.span !== span ||
-    visibleSetRef.current.filtered !== filtered
+    visibleSetRef.current.span !== span
   ) {
-    visibleSetRef.current = {
-      filtered,
-      outings,
-      set: filtered ? new Set(visible.map(({ id }) => id)) : null,
-      span,
-      sport,
-    };
+    const set = filtered ? new Set(visible.map(({ id }) => id)) : null;
+    visibleSetRef.current = { outings, set, span, sport };
   }
   const bumpFit = () => setFitKey((key) => key + 1);
   const selectRegion = (nextCity: CoverageCity) => {

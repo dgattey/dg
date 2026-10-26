@@ -3,8 +3,12 @@
 import type { TileComponentProps } from 'pigeon-maps';
 import { type CSSProperties, type RefObject, useEffect, useState } from 'react';
 
-/** Lazy, so a hidden scheme's tiles never load until that scheme shows. */
-export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
+/** Lazy for network tiles, so a hidden scheme's tiles never load until that scheme shows. */
+export function SmoothTile({ tile }: TileComponentProps) {
+  if (!tile.active) {
+    return <></>;
+  }
+  const isDataUri = tile.url.startsWith('data:');
   const tileVars = {
     '--tile-h': `${tile.height}px`,
     '--tile-left': `${tile.left}px`,
@@ -12,15 +16,14 @@ export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
     '--tile-w': `${tile.width}px`,
   } as CSSProperties;
   return (
-    <div data-active={tile.active ? 'true' : undefined} data-map-tile="" style={tileVars}>
+    <div data-active="true" data-map-tile="" style={tileVars}>
       <img
         alt=""
         data-map-tile-img=""
-        decoding="async"
-        loading="lazy"
-        onLoad={tileLoaded}
+        decoding={isDataUri ? undefined : 'async'}
+        loading={isDataUri ? undefined : 'lazy'}
         src={tile.url}
-        srcSet={tile.srcSet}
+        srcSet={tile.srcSet || undefined}
       />
     </div>
   );
