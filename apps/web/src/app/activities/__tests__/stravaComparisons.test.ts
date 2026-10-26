@@ -32,12 +32,15 @@ describe('everestComparison', () => {
 });
 
 describe('movingTimeComparison', () => {
-  it('counts days in the saddle for rides and on the move for anything else', () => {
+  it('counts nonstop days in the saddle for rides and on the move for anything else', () => {
     expect(movingTimeComparison(1_512 * 3600, 'ride')).toEqual({
       figure: '63',
-      unit: 'days in the saddle',
+      unit: 'nonstop days in the saddle',
     });
-    expect(movingTimeComparison(DAY, 'run')).toEqual({ figure: '1', unit: 'day on the move' });
+    expect(movingTimeComparison(DAY, 'run')).toEqual({
+      figure: '1',
+      unit: 'nonstop day on the move',
+    });
     expect(movingTimeComparison(6 * 3600, 'all')).toEqual({
       figure: '25%',
       unit: 'of a day on the move',

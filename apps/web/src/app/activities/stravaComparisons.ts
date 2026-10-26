@@ -59,7 +59,7 @@ export function everestComparison(meters: number): Comparison {
   return { figure, unit: figure === '1' ? 'Everest climbed' : 'Everests climbed' };
 }
 
-/** Moving time as days without stopping: `63` days in the saddle, or `25%` of a day for a short spell. */
+/** Moving time as days without stopping: `63` nonstop days in the saddle, or `25%` of a day for a short spell. */
 export function movingTimeComparison(seconds: number, sport: StravaSport | 'all'): Comparison {
   const days = seconds / SECONDS_PER_DAY;
   const doing = sport === 'ride' ? 'in the saddle' : 'on the move';
@@ -67,5 +67,5 @@ export function movingTimeComparison(seconds: number, sport: StravaSport | 'all'
     return { figure: `${Math.round(days * 100)}%`, unit: `of a day ${doing}` };
   }
   const figure = formatRatio(days);
-  return { figure, unit: `${figure === '1' ? 'day' : 'days'} ${doing}` };
+  return { figure, unit: `nonstop ${figure === '1' ? 'day' : 'days'} ${doing}` };
 }
