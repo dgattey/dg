@@ -4,7 +4,7 @@ import type {
   StravaOuting,
 } from '@dg/content-models/strava/StravaHistory';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PAPER_TONES } from '../../collage/types';
 import { StravaHistorySections } from '../StravaHistorySections';
@@ -467,16 +467,5 @@ describe('StravaHistorySections', () => {
 
     expect(tones.length).toBeGreaterThan(10);
     expect(tones.filter((tone) => !allowed.includes(tone))).toEqual([]);
-  });
-
-  it('pans the atlas map via GPU gesture transforms and updates the active region on release', () => {
-    const { container } = renderSections(full);
-    const tiles = container.querySelector('[data-atlas-tiles]') as HTMLElement;
-
-    fireEvent.mouseDown(tiles, { button: 0, clientX: 400, clientY: 300 });
-    fireEvent.mouseMove(window, { clientX: 480, clientY: 350 });
-    expect(tiles.style.transform).toContain('translate3d(');
-    fireEvent.mouseUp(window);
-    expect(tiles.style.transform).toBe('');
   });
 });

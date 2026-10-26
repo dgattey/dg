@@ -2,7 +2,6 @@
 
 import { Map as PigeonMapCore } from 'pigeon-maps';
 import { useRef } from 'react';
-import { RouteSvgPaths } from './RouteSvgPaths';
 import type { FramedPath, RouteFrame } from './routeFrame';
 import { ROUTE_MAP_TOKENS } from './routeMapTokens';
 import { SmoothTile, useHostSize } from './SmoothTile';
@@ -28,6 +27,7 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
   const size = useHostSize(containerRef, { height: frame.height, width: frame.width });
   const zoom =
     frame.zoom + Math.log2(Math.max(size.width / frame.width, size.height / frame.height));
+  const casingStroke = `light-dark(${ROUTE_MAP_TOKENS.light.casingStroke}, ${ROUTE_MAP_TOKENS.dark.casingStroke})`;
 
   return (
     <div aria-hidden="true" data-route-map="" ref={containerRef}>
@@ -64,12 +64,21 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
         preserveAspectRatio="xMidYMid slice"
         viewBox={`0 0 ${frame.width} ${frame.height}`}
       >
-        <RouteSvgPaths
-          casingStroke={`light-dark(${ROUTE_MAP_TOKENS.light.casingStroke}, ${ROUTE_MAP_TOKENS.dark.casingStroke})`}
-          casingWidth={strokeWidth + 2.5}
-          lineWidth={strokeWidth}
-          paths={paths}
-        />
+        {[true, false].map((casing) =>
+          paths.map(({ d, tone }) => (
+            <path
+              d={d}
+              data-tone={casing ? undefined : tone}
+              fill="none"
+              key={casing ? `casing-${tone}` : tone}
+              stroke={casing ? casingStroke : `var(--${tone})`}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={casing ? strokeWidth + 2.5 : strokeWidth}
+              vectorEffect="non-scaling-stroke"
+            />
+          )),
+        )}
       </svg>
     </div>
   );

@@ -93,38 +93,6 @@
   overflow: clip;
   border-radius: 0;
 }
-.strava__atlasMap::after {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  content: "";
-  background:
-    radial-gradient(
-      circle at var(--print-radius) var(--print-radius),
-      transparent calc(var(--print-radius) - 0.5px),
-      var(--pc, var(--cream)) var(--print-radius)
-    )
-    0 0 / var(--print-radius) var(--print-radius) no-repeat,
-    radial-gradient(
-      circle at 0 var(--print-radius),
-      transparent calc(var(--print-radius) - 0.5px),
-      var(--pc, var(--cream)) var(--print-radius)
-    )
-    100% 0 / var(--print-radius) var(--print-radius) no-repeat,
-    radial-gradient(
-      circle at var(--print-radius) 0,
-      transparent calc(var(--print-radius) - 0.5px),
-      var(--pc, var(--cream)) var(--print-radius)
-    )
-    0 100% / var(--print-radius) var(--print-radius) no-repeat,
-    radial-gradient(
-      circle at 0 0,
-      transparent calc(var(--print-radius) - 0.5px),
-      var(--pc, var(--cream)) var(--print-radius)
-    )
-    100% 100% / var(--print-radius) var(--print-radius) no-repeat;
-}
 .strava__atlasBlank,
 .strava__printBlank {
   background: color-mix(in oklab, var(--cerulean) 34%, var(--cream));
