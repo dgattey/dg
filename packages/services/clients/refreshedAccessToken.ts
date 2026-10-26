@@ -84,10 +84,17 @@ export async function upsertAndCacheToken({
   return token;
 }
 
+const isUnexpired = (expiryAt: Date | null): expiryAt is Date =>
+  Boolean(expiryAt && Number(expiryAt) > Date.now());
+
 async function readTokenWithHooks(name: string): Promise<StoredTokenRecord> {
   if (process.env.NODE_ENV !== 'test' && tokenCacheHooks.readToken) {
     try {
-      return await tokenCacheHooks.readToken(name);
+      const cached = await tokenCacheHooks.readToken(name);
+      // Another instance may have persisted a fresh token after this cache entry went stale.
+      if (isUnexpired(cached.expiryAt)) {
+        return cached;
+      }
     } catch (error) {
       if (error instanceof MissingTokenError) {
         throw error;
@@ -99,13 +106,12 @@ async function readTokenWithHooks(name: string): Promise<StoredTokenRecord> {
 
 async function queryLatestTokenFromDb({ name }: FetchTokenProps): Promise<StoredTokenLookup> {
   const { refreshToken, accessToken, expiryAt } = await readTokenWithHooks(name);
-  const isValid = Boolean(expiryAt && Number(expiryAt) > Date.now());
-  if (isValid && accessToken && expiryAt) {
+  if (isUnexpired(expiryAt) && accessToken) {
     cachedTokens.set(name, { accessToken, expiryAt, refreshToken });
-  } else {
-    cachedTokens.delete(name);
+    return { accessToken, refreshToken };
   }
-  return { accessToken: isValid && accessToken ? accessToken : null, refreshToken };
+  cachedTokens.delete(name);
+  return { accessToken: null, refreshToken };
 }
 
 function getLatestTokenIfValid({ name }: FetchTokenProps): Promise<StoredTokenLookup> {
@@ -165,49 +171,36 @@ async function refreshTokenAndPersistInternal(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
-  forcePersist: boolean,
+  throwOnPersistError: boolean,
 ): Promise<ValidatedToken> {
   log.info('Fetching refreshed token', { name });
-  const {
-    refreshToken: newRefreshToken,
-    accessToken,
-    expiryAt,
-  } = await fetchRefreshedTokenFromApi(name, refreshTokenConfig, refreshToken);
+  const refreshed = await fetchRefreshedTokenFromApi(name, refreshTokenConfig, refreshToken);
   log.info('Fetched refreshed token', { name });
-  if (forcePersist || newRefreshToken !== refreshToken) {
-    if (Number(expiryAt) > Date.now()) {
-      cachedTokens.set(name, { accessToken, expiryAt, refreshToken: newRefreshToken });
+  try {
+    await upsertAndCacheToken({ name, ...refreshed });
+    log.info('Updated token in db, returning', { name });
+  } catch (error) {
+    if (throwOnPersistError) {
+      throw error;
     }
-    try {
-      await upsertAndCacheToken({
-        accessToken,
-        expiryAt,
-        name,
-        refreshToken: newRefreshToken,
-      });
-      log.info('Updated token in db, returning', { name });
-    } catch (error) {
-      if (forcePersist) {
-        throw error;
-      }
-      log.warn('Could not persist refreshed token to database; keeping in memory', {
-        error,
-        name,
-      });
+    log.warn('Could not persist refreshed token to database; keeping in memory', {
+      error,
+      name,
+    });
+    if (isUnexpired(refreshed.expiryAt)) {
+      cachedTokens.set(name, refreshed);
+    } else {
+      cachedTokens.delete(name);
     }
-  } else if (Number(expiryAt) > Date.now()) {
-    cachedTokens.set(name, { accessToken, expiryAt, refreshToken: newRefreshToken });
-  } else {
-    cachedTokens.delete(name);
   }
-  return { accessToken, expiryAt, refreshToken: newRefreshToken };
+  return refreshed;
 }
 
 async function refreshTokenAndPersist(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
-  forcePersist = false,
+  throwOnPersistError: boolean,
 ): Promise<ValidatedToken> {
   const existingRefresh = pendingRefreshes.get(name);
   if (existingRefresh) {
@@ -219,7 +212,7 @@ async function refreshTokenAndPersist(
     name,
     refreshTokenConfig,
     refreshToken,
-    forcePersist,
+    throwOnPersistError,
   );
   pendingRefreshes.set(name, refreshPromise);
 
@@ -248,7 +241,7 @@ export async function refreshedAccessToken(
     cachedTokens.delete(name);
   } else {
     const cached = cachedTokens.get(name);
-    if (cached && Number(cached.expiryAt) > Date.now()) {
+    if (cached && isUnexpired(cached.expiryAt)) {
       return cached.accessToken;
     }
   }

@@ -120,7 +120,7 @@ describe('refreshedAccessToken', () => {
     expect(updatedToken?.refreshToken).toBe('new-refresh-token');
   });
 
-  it('caches refreshed access token in memory without writing to DB when refresh_token is unchanged', async () => {
+  it('persists the refreshed access token and expiry when refresh_token is unchanged', async () => {
     await db.Token.upsert({
       accessToken: 'expired-access-token',
       expiryAt: new Date(0),
@@ -137,21 +137,18 @@ describe('refreshedAccessToken', () => {
       status: 200,
     });
 
-    const upsertSpy = jest.spyOn(db.Token, 'upsert');
-    const findOneSpy = jest.spyOn(db.Token, 'findOne');
-    try {
-      const first = await refreshedAccessToken('unchanged-refresh-token', mockRefreshConfig);
-      const second = await refreshedAccessToken('unchanged-refresh-token', mockRefreshConfig);
+    const first = await refreshedAccessToken('unchanged-refresh-token', mockRefreshConfig);
+    clearTokenCache();
+    const second = await refreshedAccessToken('unchanged-refresh-token', mockRefreshConfig);
 
-      expect(first).toBe('fresh-access-token');
-      expect(second).toBe('fresh-access-token');
-      expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect(findOneSpy).toHaveBeenCalledTimes(1);
-      expect(upsertSpy).not.toHaveBeenCalled();
-    } finally {
-      upsertSpy.mockRestore();
-      findOneSpy.mockRestore();
-    }
+    expect(first).toBe('fresh-access-token');
+    expect(second).toBe('fresh-access-token');
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    const stored = await db.Token.findOne({ where: { name: 'unchanged-refresh-token' } });
+    expect(stored?.accessToken).toBe('fresh-access-token');
+    expect(stored?.refreshToken).toBe('stable-refresh-token');
+    expect(Number(stored?.expiryAt)).toBeGreaterThan(Date.now());
   });
 
   it('deduplicates concurrent refresh requests - only one API call is made', async () => {
