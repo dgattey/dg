@@ -76,7 +76,6 @@
   height: 100%;
   overflow: hidden;
   isolation: isolate;
-  will-change: transform;
 }
 
 [data-atlas-overlay] {

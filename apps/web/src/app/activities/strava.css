@@ -81,6 +81,8 @@
 .strava__atlasMat {
   position: relative;
   padding: var(--mat-feature);
+  overflow: visible;
+  border-radius: 0;
 }
 .strava__atlasMap {
   position: relative;
@@ -89,8 +91,20 @@
 .strava__atlasBlank {
   aspect-ratio: 780 / 940;
   overflow: clip;
-  border-radius: var(--print-radius);
-  will-change: transform;
+  border-radius: 0;
+}
+.strava__atlasMap::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(circle at 6px 6px, transparent 5.5px, var(--cream) 6px) 0 0 / 6px 6px no-repeat,
+    radial-gradient(circle at 0 6px, transparent 5.5px, var(--cream) 6px) 100% 0 / 6px 6px no-repeat,
+    radial-gradient(circle at 6px 0, transparent 5.5px, var(--cream) 6px) 0 100% / 6px 6px no-repeat,
+    radial-gradient(circle at 0 0, transparent 5.5px, var(--cream) 6px) 100% 100% / 6px 6px
+    no-repeat;
 }
 .strava__atlasBlank,
 .strava__printBlank {
