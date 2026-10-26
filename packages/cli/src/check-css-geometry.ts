@@ -10,6 +10,7 @@ import type { StructureViolation } from './check-structure.js';
 
 /** Narrowest box a page grid gets: a 320px phone minus the 16px page gutters. */
 export const NARROWEST_GRID_PX = 288;
+const lastCompound = (selector: string): string => selector.split(/[\s>+~]+/).at(-1) ?? '';
 
 function columnGapPx(body: string): number | null | undefined {
   const gap = declaration(body, 'column-gap') ?? declaration(body, 'gap')?.split(/\s+/).at(-1);
@@ -24,13 +25,8 @@ function trackCount(columns: string): number {
     count += Number(n);
     return ' ';
   });
-  return (
-    count +
-    rest
-      .replace(/\([^()]*\)/g, '')
-      .split(/\s+/)
-      .filter(Boolean).length
-  );
+  const tokens = rest.replace(/\([^()]*\)/g, '').split(/\s+/);
+  return count + tokens.filter(Boolean).length;
 }
 
 type GridOverride = { columns?: string; display?: string; gap: number | null | undefined };
@@ -73,47 +69,46 @@ export function checkScallopPadding(
         );
       }
       const stickerPct = /^(\d+(?:\.\d+)?)%$/.exec(pad ?? '');
-      if (
+      const badSticker =
         rule.selectors.includes('.stats__scallop--sticker') &&
         pad &&
-        (!stickerPct || Number(stickerPct[1]) < 14)
-      ) {
+        (!stickerPct || Number(stickerPct[1]) < 14);
+      if (badSticker) {
         flag('Sticker padding must be at least 14% to clear the scallop valleys');
       }
       if (!rule.media) {
         for (const selector of rule.selectors.filter((s) => statSeals.has(s))) {
           const px = /(\d+(?:\.\d+)?)px/.exec(declaration(rule.body, 'width') ?? '');
           if (px && Number(px[1]) < 184) {
-            flag(
-              `Stat seal \`${selector}\` needs at least 184px width (${px[1]}px given) so wrapped lines stay inside the circular ring chord`,
-            );
+            flag(`Stat seal \`${selector}\` needs >= 184px width (${px[1]}px given)`);
           }
         }
       }
-      if (
-        rule.selectors.some((s) => /\.stats__scallop/.test(s)) &&
-        /--type-(?:title-lg|display|h1)\b/.test(rule.body)
-      ) {
-        flag(
-          'Seal and sticker text must use --type-title-md or smaller so multi-line stacks stay inside the circular ring chord',
-        );
+      const isScallop = rule.selectors.some((s) => /\.stats__scallop/.test(s));
+      if (isScallop && /--type-(?:title-lg|display|h1)\b/.test(rule.body)) {
+        flag('Seal and sticker text must use --type-title-md or smaller');
       }
       const scallop = rule.selectors.some(
-        (selector) =>
-          !owners.has(selector) &&
-          /\.stats__scallop(?![\w-]*::?)/.test(selector.split(/[\s>+~]+/).at(-1) ?? ''),
+        (s) => !owners.has(s) && /\.stats__scallop(?![\w-]*::?)/.test(lastCompound(s)),
       );
       if (scallop && /(?:^|[;\s])padding(?:-[a-z]+)?\s*:/.test(rule.body)) {
-        flag(
-          'Size the seal or sticker instead of overriding scallop padding, which keeps text inside the ring',
-        );
+        flag('Size the seal or sticker instead of overriding scallop padding');
       }
     }
   }
   return violations;
 }
 
-const lastCompound = (selector: string): string => selector.split(/[\s>+~]+/).at(-1) ?? '';
+const STREETS_HEAD_PROPS = [
+  ['.streets__cities', 'flex-shrink', '0'],
+  ['.streets__cities', 'flex-wrap', 'nowrap'],
+  ['.streets__figures', 'min-width', '0'],
+  ['.streets__figures', 'max-width', '100%'],
+  ['.streets__focusName', 'min-width', '0'],
+  ['.streets__focusName', 'white-space', 'nowrap'],
+  ['.streets__focusShare', 'white-space', 'nowrap'],
+  ['.streets__figures .strava__aside', 'white-space', 'nowrap'],
+] as const;
 
 export function checkCardHeadStable(
   cssFiles: ReadonlyMap<string, string>,
@@ -156,6 +151,22 @@ export function checkCardHeadStable(
       );
     }
   }
+  const streetsFile = 'apps/web/src/app/activities/streetCoverage.css';
+  const streetsCss = cssFiles.get(streetsFile);
+  if (streetsCss) {
+    const baseRules = cssRules(streetsCss).filter((r) => !r.media);
+    for (const [sel, prop, val] of STREETS_HEAD_PROPS) {
+      const matches = baseRules.filter((r) => r.selectors.includes(sel));
+      if (!matches.some((r) => declaration(r.body, prop) === val)) {
+        violations.push({
+          file: streetsFile,
+          line: lineAt(streetsCss, matches[0]?.index ?? 0),
+          message: `\`${sel}\` needs \`${prop}: ${val}\` so hovering a neighborhood never changes the header height`,
+          rule: 'css-card-head-wrap',
+        });
+      }
+    }
+  }
   return violations;
 }
 
@@ -164,13 +175,11 @@ export function checkCornerTagRoom(
 ): Array<StructureViolation> {
   const rulesByFile = new Map([...cssFiles].map(([file, content]) => [file, cssRules(content)]));
   const roomFor = new Set<string>();
-  for (const rules of rulesByFile.values()) {
-    for (const rule of rules) {
-      if (!/(?:^|[;\s])padding(?:-right|-inline-end|-inline)?\s*:/.test(rule.body)) continue;
-      for (const selector of rule.selectors) {
-        for (const match of selector.matchAll(/:has\(>\s*(\.[\w-]+)\)/g)) {
-          if (match[1] && /\.stats__head|\.stats__heading/.test(selector)) roomFor.add(match[1]);
-        }
+  for (const rule of [...rulesByFile.values()].flat()) {
+    if (!/(?:^|[;\s])padding(?:-right|-inline-end|-inline)?\s*:/.test(rule.body)) continue;
+    for (const selector of rule.selectors.filter((s) => /\.stats__head|\.stats__heading/.test(s))) {
+      for (const match of selector.matchAll(/:has\(>\s*(\.[\w-]+)\)/g)) {
+        if (match[1]) roomFor.add(match[1]);
       }
     }
   }
@@ -179,26 +188,25 @@ export function checkCornerTagRoom(
     for (const rule of rules) {
       const tag = rule.selectors.length === 1 ? rule.selectors[0] : undefined;
       if (!tag || !/^\.[\w-]+$/.test(tag) || rule.media) continue;
+      const right = declaration(rule.body, 'right');
       const hangs =
         declaration(rule.body, 'position') === 'absolute' &&
         declaration(rule.body, 'top')?.startsWith('-') &&
-        declaration(rule.body, 'right') !== undefined &&
-        !declaration(rule.body, 'right')?.startsWith('-') &&
+        right !== undefined &&
+        !right.startsWith('-') &&
         !declaration(rule.body, 'z-index')?.startsWith('-');
       if (!hangs) continue;
+      const hasWidth = Boolean(
+        declaration(rule.body, 'width') || declaration(rule.body, 'max-width'),
+      );
       const problems = [
-        declaration(rule.body, 'width') || declaration(rule.body, 'max-width')
-          ? null
-          : 'a `width` or `max-width`',
+        hasWidth ? null : 'a `width` or `max-width`',
         roomFor.has(tag) ? null : `a \`.paperWrap:has(> ${tag})\` rule padding the card head`,
       ].filter(Boolean);
       if (problems.length > 0) {
-        violations.push({
-          file,
-          line: lineAt(cssFiles.get(file) ?? '', rule.index),
-          message: `Corner tag \`${tag}\` needs ${problems.join(' and ')} so card text keeps clear of it`,
-          rule: 'css-corner-tag-room',
-        });
+        const line = lineAt(cssFiles.get(file) ?? '', rule.index);
+        const message = `Corner tag \`${tag}\` needs ${problems.join(' and ')} so card text keeps clear of it`;
+        violations.push({ file, line, message, rule: 'css-corner-tag-room' });
       }
     }
   }
@@ -208,17 +216,15 @@ export function checkCornerTagRoom(
 export function checkGridGapsFit(cssFiles: ReadonlyMap<string, string>): Array<StructureViolation> {
   const rulesByFile = new Map([...cssFiles].map(([file, content]) => [file, cssRules(content)]));
   const overrides = new Map<string, Array<GridOverride>>();
-  for (const rules of rulesByFile.values()) {
-    for (const rule of rules) {
-      if (!rule.media?.includes('max-width')) continue;
-      const override = {
-        columns: declaration(rule.body, 'grid-template-columns'),
-        display: declaration(rule.body, 'display'),
-        gap: columnGapPx(rule.body),
-      };
-      for (const selector of rule.selectors) {
-        overrides.set(selector, [...(overrides.get(selector) ?? []), override]);
-      }
+  for (const rule of [...rulesByFile.values()].flat()) {
+    if (!rule.media?.includes('max-width')) continue;
+    const override = {
+      columns: declaration(rule.body, 'grid-template-columns'),
+      display: declaration(rule.body, 'display'),
+      gap: columnGapPx(rule.body),
+    };
+    for (const selector of rule.selectors) {
+      overrides.set(selector, [...(overrides.get(selector) ?? []), override]);
     }
   }
   const violations: Array<StructureViolation> = [];
@@ -232,12 +238,9 @@ export function checkGridGapsFit(cssFiles: ReadonlyMap<string, string>): Array<S
         (overrides.get(selector) ?? []).some((override) => overrideFits(override, columns, gap)),
       );
       if (gapsPx > NARROWEST_GRID_PX && !collapses) {
-        violations.push({
-          file,
-          line: lineAt(cssFiles.get(file) ?? '', rule.index),
-          message: `${trackCount(columns)} columns with ${gap}px gaps need ${gapsPx}px, wider than a ${NARROWEST_GRID_PX}px phone box; collapse the columns in a max-width media query`,
-          rule: 'css-grid-gaps-fit',
-        });
+        const line = lineAt(cssFiles.get(file) ?? '', rule.index);
+        const message = `${trackCount(columns)} columns with ${gap}px gaps need ${gapsPx}px, wider than a ${NARROWEST_GRID_PX}px phone box; collapse the columns in a max-width media query`;
+        violations.push({ file, line, message, rule: 'css-grid-gaps-fit' });
       }
     }
   }
@@ -264,12 +267,9 @@ export function checkHeaderAboveSticky(
         Number.isFinite(z) &&
         z >= maxZ
       ) {
-        violations.push({
-          file,
-          line: lineAt(cssFiles.get(file) ?? '', rule.index),
-          message: `Sticky rule \`${rule.selectors.join(', ')}\` has z-index ${z}, which must be below \`.chrome__header\` (z-index ${maxZ}) so the header dropdown paints on top`,
-          rule: 'css-header-above-sticky',
-        });
+        const line = lineAt(cssFiles.get(file) ?? '', rule.index);
+        const message = `Sticky rule \`${rule.selectors.join(', ')}\` has z-index ${z}, which must be below \`.chrome__header\` (z-index ${maxZ}) so the header dropdown paints on top`;
+        violations.push({ file, line, message, rule: 'css-header-above-sticky' });
       }
     }
   }
@@ -284,6 +284,30 @@ const RAW_MARK_PROPS = [
   ['transform', 'none'],
 ] as const;
 
+const HOME_RULES: ReadonlyArray<readonly [boolean, string, (b: string) => boolean, string]> = [
+  [true, '.home__hello', (b) => declaration(b, '--sp-top') === '40px', 'Set --sp-top: 40px'],
+  [true, '.home__headline', (b) => !declaration(b, 'padding-top'), 'Drop padding-top'],
+  [
+    true,
+    '.home__frameCard',
+    (b) => Boolean(declaration(b, '--frame-radius')),
+    'Set --frame-radius',
+  ],
+  [
+    true,
+    '.home__frameShot',
+    (b) => declaration(b, 'border-radius') === 'var(--nested-radius)',
+    'Use --nested-radius',
+  ],
+  [true, '.home__sideRowWrap', (b) => Boolean(declaration(b, '--row-radius')), 'Set --row-radius'],
+  [
+    false,
+    '[data-role="side-project-mark"]',
+    (b) => RAW_MARK_PROPS.every(([k, v]) => declaration(b, k) === v),
+    'Keep side-project marks untouched',
+  ],
+];
+
 export function checkHomepageConsistency(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
@@ -293,45 +317,15 @@ export function checkHomepageConsistency(
   const collage = cssFiles.get(collageFile);
   if (!home || !collage) return [];
   const violations: Array<StructureViolation> = [];
-  const check = (isHome: boolean, sel: string, ok: (b: string) => boolean, message: string) => {
+  for (const [isHome, sel, ok, message] of HOME_RULES) {
     const raw = isHome ? home : collage;
     const rule = cssRules(raw).find((r) => !r.media && r.selectors.join(',') === sel);
     if (rule && !ok(rule.body)) {
       const file = isHome ? homeFile : collageFile;
-      violations.push({
-        file,
-        line: lineAt(raw, rule.index),
-        message,
-        rule: 'css-homepage-consistency',
-      });
+      const line = lineAt(raw, rule.index);
+      violations.push({ file, line, message, rule: 'css-homepage-consistency' });
     }
-  };
-  check(true, '.home__hello', (b) => declaration(b, '--sp-top') === '40px', 'Set --sp-top: 40px');
-  check(true, '.home__headline', (b) => !declaration(b, 'padding-top'), 'Drop padding-top');
-  check(
-    true,
-    '.home__frameCard',
-    (b) => Boolean(declaration(b, '--frame-radius')),
-    'Set --frame-radius',
-  );
-  check(
-    true,
-    '.home__frameShot',
-    (b) => declaration(b, 'border-radius') === 'var(--nested-radius)',
-    'Use --nested-radius',
-  );
-  check(
-    true,
-    '.home__sideRowWrap',
-    (b) => Boolean(declaration(b, '--row-radius')),
-    'Set --row-radius',
-  );
-  check(
-    false,
-    '[data-role="side-project-mark"]',
-    (b) => RAW_MARK_PROPS.every(([k, v]) => declaration(b, k) === v),
-    'Keep side-project marks untouched',
-  );
+  }
   return violations;
 }
 

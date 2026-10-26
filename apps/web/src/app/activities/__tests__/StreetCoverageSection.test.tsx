@@ -143,6 +143,10 @@ describe('StreetCoverageSection', () => {
 
     await user.hover(hoods()[3] as Element);
     expect(header()).toBe('San FranciscoSan DiegoExcelsior30.0%0.6 of 2.0 mi');
+    expect(document.querySelector('.streets__focusName')).toHaveAttribute(
+      'data-typography',
+      'row-title',
+    );
     expect(hoods()[3]).toHaveAttribute('data-tier', '2');
     expect(document.querySelector('.streets__focus')).toHaveAttribute('d', 'M30 0l10 0 0 10z');
   });

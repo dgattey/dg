@@ -123,6 +123,31 @@ describe('check-css-geometry', () => {
     );
   });
 
+  it('keeps the street coverage card head height locked across hovered neighborhoods', () => {
+    const streetsFile = 'apps/web/src/app/activities/streetCoverage.css';
+    const violations = checkCardHeadStable(
+      new Map([
+        [
+          streetsFile,
+          [
+            '.streets__cities { flex-shrink: 0; }',
+            '.streets__figures { min-width: 0; }',
+            '.streets__focusShare, .streets__figures .strava__aside { white-space: nowrap; }',
+            '.streets__focusName { min-width: 0; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, rule }) => ({ line, rule })),
+      [
+        { line: 1, rule: 'css-card-head-wrap' },
+        { line: 2, rule: 'css-card-head-wrap' },
+        { line: 4, rule: 'css-card-head-wrap' },
+      ],
+    );
+  });
+
   it('makes every tag hung over a card face bounded and padded out of the head', () => {
     const violations = checkCornerTagRoom(
       new Map([

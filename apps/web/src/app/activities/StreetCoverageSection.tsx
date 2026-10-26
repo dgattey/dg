@@ -291,7 +291,7 @@ function CityCoverageCards({
           )}
           <span className="streets__figures">
             {focused ? (
-              <span className="streets__focusName" data-typography="title-md">
+              <span className="streets__focusName" data-typography="row-title">
                 {focused.name}
               </span>
             ) : null}
