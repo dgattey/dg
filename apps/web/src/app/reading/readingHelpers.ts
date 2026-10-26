@@ -22,29 +22,34 @@ const READING_FILTERS: Record<ReadingFilterKey, ReadingFilter> = {
   },
 };
 
-type ReadingFilterOption = {
+export type ReadingFilterOption = {
   count: number;
   key: ReadingFilterKey;
   label: string;
   tiltDeg: number;
 };
 
+/** Every non-`all` filter key matched by a single book. */
+export function bookFilterKeys(book: RenderableBook): Array<Exclude<ReadingFilterKey, 'all'>> {
+  return READING_FILTER_KEYS.filter(
+    (key): key is Exclude<ReadingFilterKey, 'all'> =>
+      key !== 'all' && READING_FILTERS[key].matches(book),
+  );
+}
+
 /** Every filter that narrows the shelf. One matching no book, or every book, is left out. */
 export function readingFilterOptions(
   books: ReadonlyArray<RenderableBook>,
 ): Array<ReadingFilterOption> {
-  return READING_FILTER_KEYS.map((key) => ({
-    ...READING_FILTERS[key],
-    count: books.filter(READING_FILTERS[key].matches).length,
-    key,
-  })).filter(({ count, key }) => key === 'all' || (count > 0 && count < books.length));
-}
-
-export function filterBooks(
-  books: ReadonlyArray<RenderableBook>,
-  key: ReadingFilterKey,
-): Array<RenderableBook> {
-  return books.filter(READING_FILTERS[key].matches);
+  return READING_FILTER_KEYS.map((key) => {
+    const { label, matches, tiltDeg } = READING_FILTERS[key];
+    return {
+      count: books.filter(matches).length,
+      key,
+      label,
+      tiltDeg,
+    };
+  }).filter(({ count, key }) => key === 'all' || (count > 0 && count < books.length));
 }
 
 /** Books in progress first, then newest finished. */

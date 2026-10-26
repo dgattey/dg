@@ -413,9 +413,9 @@ describe('check-structure', () => {
     assert.deepEqual(
       checkFileStructure(
         'apps/web/src/app/reading/ReadingShelf.tsx',
-        'export const bar = <div className="reading__filters pillStrip" />;\n',
+        '\'use client\';\nexport const bar = <div className="reading__filters pillStrip" />;\n',
       ).map(({ rule }) => rule),
-      ['no-duplicate-filter-bar'],
+      ['reading-shelf-server-component', 'no-duplicate-filter-bar'],
     );
 
     assert.deepEqual(
