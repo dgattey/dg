@@ -109,9 +109,9 @@ export async function Footer() {
         <div
           className="chrome__helloDescription"
           data-typography="stat-lg"
-          data-typography-md="title-sm"
+          data-typography-md="title-md"
         >
-          <RichText {...footerContent.description} mdVariant="title-sm" variant="stat-lg" />
+          <RichText {...footerContent.description} mdVariant="title-md" variant="stat-lg" />
         </div>
       ) : null}
       {encodedEmail ? <FooterEmailAction encodedEmail={encodedEmail} /> : null}
@@ -180,12 +180,8 @@ export async function Footer() {
           <div className="chrome__footerGrid">
             {sectionOrder.map((key) => (key === 'hello' ? helloColumn : elsewhereColumn))}
           </div>
-          <div
-            className="chrome__colophon"
-            data-typography="row-title"
-            data-typography-md="caption"
-          >
-            <div className="chrome__colophonGroup">
+          <div className="chrome__colophon" data-typography="row-title" data-typography-md="meta">
+            <div className="chrome__colophonGroup chrome__colophonMeta">
               <span>© {new Date(serverTime).getFullYear()} Dylan Gattey</span>
               {version ? (
                 <PageTransitionLink
@@ -204,7 +200,10 @@ export async function Footer() {
                 Site map
               </PageTransitionLink>
             </div>
-            <nav aria-label="Footer navigation" className="chrome__colophonGroup">
+            <nav
+              aria-label="Footer navigation"
+              className="chrome__colophonGroup chrome__colophonNav"
+            >
               {footerDestinations.map((destination) => (
                 <PageTransitionLink
                   className="chrome__colophonLink"

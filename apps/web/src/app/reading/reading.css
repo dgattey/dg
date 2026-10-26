@@ -39,12 +39,22 @@
   margin: 0;
   text-wrap: balance;
 }
+.reading__bookTitle,
+.reading__featureTitle,
+.reading__author {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
 .reading__author,
 .reading__meta {
   margin: 0;
 }
 .reading__author {
-  color: color-mix(in oklab, currentColor 78%, transparent);
+  color: color-mix(in oklab, currentColor 82%, var(--pc, transparent));
 }
 .reading__meta {
   margin-top: 4px;

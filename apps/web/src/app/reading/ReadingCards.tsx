@@ -117,10 +117,11 @@ export function ReviewCard({
         <h3
           className="reading__bookTitle"
           data-typography={kind === 'feature' ? 'title-md' : 'title-sm'}
+          title={book.title}
         >
           {book.title}
         </h3>
-        <p className="reading__author" data-typography="meta">
+        <p className="reading__author" data-typography="meta" title={book.author}>
           {book.author}
         </p>
         {hasMeta(book) ? (
@@ -166,10 +167,10 @@ export function CoverCard({
       tone={treatment.tone}
     >
       <CoverPrint book={book} width={look.coverWidth} />
-      <h3 className="reading__bookTitle" data-typography="title-sm">
+      <h3 className="reading__bookTitle" data-typography="title-sm" title={book.title}>
         {book.title}
       </h3>
-      <p className="reading__author" data-typography="meta">
+      <p className="reading__author" data-typography="meta" title={book.author}>
         {book.author}
       </p>
       {hasMeta(book) ? (

@@ -73,6 +73,7 @@ body {
   overscroll-behavior-x: none;
 }
 :where([data-typography]) {
+  color: inherit;
   margin: 0;
   text-rendering: optimizeLegibility;
 }

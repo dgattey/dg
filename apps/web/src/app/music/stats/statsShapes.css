@@ -5,7 +5,7 @@
   display: inline-grid;
 }
 .stats__cut {
-  --soft: color-mix(in oklab, var(--on) 68%, var(--pc));
+  --soft: color-mix(in oklab, var(--on) 80%, var(--pc));
   color: var(--on);
   filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
   rotate: var(--r, 0deg);

@@ -73,6 +73,10 @@ export function checkFooterCurtainReveal(
   const sheetRule = cssRules(collage).find(
     (r) => !r.media && r.selectors.includes('.collageSheet'),
   );
+  const rootRule = cssRules(collage).find((r) => !r.media && r.selectors.includes('.collageRoot'));
+  const bleedRule = cssRules(collage).find(
+    (r) => !r.media && r.selectors.includes('.collageBleed'),
+  );
   const footerRule = cssRules(chrome).find(
     (r) => !r.media && r.selectors.includes('.chrome__footer'),
   );
@@ -88,6 +92,14 @@ export function checkFooterCurtainReveal(
   const nowZ = Number(declaration(nowWrapRule?.body ?? '', 'z-index'));
 
   const violations: Array<StructureViolation> = [];
+  const flag = (isChrome: boolean, idx: number | undefined, rule: string, message: string) =>
+    violations.push({
+      file: isChrome ? chromeFile : collageFile,
+      line: lineAt(isChrome ? chrome : collage, idx ?? 0),
+      message,
+      rule,
+    });
+
   if (
     declaration(sheetRule?.body ?? '', 'position') !== 'relative' ||
     declaration(footerRule?.body ?? '', 'position') !== 'sticky' ||
@@ -95,48 +107,47 @@ export function checkFooterCurtainReveal(
     declaration(nowWrapRule?.body ?? '', 'height') !== '0' ||
     !(footerZ < sheetZ && sheetZ < nowZ)
   ) {
-    violations.push({
-      file: chromeFile,
-      line: lineAt(chrome, footerRule?.index ?? 0),
-      message:
-        'Keep `.chrome__footer` (`position: sticky; bottom: 0`), `.collageSheet` (`position: relative`), and `.chrome__nowWrap` (`height: 0`) ordered as footer < sheet < nowWrap in z-index',
-      rule: 'css-footer-curtain',
-    });
+    flag(true, footerRule?.index, 'css-footer-curtain', 'Keep footer < sheet < nowWrap in z-index');
   }
   if (!declaration(gridRule?.body ?? '', 'padding-block')) {
-    violations.push({
-      file: chromeFile,
-      line: lineAt(chrome, gridRule?.index ?? 0),
-      message:
-        'Set symmetric vertical spacing on `.chrome__footerGrid` with `padding-block` so top and bottom footer padding stay equal',
-      rule: 'css-footer-curtain',
-    });
+    flag(
+      true,
+      gridRule?.index,
+      'css-footer-curtain',
+      'Set `padding-block` on `.chrome__footerGrid`',
+    );
   }
-  const bleedRule = cssRules(collage).find(
-    (r) => !r.media && r.selectors.includes('.collageBleed'),
-  );
+  if (rootRule && declaration(rootRule.body, 'background-image')?.includes('grain')) {
+    flag(false, rootRule.index, 'css-footer-stationary-texture', 'No grain on `.collageRoot`');
+  }
+  if (
+    footerRule &&
+    declaration(footerRule.body, 'background-image') !== undefined &&
+    (!declaration(footerRule.body, 'background-color') ||
+      !declaration(footerRule.body, 'background-image')?.includes('grain'))
+  ) {
+    flag(true, footerRule.index, 'css-footer-stationary-texture', 'Set grain on `.chrome__footer`');
+  }
   if (bleedRule && declaration(bleedRule.body, '--sheet-inset') !== '0px') {
-    violations.push({
-      file: collageFile,
-      line: lineAt(collage, bleedRule.index),
-      message:
-        'Set `--sheet-inset: 0px` on `.collageBleed` so full-bleed sections do not reflow `.collageMeasure` width during the footer reveal',
-      rule: 'css-footer-curtain',
-    });
+    flag(
+      false,
+      bleedRule.index,
+      'css-footer-curtain',
+      'Set `--sheet-inset: 0px` on `.collageBleed`',
+    );
   }
-  for (const rule of cssRules(chrome)) {
+  for (const r of cssRules(chrome)) {
     if (
-      rule.media &&
-      rule.selectors.includes('.chrome__nowPlaying') &&
-      declaration(rule.body, 'order')?.startsWith('-')
+      r.media &&
+      r.selectors.includes('.chrome__nowPlaying') &&
+      declaration(r.body, 'order')?.startsWith('-')
     ) {
-      violations.push({
-        file: chromeFile,
-        line: lineAt(chrome, rule.index),
-        message:
-          'Keep `.chrome__nowPlaying` below `.chrome__bar` on mobile instead of ordering it above the logo and navigation strip',
-        rule: 'css-mobile-header-order',
-      });
+      flag(
+        true,
+        r.index,
+        'css-mobile-header-order',
+        'No negative `order` on `.chrome__nowPlaying`',
+      );
     }
   }
   return violations;
@@ -246,123 +257,79 @@ export function checkNoDuplicateImplementations(
   if (isTestFile(relPath) || relPath.startsWith('packages/cli/')) {
     return [];
   }
-  const checkHoverMenu = !HOVER_MENU_OWNERS.has(relPath) && content.includes('bindHoverMenu');
-  const checkSkeleton =
-    !SKELETON_OWNERS.has(relPath) &&
-    (content.includes('SkeletonLine') || content.includes('data-skeleton'));
-  const checkCronAuth =
-    relPath.startsWith('apps/web/src/app/api/') &&
-    relPath !== 'apps/web/src/app/api/apiResponses.ts' &&
-    content.includes('CRON_SECRET');
-  const checkTimingSafe =
-    relPath !== 'packages/services/auth/devConsoleBasicAuth.ts' &&
-    content.includes('timingSafeEqual');
-  const checkUnitConstants =
-    !UNIT_CONSTANT_OWNERS.has(relPath) &&
-    (content.includes('METERS_PER_MILE') || content.includes('FEET_PER_METER'));
-  const checkCountFormatter =
-    relPath !== 'packages/shared-core/formatting/formattedDistance.ts' &&
-    content.includes('Intl.NumberFormat');
-  const checkFilterBar =
-    relPath.startsWith('apps/web/src/') &&
-    relPath !== 'apps/web/src/app/collage/FilterBar.tsx' &&
-    content.includes('pillStrip');
-  const checkSharedComponentBoundary =
-    (relPath.startsWith('packages/ui/') ||
-      relPath.startsWith('packages/maps/') ||
-      (relPath.startsWith('apps/web/src/app/collage/') &&
-        !SOCIAL_CARD_VARIANT_ADAPTERS.has(relPath))) &&
-    ROUTE_CLASS_OR_IMPORT_IN_SHARED.test(content);
-
-  if (
-    !checkHoverMenu &&
-    !checkSkeleton &&
-    !checkCronAuth &&
-    !checkTimingSafe &&
-    !checkUnitConstants &&
-    !checkCountFormatter &&
-    !checkFilterBar &&
-    !checkSharedComponentBoundary
-  ) {
-    return [];
-  }
+  const rules: ReadonlyArray<readonly [boolean, RegExp, string, string]> = [
+    [
+      !HOVER_MENU_OWNERS.has(relPath) && content.includes('bindHoverMenu'),
+      /\bbindHoverMenu\b/,
+      'no-duplicate-hover-menu',
+      'Use HoverMenu or PillMenu from apps/web/src/app/collage/PillMenu.tsx instead of wiring bindHoverMenu directly',
+    ],
+    [
+      !SKELETON_OWNERS.has(relPath) &&
+        (content.includes('SkeletonLine') || content.includes('data-skeleton')),
+      /\bfunction\s+SkeletonLine\b|\bdata-skeleton\b/,
+      'no-duplicate-skeleton',
+      'Use Skeleton from @dg/ui/core/Skeleton instead of defining a custom SkeletonLine or raw data-skeleton element',
+    ],
+    [
+      relPath.startsWith('apps/web/src/app/api/') &&
+        relPath !== 'apps/web/src/app/api/apiResponses.ts' &&
+        content.includes('CRON_SECRET'),
+      /\bprocess\.env\.CRON_SECRET\b/,
+      'no-duplicate-cron-auth',
+      'Use isCronAuthorized from apps/web/src/app/api/apiResponses.ts instead of duplicating CRON_SECRET Bearer checks',
+    ],
+    [
+      relPath !== 'packages/services/auth/devConsoleBasicAuth.ts' &&
+        content.includes('timingSafeEqual'),
+      /\btimingSafeEqual\s*\(/,
+      'no-duplicate-timing-safe-equal',
+      'Use timingSafeEqualStrings from @dg/services/auth/devConsoleBasicAuth instead of calling crypto.timingSafeEqual directly',
+    ],
+    [
+      !UNIT_CONSTANT_OWNERS.has(relPath) &&
+        (content.includes('METERS_PER_MILE') || content.includes('FEET_PER_METER')),
+      /\b(?:METERS_PER_MILE|FEET_PER_METER)\s*=/,
+      'no-duplicate-unit-constants',
+      'Import METERS_PER_MILE from @dg/shared-core/formatting/formattedDistance and formatFeet/formatMiles from stravaFormat.ts instead of redeclaring conversion constants',
+    ],
+    [
+      relPath !== 'packages/shared-core/formatting/formattedDistance.ts' &&
+        content.includes('Intl.NumberFormat'),
+      /new\s+Intl\.NumberFormat\(\s*['"]en-US['"]\s*\)/,
+      'no-duplicate-count-formatter',
+      'Use formatCount from @dg/shared-core/formatting/formattedDistance instead of instantiating a duplicate bare Intl.NumberFormat("en-US")',
+    ],
+    [
+      relPath.startsWith('apps/web/src/') &&
+        relPath !== 'apps/web/src/app/collage/FilterBar.tsx' &&
+        content.includes('pillStrip'),
+      /\bpillStrip\b/,
+      'no-duplicate-filter-bar',
+      'Use FilterBar from apps/web/src/app/collage/FilterBar.tsx instead of applying .pillStrip directly',
+    ],
+    [
+      (relPath.startsWith('packages/ui/') ||
+        relPath.startsWith('packages/maps/') ||
+        (relPath.startsWith('apps/web/src/app/collage/') &&
+          !SOCIAL_CARD_VARIANT_ADAPTERS.has(relPath))) &&
+        ROUTE_CLASS_OR_IMPORT_IN_SHARED.test(content),
+      ROUTE_CLASS_OR_IMPORT_IN_SHARED,
+      'no-consumer-leakage-in-shared-component',
+      'Shared components in collage/, packages/ui/, and packages/maps/ must not import from route directories or reference route-specific classes',
+    ],
+  ];
+  const active = rules.filter(([enabled]) => enabled);
+  if (active.length === 0) return [];
 
   const sourceLines = lines ?? content.split('\n');
   const violations: Array<StructureViolation> = [];
   for (let i = 0; i < sourceLines.length; i += 1) {
     const lineText = sourceLines[i] ?? '';
-    const line = i + 1;
-    if (checkHoverMenu && /\bbindHoverMenu\b/.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Use HoverMenu or PillMenu from apps/web/src/app/collage/PillMenu.tsx instead of wiring bindHoverMenu directly',
-        rule: 'no-duplicate-hover-menu',
-      });
-    }
-    if (checkSkeleton && /\bfunction\s+SkeletonLine\b|\bdata-skeleton\b/.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Use Skeleton from @dg/ui/core/Skeleton instead of defining a custom SkeletonLine or raw data-skeleton element',
-        rule: 'no-duplicate-skeleton',
-      });
-    }
-    if (checkCronAuth && /\bprocess\.env\.CRON_SECRET\b/.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Use isCronAuthorized from apps/web/src/app/api/apiResponses.ts instead of duplicating CRON_SECRET Bearer checks',
-        rule: 'no-duplicate-cron-auth',
-      });
-    }
-    if (checkTimingSafe && /\btimingSafeEqual\s*\(/.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Use timingSafeEqualStrings from @dg/services/auth/devConsoleBasicAuth instead of calling crypto.timingSafeEqual directly',
-        rule: 'no-duplicate-timing-safe-equal',
-      });
-    }
-    if (checkUnitConstants && /\b(?:METERS_PER_MILE|FEET_PER_METER)\s*=/.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Import METERS_PER_MILE from @dg/shared-core/formatting/formattedDistance and formatFeet/formatMiles from stravaFormat.ts instead of redeclaring conversion constants',
-        rule: 'no-duplicate-unit-constants',
-      });
-    }
-    if (checkCountFormatter && /new\s+Intl\.NumberFormat\(\s*['"]en-US['"]\s*\)/.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Use formatCount from @dg/shared-core/formatting/formattedDistance instead of instantiating a duplicate bare Intl.NumberFormat("en-US")',
-        rule: 'no-duplicate-count-formatter',
-      });
-    }
-    if (checkFilterBar && /\bpillStrip\b/.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Use FilterBar from apps/web/src/app/collage/FilterBar.tsx instead of applying .pillStrip directly',
-        rule: 'no-duplicate-filter-bar',
-      });
-    }
-    if (checkSharedComponentBoundary && ROUTE_CLASS_OR_IMPORT_IN_SHARED.test(lineText)) {
-      violations.push({
-        file: relPath,
-        line,
-        message:
-          'Shared components in collage/, packages/ui/, and packages/maps/ must not import from route directories or reference route-specific classes',
-        rule: 'no-consumer-leakage-in-shared-component',
-      });
+    for (const [, pattern, rule, message] of active) {
+      if (pattern.test(lineText)) {
+        violations.push({ file: relPath, line: i + 1, message, rule });
+      }
     }
   }
   return violations;

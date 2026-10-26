@@ -338,6 +338,10 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   z-index: 1;
   padding: var(--now-strip-overhang) 0 36px;
   color: var(--cream);
+  background-color: var(--viridian);
+  background-image: url("./img/grain.png");
+  background-size: 256px 256px;
+  translate: 0 var(--footer-offset, 0px);
 }
 .chrome__footer[data-occluded="true"] {
   visibility: hidden;
@@ -690,16 +694,20 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     margin: 8px auto 0;
   }
   .chrome__footer {
-    --now-strip-overhang: 34px;
-    --footer-content-pad: 20px;
-    padding-bottom: 16px;
+    --now-strip-overhang: 50px;
+    --footer-content-pad: 32px;
+    padding-bottom: 28px;
+  }
+  .chrome__footer > .collageMeasure,
+  .chrome__nowWrap {
+    width: min(calc(100% - 44px), var(--measure));
   }
   .chrome__nowStrip {
-    --strip-inset: 6px;
-    --cell-inset: 4px;
+    --strip-inset: 7px;
+    --cell-inset: 5px;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 5px 8px;
+    gap: 6px 8px;
   }
   .chrome__nowCellLead {
     grid-row: 1;
@@ -738,32 +746,29 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   .chrome__nowArtImg,
   .chrome__nowArtFallback,
   .chrome__nowStrava {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
   .chrome__footerGrid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+    gap: 24px;
   }
   .chrome__helloCol,
   .chrome__elsewhereCol {
-    gap: 8px;
+    gap: 12px;
   }
   .chrome__helloDescription > * {
-    gap: 4px;
-  }
-  .chrome__emailLink {
-    padding: 0.5em 0.8em 0.55em;
+    gap: 6px;
   }
   .chrome__elsewhereLedger {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 12px;
+    gap: 0 14px;
   }
   .chrome__elsewhereRow {
     gap: 8px;
-    height: 36px;
-    padding: 0 6px;
+    height: 40px;
+    padding: 0 8px;
   }
   .chrome__elsewhereHandle {
     display: none;
@@ -772,11 +777,42 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     margin-left: auto;
   }
   .chrome__colophon {
-    gap: 6px 14px;
-    padding-top: 10px;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    padding-top: 18px;
   }
-  .chrome__colophonGroup {
-    gap: 4px 9px;
+  .chrome__colophonMeta {
+    gap: 8px 14px;
+    justify-content: space-between;
+    order: 2;
+    padding-top: 12px;
+    border-top: 1px solid rgb(247 241 226 / 0.14);
+  }
+  .chrome__colophonNav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    order: 1;
+  }
+  .chrome__colophonLink {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 10px;
+    color: var(--cream);
+    text-align: center;
+    white-space: nowrap;
+    background: rgb(247 241 226 / 0.08);
+    border: 1px solid rgb(247 241 226 / 0.16);
+    border-radius: 9px;
+  }
+  .chrome__colophonLink:hover,
+  .chrome__colophonLink:focus-visible {
+    color: var(--ochre);
+    text-decoration: none;
+    background: rgb(247 241 226 / 0.14);
+    border-color: var(--ochre);
   }
 }
 
