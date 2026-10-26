@@ -115,6 +115,62 @@ export function checkFooterCurtainReveal(
   return violations;
 }
 
+/** Keeps the header row vertically centered, the `dg.` sticker flush with the left rail, and its desktop SVG height balanced with Now Playing. */
+export function checkHeaderLogoAlignment(
+  cssFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const chromeFile = 'apps/web/src/app/collage/chrome.css';
+  const chrome = cssFiles.get(chromeFile);
+  if (!chrome) return [];
+
+  const baseRules = cssRules(chrome).filter((r) => !r.media);
+  const findRule = (selector: string) => baseRules.find((r) => r.selectors.includes(selector));
+  const headerRule = findRule('.chrome__header');
+  const logoRule = findRule('.chrome__logo');
+  const svgRule = findRule('.chrome__logo > svg');
+  const violations: Array<StructureViolation> = [];
+  const flag = (rule: CssRule | undefined, message: string) =>
+    violations.push({
+      file: chromeFile,
+      line: lineAt(chrome, rule?.index ?? 0),
+      message,
+      rule: 'css-header-logo-alignment',
+    });
+
+  if (headerRule && declaration(headerRule.body, 'align-items') !== 'center') {
+    flag(
+      headerRule,
+      'Set `align-items: center` on `.chrome__header` so the logo, Now Playing card, and nav strip share one center axis',
+    );
+  }
+  if (logoRule && declaration(logoRule.body, 'padding') !== '0') {
+    flag(
+      logoRule,
+      'Set `padding: 0` on `.chrome__logo` so the die-cut sticker left edge aligns with the `.collageMain` left rail',
+    );
+  }
+  const svgHeights = [
+    ...(declaration(svgRule?.body ?? '', 'height') ?? '').matchAll(/(\d+(?:\.\d+)?)px/g),
+  ].map((m) => Number(m[1]));
+  if (svgRule && (svgHeights.length === 0 || Math.max(...svgHeights) < 64)) {
+    flag(
+      svgRule,
+      'Keep `.chrome__logo > svg` desktop height at least 64px so the `dg.` sticker balances the Now Playing card',
+    );
+  }
+  for (const selector of ['.chrome__nowPlaying', '.chrome__nav']) {
+    const rule = findRule(selector);
+    const mt = declaration(rule?.body ?? '', 'margin-top');
+    if (rule && mt && mt !== '0' && mt !== '0px') {
+      flag(
+        rule,
+        `Avoid \`margin-top\` on \`${selector}\` so all header items stay centered on \`.chrome__header\``,
+      );
+    }
+  }
+  return violations;
+}
+
 const PAGE_TITLE_THEN_PARAGRAPH =
   /<CutLetters\b[^>]*\bclassName="[^"]*\bcollagePageTitle\b[^"]*"[^>]*\/>\s*(?:\{[^}]*\}\s*)?<p\b/g;
 

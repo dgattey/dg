@@ -1,6 +1,7 @@
 import {
   type CssRule,
   checkFooterCurtainReveal,
+  checkHeaderLogoAlignment,
   cssRules,
   declaration,
   lineAt,
@@ -306,5 +307,6 @@ export function checkCssGeometry(cssFiles: ReadonlyMap<string, string>): Array<S
     ...checkCornerTagRoom(cssFiles),
     ...checkHeaderAboveSticky(cssFiles),
     ...checkFooterCurtainReveal(cssFiles),
+    ...checkHeaderLogoAlignment(cssFiles),
   ];
 }
