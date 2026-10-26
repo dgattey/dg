@@ -161,11 +161,10 @@ describe('OAuth Route', () => {
     beforeEach(() => {
       process.env = {
         ...originalEnv,
-        DEV_CONSOLE_BASIC_AUTH_PASS: undefined,
-        DEV_CONSOLE_BASIC_AUTH_USER: undefined,
         OAUTH_CALLBACK_URL: `https://example.com${oauthRoute}`,
         SPOTIFY_CLIENT_ID: 'test-spotify-client-id',
         STRAVA_CLIENT_ID: 'test-strava-client-id',
+        VERCEL_APP_CLIENT_SECRET: 'test-vercel-secret',
       };
     });
 
@@ -173,18 +172,25 @@ describe('OAuth Route', () => {
       process.env = originalEnv;
     });
 
-    it('requires Basic Auth when dev console credentials are configured', async () => {
-      process.env.DEV_CONSOLE_BASIC_AUTH_USER = 'admin';
-      process.env.DEV_CONSOLE_BASIC_AUTH_PASS = 'secret';
+    it('requires a signed Vercel owner session in production', async () => {
+      const { signSession, VERCEL_SESSION_COOKIE } = await import(
+        '../../../../auth/vercel/session'
+      );
+      process.env = { ...process.env, NODE_ENV: 'production' };
 
       const unauthedResponse = await GET(createGetRequest({ provider: 'spotify' }));
       expect(unauthedResponse.status).toBe(401);
-      expect(unauthedResponse.headers.get('WWW-Authenticate')).toBe('Basic realm="Dev Console"');
       expect(mockSaveOauthState).not.toHaveBeenCalled();
 
-      const authHeader = `Basic ${Buffer.from('admin:secret').toString('base64')}`;
+      const signed = signSession({
+        email: 'dylan.gattey@gmail.com',
+        id: 'Zd6kYbHOXbM1fi2NHCmuSSDP',
+      });
       const authedResponse = await GET(
-        createGetRequest({ provider: 'spotify' }, { authorization: authHeader }),
+        createGetRequest(
+          { provider: 'spotify' },
+          { cookie: `${VERCEL_SESSION_COOKIE}=${signed ?? ''}` },
+        ),
       );
       expect(authedResponse.status).toBe(307);
     });

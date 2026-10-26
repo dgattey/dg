@@ -51,7 +51,7 @@ If `turbo` is not found, ensure `~/.nodenv/shims` is on PATH, then `nodenv rehas
 
 `.env` is generated from 1Password (vault `dg`) using `[config/env.secrets.keys](config/env.secrets.keys)`. Each key must be an item with the same name and the value stored in the `value` field. To regenerate after vault changes: `turbo clean && turbo dev` or delete `.env` and re-run `turbo dev`.
 
-Feature flags are separate: Vercel Flags (`FLAGS` on Vercel, see `apps/web/src/flags.ts`). Local OAuth/webhook debugging lives at `/dev-console`. Optional **Sign in with Vercel** on that page establishes a signed identity session so Flags `identify` can send `user.id` / `user.email` for segment targeting (dashboard login alone does not). Needs a Vercel App plus `NEXT_PUBLIC_VERCEL_APP_CLIENT_ID` / `VERCEL_APP_CLIENT_SECRET` in the project env and matching 1Password items before `turbo env`. How it works, dashboard setup, and security boundary: [`apps/web/src/auth/vercel/README.md`](apps/web/src/auth/vercel/README.md).
+OAuth and webhook debugging lives at `/dev-console`. In production, **Sign in with Vercel** on `/dev-console` authenticates the site owner via a signed HttpOnly session cookie (local `turbo dev` unlocks `/dev-console` automatically). Needs a Vercel App plus `NEXT_PUBLIC_VERCEL_APP_CLIENT_ID` / `VERCEL_APP_CLIENT_SECRET` in the project env and matching 1Password items before `turbo env`. How it works, dashboard setup, and security boundary: [`apps/web/src/auth/vercel/README.md`](apps/web/src/auth/vercel/README.md).
 
 ### Agent surfaces
 
@@ -60,10 +60,7 @@ Public discovery endpoints for LLMs and tools (route registry lives in `packages
 - `/llms.txt` and `/llms-full.txt` — site summaries for agents
 - `/.well-known/api-catalog`, `openapi.json`, `api-status` — machine-readable API discovery
 - `/.well-known/agent-skills` — skill index + per-skill markdown
-- `/.well-known/vercel/flags` — Vercel Flags discovery (not 1Password)
 - WebMCP tools in `apps/web/src/app/layouts/WebMcpTools.tsx`
-
-Secrets stay on 1Password via `turbo env` / `config/env.secrets.keys`. Flags stay on Vercel (`FLAGS`). Do not merge those systems without an explicit product decision.
 
 ## :memo: Pull Requests
 

@@ -24,6 +24,16 @@ async function resolveAuthErrorReason(searchParams?: SearchParams): Promise<stri
   return typeof reasonValue === 'string' ? reasonValue : 'unknown';
 }
 
+function formatAuthError(reason: string | null): string | null {
+  if (!reason) {
+    return null;
+  }
+  if (reason === 'unauthorized_user') {
+    return 'This Vercel account is not authorized to access the dev console.';
+  }
+  return `Sign-in failed (${reason}). Try again.`;
+}
+
 export async function VercelSignInCardContent({ searchParams }: VercelSignInCardProps = {}) {
   const [session, authErrorReason] = await Promise.all([
     getVercelSession(),
@@ -41,13 +51,12 @@ export async function VercelSignInCardContent({ searchParams }: VercelSignInCard
       </div>
 
       <Typography color="var(--dg-palette-text-secondary)" variant="meta">
-        Optional Sign in with Vercel for Flags user targeting. Any Vercel account can complete
-        OAuth; segment rules decide whether you match.
+        {isSignedIn
+          ? 'Signed in as the site owner to manage OAuth connections and webhooks.'
+          : 'Sign in with your owner Vercel account to unlock OAuth connections and webhook tools.'}
       </Typography>
 
-      <ErrorMessage
-        message={authErrorReason ? `Sign-in failed (${authErrorReason}). Try again.` : null}
-      />
+      <ErrorMessage message={formatAuthError(authErrorReason)} />
 
       {session ? (
         <div className="devConsole__stack devConsole__stack--tight">
@@ -79,7 +88,7 @@ export async function VercelSignInCardContent({ searchParams }: VercelSignInCard
 }
 
 /**
- * Dev-console card for optional Sign in with Vercel (Flags identify only).
+ * Dev-console card for Sign in with Vercel authentication.
  * Session + searchParams are read inside Suspense so /dev-console can prerender.
  */
 export function VercelSignInCard({ searchParams }: VercelSignInCardProps) {

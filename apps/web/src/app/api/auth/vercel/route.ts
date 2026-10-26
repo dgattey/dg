@@ -14,18 +14,13 @@ import {
   VERCEL_OAUTH_SCOPES,
   VERCEL_OAUTH_STATE_COOKIE,
 } from '../../../../auth/vercel/oauthCookies';
-import { redirectToConsoleWithAuthError, requireDevConsoleBasicAuth } from '../../apiResponses';
+import { redirectToConsoleWithAuthError } from '../../apiResponses';
 
 /**
  * Starts Sign in with Vercel: PKCE + state/nonce cookies, then redirect to
  * https://vercel.com/oauth/authorize.
  */
 export async function GET(request: NextRequest) {
-  const unauthorized = requireDevConsoleBasicAuth(request);
-  if (unauthorized) {
-    return unauthorized;
-  }
-
   const clientId = process.env.NEXT_PUBLIC_VERCEL_APP_CLIENT_ID;
   if (!clientId) {
     return redirectToConsoleWithAuthError(request, 'missing_client_id');

@@ -1,10 +1,10 @@
 import { completeOauthFlow } from '@dg/services/oauth/completeOauthFlow';
 import { initiateOauthFlow } from '@dg/services/oauth/initiateOauthFlow';
 import { type NextRequest, NextResponse } from 'next/server';
-import { jsonError, redirectToConsole, requireDevConsoleBasicAuth } from '../apiResponses';
+import { jsonError, redirectToConsole, requireDevConsoleAuth } from '../apiResponses';
 
 async function handleOauthInit(request: NextRequest): Promise<NextResponse> {
-  const unauthorized = requireDevConsoleBasicAuth(request);
+  const unauthorized = requireDevConsoleAuth(request);
   if (unauthorized) {
     return unauthorized;
   }

@@ -10,7 +10,11 @@ import {
   VERCEL_TOKEN_URL,
   VERCEL_USERINFO_URL,
 } from '../../../../../auth/vercel/oauthCookies';
-import { signSession, VERCEL_SESSION_COOKIE } from '../../../../../auth/vercel/session';
+import {
+  isAuthorizedVercelUser,
+  signSession,
+  VERCEL_SESSION_COOKIE,
+} from '../../../../../auth/vercel/session';
 import { redirectToConsole, redirectToConsoleWithAuthError } from '../../../apiResponses';
 
 type TokenResponse = {
@@ -103,7 +107,8 @@ async function clearOauthTempCookies() {
 
 /**
  * Completes Sign in with Vercel: validates state/nonce, exchanges the code,
- * loads userinfo, and sets a signed identity session cookie (no Vercel tokens).
+ * verifies that the identity belongs to the site owner, and sets a signed
+ * session cookie (no Vercel tokens stored).
  */
 export async function GET(request: NextRequest) {
   try {
@@ -136,7 +141,19 @@ export async function GET(request: NextRequest) {
 
     const userInfo = await fetchUserInfo(tokenData.access_token);
     if (!userInfo.sub || !userInfo.email) {
+      await clearOauthTempCookies();
       return redirectToConsoleWithAuthError(request, 'missing_identity');
+    }
+
+    if (
+      !isAuthorizedVercelUser({
+        email: userInfo.email,
+        id: userInfo.sub,
+        username: userInfo.preferred_username,
+      })
+    ) {
+      await clearOauthTempCookies();
+      return redirectToConsoleWithAuthError(request, 'unauthorized_user');
     }
 
     const signed = signSession({
@@ -146,6 +163,7 @@ export async function GET(request: NextRequest) {
     });
 
     if (!signed) {
+      await clearOauthTempCookies();
       return redirectToConsoleWithAuthError(request, 'session_secret_missing');
     }
 

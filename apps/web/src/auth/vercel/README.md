@@ -1,26 +1,19 @@
-# Sign in with Vercel for Flags targeting
+# Sign in with Vercel for `/dev-console`
 
-Optional OAuth on `/dev-console` that gives Vercel Flags a real `user.id` / `user.email` for segment rules. Dashboard login alone does not identify the visitor to this app.
-
-## Why
-
-`dylangattey.com` has no general user auth. Being logged into the Vercel dashboard is not an evaluation identity the Flags SDK can read. Flags need `identify` to return entities (here `user.id` and `user.email`) before Segments can match “just Dylan.”
-
-Toolbar / Flags Explorer overrides still work without this flow (per-browser override cookie via `FLAGS_SECRET`). Use Sign in when you want durable, dashboard-managed targeting across browsers.
+OAuth login on `/dev-console` that authenticates the site owner (`dgattey`) to manage OAuth connections and Strava webhooks in production without HTTP Basic Auth.
 
 ## Flow
 
-1. Open `/dev-console` (Basic Auth is separate — see Security).
+1. Open `/dev-console`. In local development (`NODE_ENV=development`), the console tools are unlocked automatically; in production, only the **Access** sign-in card is shown until you sign in.
 2. Click **Sign in with Vercel** → PKCE authorize at `https://vercel.com/oauth/authorize`.
-3. Callback exchanges the code, loads userinfo, and sets a signed HttpOnly `vercel_flags_session` cookie with `{ id: sub, email, name? }`. Vercel access/refresh tokens are **not** stored.
-4. `apps/web/src/flags.ts` `identify` reads that cookie and returns `{ user?: { id, email } }` for flags that share it.
-5. Flags dashboard Entities + Segment rules match on `user.id` / `user.email` and attach to the flag.
+3. Callback (`/api/auth/vercel/callback`) verifies the PKCE `state` and OIDC `nonce`, exchanges the authorization code, fetches userinfo (`https://api.vercel.com/login/oauth/userinfo`), verifies that the account belongs to the site owner (`isAuthorizedVercelUser`), and sets a signed HttpOnly `vercel_session` cookie. Vercel access/refresh tokens are **not** stored.
+4. Once authenticated, `/dev-console` renders the **OAuth connections** (`Strava`, `Spotify`) and **Tools** (`Strava webhooks`) sections, and Server Actions (`withDevConsoleAuth`) and OAuth initiation (`/api/oauth?provider=...`) allow mutations.
 
-Sign out is a form bound to the `signOutOfVercel` Server Action, which clears the session cookie. It must stay a POST: Next prefetches every in-viewport `Link` in production, so a GET sign-out URL would run as soon as the signed-in card rendered.
+Sign out is a form bound to the `signOutOfVercel` Server Action, which clears the session cookie. It stays a POST so Next.js `<Link>` prefetching cannot trigger sign-out when the card renders.
 
 ## Dashboard setup
 
-One-time human setup under team `dylan-gattey`:
+One-time setup under team `dylan-gattey`:
 
 1. Team Settings → Apps → Create app.
 2. Authorization callback URLs:
@@ -32,29 +25,22 @@ One-time human setup under team `dylan-gattey`:
    - `NEXT_PUBLIC_VERCEL_APP_CLIENT_ID`
    - `VERCEL_APP_CLIENT_SECRET`
    - Both keys are listed in `config/env.secrets.keys`. Session HMAC uses `VERCEL_APP_CLIENT_SECRET`.
-5. Flags → Entities: `user` with string attributes `id`, `email`.
-6. Flags → Segments: e.g. `dylan` with `user.email equals <your email>` or `user.id equals <sub from first login>`.
 
 ## Security
 
-- Any Vercel account can complete OAuth. “Just me” is the Segment rule on your id/email, not the login button.
-- The Flags session does **not** bypass `/dev-console` Basic Auth (`apps/web/src/proxy.ts`). Those are independent gates.
-- Cookie is HttpOnly, HMAC-signed, 30-day max age; payload is identity only.
-
-## Fallback
-
-Vercel Toolbar → Flags / Flags Explorer overrides still work without Sign in, in every environment. Override is browser-local and requires `FLAGS_SECRET` on the project.
+- Only the site owner's Vercel identity (`isAuthorizedVercelUser` in `apps/web/src/auth/vercel/session.ts`) can mint or validate a `vercel_session` cookie; any other Vercel account is rejected at callback with `reason=unauthorized_user`.
+- Cookie is HttpOnly, HMAC-signed (`sha256`), 30-day max age; payload is identity only.
+- Server Actions (`withDevConsoleAuth` in `apps/web/src/services/devConsoleAuth.ts`) and OAuth initiation (`requireDevConsoleAuth` in `apps/web/src/app/api/apiResponses.ts`) enforce the same session check on the server.
 
 ## Code map
 
 | Piece | Path |
 | --- | --- |
-| Flag `identify` | `apps/web/src/flags.ts` |
-| Session cookie sign/verify | `apps/web/src/auth/vercel/session.ts` |
+| Session cookie sign/verify & owner check | `apps/web/src/auth/vercel/session.ts` |
+| Server session reader | `apps/web/src/auth/vercel/getVercelSession.ts` |
 | Authorize (PKCE) | `apps/web/src/app/api/auth/vercel/route.ts` |
 | Callback | `apps/web/src/app/api/auth/vercel/callback/route.ts` |
 | Sign out (Server Action) | `apps/web/src/auth/vercel/session.actions.ts` |
+| Server Action auth wrapper | `apps/web/src/services/devConsoleAuth.ts` |
 | Dev-console UI | `apps/web/src/app/dev-console/vercel/VercelSignInCard.tsx` |
-| Basic Auth on `/dev-console` | `apps/web/src/proxy.ts` |
 | Env key list | `config/env.secrets.keys` |
-| Flags discovery | `apps/web/src/app/.well-known/vercel/flags/route.ts` |

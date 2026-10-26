@@ -30,7 +30,7 @@ Never maintain parallel implementations of the same UI component, menu behavior,
 
 ### Auth, OAuth, and service helpers
 
-- **Constant-time string comparison and Basic Auth:** `timingSafeEqualStrings` and `isDevConsoleAccessAllowed` in `@dg/services/auth/devConsoleBasicAuth`
+- **Constant-time string comparison and dev console auth:** `timingSafeEqualStrings` in `@dg/services/auth/devConsoleBasicAuth` and `isDevConsoleAccessAllowed` in `apps/web/src/auth/vercel/session.ts`
 - **Cron Bearer authentication:** `isCronAuthorized` in `apps/web/src/app/api/apiResponses.ts`
 - **OAuth token validation and persistence:** `validateSpotifyTokenResponse` in `@dg/services/spotify/spotifyClient`, `validateRawDataToToken` in `@dg/services/strava/stravaClient`, and `upsertAndCacheToken` in `@dg/services/clients/refreshedAccessToken`
 

@@ -1,7 +1,8 @@
 import 'server-only';
 import './devConsole.css';
 
-import type { ReactNode } from 'react';
+import { type ReactNode, Suspense } from 'react';
+import { isDevConsoleAuthenticated } from '../../auth/vercel/getVercelSession';
 import { DEV_CONSOLE_BACKDROP } from '../collage/backdrops';
 import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
@@ -38,9 +39,41 @@ type ConsolePageProps = {
   searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
 };
 
+export async function DevConsoleBody({ searchParams }: ConsolePageProps = {}) {
+  const isAuthenticated = await isDevConsoleAuthenticated();
+
+  if (!isAuthenticated) {
+    return (
+      <Section sectionId="Access" tiltDeg={-1.5} title="Access" tone="ultramarine">
+        <VercelSignInCard searchParams={searchParams} />
+      </Section>
+    );
+  }
+
+  return (
+    <>
+      <Section
+        sectionId="OAuth-connections"
+        tiltDeg={-2}
+        title="OAuth connections"
+        tone="vermilion"
+      >
+        <OauthCard provider="strava" />
+        <OauthCard provider="spotify" />
+      </Section>
+      <Section sectionId="Access" tiltDeg={1.5} title="Access" tone="ultramarine">
+        <VercelSignInCard searchParams={searchParams} />
+      </Section>
+      <Section sectionId="Tools" tiltDeg={-1} title="Tools" tone="black">
+        <WebhookCard />
+      </Section>
+    </>
+  );
+}
+
 /**
  * Dev console shell. Keep this sync — await `searchParams` / cookies only inside
- * Suspense boundaries (see VercelSignInCard) so the route can prerender.
+ * Suspense boundaries (see DevConsoleBody) so the route can prerender.
  */
 export default function ConsolePage({ searchParams }: ConsolePageProps) {
   return (
@@ -52,26 +85,9 @@ export default function ConsolePage({ searchParams }: ConsolePageProps) {
       <div className="collageMeasure devConsole__grid">
         <CutLetters className="collagePageTitle" text="Dev console" />
         <div className="devConsole__console">
-          <Section
-            sectionId="OAuth-connections"
-            tiltDeg={-2}
-            title="OAuth connections"
-            tone="vermilion"
-          >
-            <OauthCard provider="strava" />
-            <OauthCard provider="spotify" />
-          </Section>
-          <Section
-            sectionId="Flags-identity"
-            tiltDeg={1.5}
-            title="Flags identity"
-            tone="ultramarine"
-          >
-            <VercelSignInCard searchParams={searchParams} />
-          </Section>
-          <Section sectionId="Tools" tiltDeg={-1} title="Tools" tone="black">
-            <WebhookCard />
-          </Section>
+          <Suspense fallback={null}>
+            <DevConsoleBody searchParams={searchParams} />
+          </Suspense>
         </div>
       </div>
     </section>
