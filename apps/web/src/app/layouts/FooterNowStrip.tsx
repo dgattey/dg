@@ -57,7 +57,11 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
     <div className="collageMeasure chrome__nowWrap">
       <section aria-label="Live status" className="chrome__nowStrip">
         <div className="chrome__nowCell chrome__nowCellLead">
-          <span aria-hidden="true" className="chrome__nowLive" />
+          <span
+            aria-hidden="true"
+            className="chrome__nowLive"
+            data-playing={track?.isPlaying ? 'true' : undefined}
+          />
           <span className="chrome__nowKey" data-typography="row-title">
             Now
           </span>

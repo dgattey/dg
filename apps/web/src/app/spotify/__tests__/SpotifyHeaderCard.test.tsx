@@ -1,8 +1,15 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen } from '@testing-library/react';
+import { buildNoteLoopKeyframes, NOTES_CONFIG } from '../MusicNotes';
 import { SpotifyHeaderCard } from '../SpotifyHeaderCard';
 import { TrackListing } from '../TrackListing';
+import {
+  buildPreRedesignBounceKeyframes,
+  WAVEFORM_BOUNCE_BEAT_FREQ,
+  WAVEFORM_BOUNCE_DURATION_MS,
+  WAVEFORM_BOUNCE_TOTAL_FRAMES,
+} from '../useWaveformBounce';
 
 let mockPathname = '/';
 
@@ -38,7 +45,7 @@ describe('SpotifyHeaderCard and TrackListing', () => {
     ['/', '/reading'],
     ['/reading', '/'],
   ])(
-    'keeps the same bouncing art DOM node mounted without header notes when navigating from %s to %s',
+    'keeps the same bouncing art DOM node and compact header notes mounted when navigating from %s to %s',
     (from, to) => {
       mockPathname = from;
       const { container, rerender } = render(
@@ -48,7 +55,10 @@ describe('SpotifyHeaderCard and TrackListing', () => {
       );
       const bounceBefore = container.querySelector('[data-art-notes-bounce]');
       expect(bounceBefore).not.toBeNull();
-      expect(container.querySelector('[data-ambient-notes]')).toBeNull();
+      expect(container.querySelector('[data-ambient-notes="collageCompact"]')).not.toBeNull();
+      expect(container.querySelectorAll('[data-music-note]')).toHaveLength(
+        NOTES_CONFIG.collageCompact.slotIds.length,
+      );
 
       mockPathname = to;
       rerender(
@@ -59,7 +69,7 @@ describe('SpotifyHeaderCard and TrackListing', () => {
 
       const bounceAfter = container.querySelector('[data-art-notes-bounce]');
       expect(bounceAfter).toBe(bounceBefore);
-      expect(container.querySelector('[data-ambient-notes]')).toBeNull();
+      expect(container.querySelector('[data-ambient-notes="collageCompact"]')).not.toBeNull();
     },
   );
 
@@ -74,9 +84,51 @@ describe('SpotifyHeaderCard and TrackListing', () => {
       </ServerTimeProvider>,
     );
 
-    expect(container.querySelector('[data-ambient-notes]')).not.toBeNull();
+    expect(container.querySelector('[data-ambient-notes="collage"]')).not.toBeNull();
+    expect(container.querySelectorAll('[data-music-note]')).toHaveLength(
+      NOTES_CONFIG.collage.slotIds.length,
+    );
+    expect(container.querySelector('[data-art-notes-bounce]')).toHaveAttribute(
+      'data-playing',
+      'true',
+    );
+    expect(container.querySelector('[data-playback-status-icon]')).toHaveAttribute(
+      'data-playing',
+      'true',
+    );
     const titleLink = screen.getByRole('link', { name: 'Perfect Light' });
     expect(titleLink).toHaveAttribute('data-track-title', '');
     expect(titleLink).toHaveAttribute('data-has-color', '');
+  });
+
+  it('synthesizes the pre-redesign e5174284 bounce (Tweak C at 0.95 / ~91 BPM) and note trajectories with seamless loop boundaries', () => {
+    expect(WAVEFORM_BOUNCE_BEAT_FREQ).toBe(0.95);
+    expect(WAVEFORM_BOUNCE_TOTAL_FRAMES).toBe(1308);
+    expect(WAVEFORM_BOUNCE_DURATION_MS).toBeCloseTo(21800, 1);
+
+    const fixedRand = () => 0.5;
+    const bounceKfs = buildPreRedesignBounceKeyframes(1, fixedRand);
+    const explicitTweakCKfs = buildPreRedesignBounceKeyframes(1, fixedRand, 'upbeat-tempo');
+    expect(bounceKfs).toEqual(explicitTweakCKfs);
+    expect(bounceKfs).toHaveLength(WAVEFORM_BOUNCE_TOTAL_FRAMES / 2 + 1);
+    expect(bounceKfs[0]?.offset).toBe(0);
+    expect(bounceKfs.at(-1)?.offset).toBe(1);
+    expect(bounceKfs[0]?.transform).toBe(bounceKfs.at(-1)?.transform);
+
+    const noteKfs = buildNoteLoopKeyframes(0, 'collage');
+    expect(noteKfs[0]).toMatchObject({ offset: 0, opacity: 0.01 });
+    expect(noteKfs.at(-1)).toMatchObject({ offset: 1, opacity: 0.01 });
+
+    const { container } = render(
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <TrackListing
+          albumColors={{ ink: 'light', mesh: MESH, surface: MESH }}
+          track={{ ...TRACK, isPlaying: false, playedAt: '2026-02-10T09:00:00Z' }}
+          variant="card"
+        />
+      </ServerTimeProvider>,
+    );
+    expect(container.querySelector('[data-art-notes-bounce]')).not.toHaveAttribute('data-playing');
+    expect(container.querySelector('[data-ambient-notes]')).toBeNull();
   });
 });

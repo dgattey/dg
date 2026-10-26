@@ -2,8 +2,6 @@
 
 import { type CSSProperties, useEffect, useRef } from 'react';
 
-const PROGRESS_UPDATE_INTERVAL_MS = 2000;
-
 type PlaybackProgressBarProps = {
   durationMs?: number;
   progressMs?: number;
@@ -23,8 +21,6 @@ export function PlaybackProgressBar({
   color,
 }: PlaybackProgressBarProps) {
   const barRef = useRef<HTMLDivElement>(null);
-  const startTimeRef = useRef<number>(0);
-  const startProgressRef = useRef<number>(progressMs ?? 0);
   const hasTiming = durationMs !== undefined && durationMs > 0 && progressMs !== undefined;
   const initialProgress = hasTiming ? getProgressPercent(progressMs, durationMs) : 0;
   const resolvedColor = color ?? 'var(--dg-palette-text-primary)';
@@ -34,20 +30,32 @@ export function PlaybackProgressBar({
     if (!bar || durationMs === undefined || durationMs <= 0 || progressMs === undefined) {
       return;
     }
-    startTimeRef.current = Date.now();
-    startProgressRef.current = clamp(progressMs, 0, durationMs);
-    const apply = () => {
-      const elapsedMs = isPlaying ? Date.now() - startTimeRef.current : 0;
-      const nextMs = clamp(startProgressRef.current + elapsedMs, 0, durationMs);
-      const ratio = getProgressPercent(nextMs, durationMs);
-      bar.style.setProperty('--progress-scale', ratio.toFixed(4));
-    };
-    apply();
-    if (!isPlaying) {
+    const clampedStartMs = clamp(progressMs, 0, durationMs);
+    const startRatio = getProgressPercent(clampedStartMs, durationMs);
+    bar.style.setProperty('--progress-scale', startRatio.toFixed(4));
+
+    if (
+      !isPlaying ||
+      clampedStartMs >= durationMs ||
+      typeof bar.animate !== 'function' ||
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    ) {
       return;
     }
-    const intervalId = window.setInterval(apply, PROGRESS_UPDATE_INTERVAL_MS);
-    return () => window.clearInterval(intervalId);
+
+    const remainingMs = durationMs - clampedStartMs;
+    const animation = bar.animate(
+      [{ transform: `scaleX(${startRatio.toFixed(5)})` }, { transform: 'scaleX(1)' }],
+      {
+        duration: remainingMs,
+        easing: 'linear',
+        fill: 'forwards',
+      },
+    );
+
+    return () => {
+      animation.cancel();
+    };
   }, [durationMs, isPlaying, progressMs]);
 
   if (!hasTiming) {
