@@ -46,7 +46,11 @@ const NAMED_ENTITIES: Record<string, string> = {
   rsquo: '\u2019',
 };
 
-export type ReadingStatus = 'notStarted' | 'read' | 'reading';
+export const READING_STATUS_VALUES = ['notStarted', 'reading', 'read'] as const;
+export type ReadingStatus = (typeof READING_STATUS_VALUES)[number];
+
+export const isReadingStatus = (value: unknown): value is ReadingStatus =>
+  typeof value === 'string' && (READING_STATUS_VALUES as ReadonlyArray<string>).includes(value);
 export type RichTextDocument = {
   content: Array<{
     content: Array<{
@@ -62,22 +66,50 @@ export type RichTextDocument = {
   nodeType: typeof BLOCKS.DOCUMENT;
 };
 
+const normalizeApostrophes = (input: string): string => input.replace(/[\u2018\u2019]/g, "'");
+
 export const cleanWhitespace = (input: string | null | undefined): string =>
   input ? String(input).replace(/\s+/g, ' ').trim() : '';
 
 export const normalizeAuthor = (author: string | null | undefined): string =>
-  cleanWhitespace(author).toLowerCase();
+  normalizeApostrophes(cleanWhitespace(author)).toLowerCase();
 
 const normalizeTitle = (title: string | null | undefined): string =>
-  cleanWhitespace(title).toLowerCase();
+  normalizeApostrophes(cleanWhitespace(title)).toLowerCase();
 
 export const isDuplicateTitle = (
   a: string | null | undefined,
   b: string | null | undefined,
 ): boolean => {
   const [nA, nB] = [normalizeTitle(a), normalizeTitle(b)];
-  return Boolean(nA && nB && (nA.includes(nB) || nB.includes(nA)));
+  if (!nA || !nB) return false;
+  if (nA === nB) return true;
+  const [shorter, longer] = nA.length < nB.length ? [nA, nB] : [nB, nA];
+  return (
+    longer.startsWith(`${shorter}:`) ||
+    longer.startsWith(`${shorter} (`) ||
+    longer.startsWith(`${shorter} -`)
+  );
 };
+
+/**
+ * Identifies legacy Contentful book entries whose `readDateStarted` and `readDateFinished`
+ * were both backfilled with the same Goodreads `user_date_added` / `user_date_created`
+ * timestamp when `<user_read_at>` was empty.
+ */
+export function isBackfilledBookReadDate({
+  readDateFinished,
+  readDateStarted,
+  reviewText,
+}: {
+  readDateFinished?: string | null;
+  readDateStarted?: string | null;
+  reviewText?: string | null;
+}): boolean {
+  const finished = cleanWhitespace(readDateFinished);
+  const started = cleanWhitespace(readDateStarted);
+  return Boolean(finished && started && finished === started && !cleanWhitespace(reviewText));
+}
 
 export function decodeXmlEntities(input: string | null | undefined): string {
   if (!input) return '';

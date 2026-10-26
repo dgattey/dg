@@ -152,11 +152,21 @@ describe('readingHelpers', () => {
     expect(shelfStats(SHELF_BOOKS)).toEqual({ fiveStars: 4, total: 6 });
   });
 
-  it('groups the shelf into a reading section and then years, newest first', () => {
-    const labels = shelfSections(sortBooks([...SHELF_BOOKS, IN_PROGRESS])).map(
+  it('groups the shelf into a reading section, dated years newest first, and Earlier for undated reads', () => {
+    const undatedRead: RenderableBook = {
+      author: 'S.E. Hinton',
+      id: 'outsiders',
+      rating: 5,
+      readDateFinished: null,
+      readingStatus: 'read',
+      review: null,
+      thumbnail: null,
+      title: 'The Outsiders',
+    };
+    const labels = shelfSections(sortBooks([...SHELF_BOOKS, undatedRead, IN_PROGRESS])).map(
       ({ label }) => label,
     );
-    expect(labels).toEqual(['Currently reading', '2026', '2025', '2024', '2023']);
+    expect(labels).toEqual(['Currently reading', '2026', '2025', '2024', '2023', 'Earlier']);
   });
 });
 

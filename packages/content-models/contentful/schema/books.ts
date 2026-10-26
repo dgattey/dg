@@ -1,4 +1,5 @@
 import * as v from 'valibot';
+import { READING_STATUS_VALUES } from '../../books/bookDomain';
 import { assetSchema } from './shared';
 
 const richTextJsonSchema = v.looseObject({
@@ -16,6 +17,7 @@ const bookSchema = v.looseObject({
   rating: v.optional(v.nullable(v.number())),
   readDateFinished: v.optional(v.nullable(v.string())),
   readDateStarted: v.optional(v.nullable(v.string())),
+  readingStatus: v.optional(v.nullable(v.picklist(READING_STATUS_VALUES))),
   reviewDescription: v.optional(v.nullable(richTextJsonSchema)),
   sys: v.optional(
     v.nullable(

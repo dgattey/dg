@@ -160,6 +160,7 @@ type Book implements Entry & _Node {
   rating(locale: String, useFallbackLocale: Boolean): Int
   readDateFinished(locale: String, useFallbackLocale: Boolean): DateTime
   readDateStarted(locale: String, useFallbackLocale: Boolean): DateTime
+  readingStatus(locale: String, useFallbackLocale: Boolean): String
   reviewDescription(locale: String, useFallbackLocale: Boolean): BookReviewDescription
   sys: Sys!
   title(locale: String, useFallbackLocale: Boolean): String
@@ -229,6 +230,13 @@ input BookFilter {
   readDateStarted_lte: DateTime
   readDateStarted_not: DateTime
   readDateStarted_not_in: [DateTime]
+  readingStatus: String
+  readingStatus_contains: String
+  readingStatus_exists: Boolean
+  readingStatus_in: [String]
+  readingStatus_not: String
+  readingStatus_not_contains: String
+  readingStatus_not_in: [String]
   reviewDescription_contains: String
   reviewDescription_exists: Boolean
   reviewDescription_not_contains: String
@@ -330,6 +338,8 @@ enum BookOrder {
   readDateFinished_DESC
   readDateStarted_ASC
   readDateStarted_DESC
+  readingStatus_ASC
+  readingStatus_DESC
   sys_firstPublishedAt_ASC
   sys_firstPublishedAt_DESC
   sys_id_ASC

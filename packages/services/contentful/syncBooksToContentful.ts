@@ -7,6 +7,7 @@ import {
   decodeCoverImageBase64,
   isUsableGoodreadsCoverUrl,
   normalizeReviewText,
+  type ReadingStatus,
   upgradeGoodreadsCoverUrl,
 } from '@dg/content-models/books/bookDomain';
 import {
@@ -16,8 +17,10 @@ import {
 import {
   buildCmaBookFields,
   computeBookDiff,
+  findDuplicateContentfulEntries,
   findMatchingContentfulEntry,
   type MergedBookFields,
+  mergeCmaBookFields,
   type NormalizedContentfulBookEntry,
 } from '@dg/content-models/books/contentfulBook';
 import {
@@ -153,6 +156,18 @@ export async function upsertBookToContentful(
     coverImageUrl = await cma.fetchAssetUrl(coverImageId).catch(() => null);
   }
 
+  const readDateFinished = pick(b.readDateFinished, b.readDateFinished, ex?.readDateFinished);
+  const readDateStarted = pick(b.readDateStarted, b.readDateStarted, ex?.readDateStarted);
+  const readingStatus: ReadingStatus =
+    b.readingStatus ??
+    (readDateFinished
+      ? 'read'
+      : readDateStarted
+        ? 'reading'
+        : b.readDateFinished === null && b.readDateStarted === null
+          ? 'notStarted'
+          : (ex?.readingStatus ?? 'notStarted'));
+
   const merged: MergedBookFields = {
     author: author || ex?.author || '',
     coverImageId,
@@ -160,26 +175,15 @@ export async function upsertBookToContentful(
     notes,
     notesText,
     rating: pick(b.rating, b.rating, ex?.rating),
-    readDateFinished: pick(b.readDateFinished, b.readDateFinished, ex?.readDateFinished),
-    readDateStarted: pick(b.readDateStarted, b.readDateStarted, ex?.readDateStarted),
+    readDateFinished,
+    readDateStarted,
+    readingStatus,
     reviewDescription,
     reviewText,
     title: b.title,
   };
 
-  const preservedRawFields = ex
-    ? Object.fromEntries(
-        Object.entries(ex.rawFields).filter(
-          ([key]) =>
-            (key !== 'reviewDescription' || b.reviewPlainText === undefined) &&
-            (key !== 'notes' || b.notesPlainText === undefined),
-        ),
-      )
-    : {};
-  const fields: Record<string, unknown> = {
-    ...preservedRawFields,
-    ...buildCmaBookFields(merged, cma.locale),
-  };
+  const fields = mergeCmaBookFields(ex?.rawFields, merged, cma.locale);
   if (ex) {
     return toOutcome(
       'updated',
@@ -268,7 +272,10 @@ export async function runGoodreadsSync(opts: {
         existing.push(await cma.createAndPublishBook(buildCmaBookFields(m)));
         createdCount += 1;
       } else if (diff.action === 'update' && ex) {
-        const mergedFields = { ...ex.rawFields, ...buildCmaBookFields(m) };
+        for (const dup of findDuplicateContentfulEntries(b, ex.id, existing)) {
+          await cma.unpublishAndDeleteBook(dup.id).catch(() => false);
+        }
+        const mergedFields = mergeCmaBookFields(ex.rawFields, m, cma.locale);
         await cma.updateAndPublishBook(ex.id, ex.version, mergedFields);
         updatedCount += 1;
       }

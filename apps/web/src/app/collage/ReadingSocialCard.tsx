@@ -300,7 +300,7 @@ export function ReadingSocialCard({
                     </span>
                     <span style={{ fontSize: 14, opacity: 0.82 }}>{book.author}</span>
                     <span style={{ fontSize: 12, fontWeight: 700, marginTop: 2, opacity: 0.72 }}>
-                      Read {book.year}
+                      {book.year === 'Earlier' ? 'Read earlier' : `Read ${book.year}`}
                     </span>
                   </div>
                 </div>

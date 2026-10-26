@@ -3,9 +3,12 @@ import {
   cleanWhitespace,
   DEFAULT_LOCALE,
   extractPlainTextFromRichText,
+  isBackfilledBookReadDate,
   isDuplicateTitle,
+  isReadingStatus,
   normalizeAuthor,
   parseIsbn13Number,
+  type ReadingStatus,
 } from './bookDomain';
 import type { GoodreadsBookItem } from './goodreadsRss';
 
@@ -22,6 +25,7 @@ export type NormalizedContentfulBookEntry = {
   rawFields: Record<string, unknown>;
   readDateFinished: string | null;
   readDateStarted: string | null;
+  readingStatus: ReadingStatus | null;
   reviewDescription: unknown;
   reviewText: string | null;
   title: string;
@@ -37,6 +41,7 @@ export type MergedBookFields = {
   rating: number | null;
   readDateFinished: string | null;
   readDateStarted: string | null;
+  readingStatus: ReadingStatus;
   reviewDescription: unknown;
   reviewText: string | null;
   title: string;
@@ -70,6 +75,7 @@ export function normalizeContentfulBookEntry(
   const rawIsbn = unwrapField(fields.isbn, locale);
   const rawRating = unwrapField(fields.rating, locale);
   const rawCover = unwrapField(fields.coverImage, locale);
+  const rawReadingStatus = cleanWhitespace(getStr('readingStatus'));
   const reviewDescription = unwrapField(fields.reviewDescription, locale);
   const notes = unwrapField(fields.notes, locale);
 
@@ -94,6 +100,7 @@ export function normalizeContentfulBookEntry(
     rawFields: fields,
     readDateFinished: getStr('readDateFinished'),
     readDateStarted: getStr('readDateStarted'),
+    readingStatus: isReadingStatus(rawReadingStatus) ? rawReadingStatus : null,
     reviewDescription,
     reviewText: extractPlainTextFromRichText(reviewDescription) || null,
     title: cleanWhitespace(getStr('title') ?? ''),
@@ -101,24 +108,50 @@ export function normalizeContentfulBookEntry(
   };
 }
 
+const prioritizePublishedEntries = (
+  entries: ReadonlyArray<NormalizedContentfulBookEntry>,
+): Array<NormalizedContentfulBookEntry> =>
+  [...entries].sort(
+    (a, b) =>
+      Number(b.isPublished) - Number(a.isPublished) ||
+      Number(b.isbn !== null) - Number(a.isbn !== null),
+  );
+
 export function findMatchingContentfulEntry(
   book: { author?: string | null; id?: string | null; isbn?: number | null; title: string },
   existingEntries: ReadonlyArray<NormalizedContentfulBookEntry>,
 ): NormalizedContentfulBookEntry | null {
+  const prioritized = prioritizePublishedEntries(existingEntries);
   if (book.id) {
-    const byId = existingEntries.find((e) => e.id === book.id);
+    const byId = prioritized.find((e) => e.id === book.id);
     if (byId) return byId;
   }
   if (book.isbn) {
-    const byIsbn = existingEntries.find((e) => e.isbn !== null && e.isbn === book.isbn);
+    const byIsbn = prioritized.find((e) => e.isbn !== null && e.isbn === book.isbn);
     if (byIsbn) return byIsbn;
   }
   const targetAuthor = normalizeAuthor(book.author);
   return targetAuthor
-    ? (existingEntries.find(
+    ? (prioritized.find(
         (e) => normalizeAuthor(e.author) === targetAuthor && isDuplicateTitle(book.title, e.title),
       ) ?? null)
     : null;
+}
+
+export function findDuplicateContentfulEntries(
+  book: { author?: string | null; isbn?: number | null; title: string },
+  canonicalId: string,
+  existingEntries: ReadonlyArray<NormalizedContentfulBookEntry>,
+): Array<NormalizedContentfulBookEntry> {
+  const targetAuthor = normalizeAuthor(book.author);
+  return existingEntries.filter(
+    (e) =>
+      e.id !== canonicalId &&
+      ((book.isbn && e.isbn !== null && e.isbn === book.isbn) ||
+        (Boolean(targetAuthor) &&
+          normalizeAuthor(e.author) === targetAuthor &&
+          isDuplicateTitle(book.title, e.title))),
+  );
 }
 
 const CREATE_FIELDS = [
@@ -126,6 +159,7 @@ const CREATE_FIELDS = [
   'author',
   'isbn',
   'rating',
+  'readingStatus',
   'readDateStarted',
   'readDateFinished',
   'reviewDescription',
@@ -148,6 +182,7 @@ export function computeBookDiff(
         rating: gr.rating ?? null,
         readDateFinished: gr.readDateFinished ?? null,
         readDateStarted: gr.readDateStarted ?? null,
+        readingStatus: gr.status,
         reviewDescription: gr.reviewDescription ?? null,
         reviewText: gr.reviewText ?? null,
         title: gr.title,
@@ -158,14 +193,35 @@ export function computeBookDiff(
   const author = ex.author || gr.author;
   const isbn = ex.isbn ?? gr.isbn ?? null;
   const reviewUpdated = Boolean(gr.reviewText) && gr.reviewText !== ex.reviewText;
+  const backfilledDates = isBackfilledBookReadDate(ex);
+  const exFinished = backfilledDates ? null : ex.readDateFinished;
+  const exStarted = backfilledDates ? null : ex.readDateStarted;
+
+  const readDateFinished = gr.readDateFinished
+    ? !exFinished || exFinished.slice(0, 10) !== gr.readDateFinished.slice(0, 10)
+      ? gr.readDateFinished
+      : exFinished
+    : exFinished;
+  const readDateStarted = gr.readDateStarted
+    ? (exStarted ?? gr.readDateStarted)
+    : gr.readDateFinished && exStarted?.slice(0, 10) === gr.readDateFinished.slice(0, 10)
+      ? null
+      : exStarted;
+  const readingStatus: ReadingStatus = readDateFinished
+    ? 'read'
+    : readDateStarted
+      ? 'reading'
+      : gr.status;
+
   const changedFields = [
     title !== ex.title && 'title',
     author !== ex.author && 'author',
     isbn !== ex.isbn && 'isbn',
     Boolean(gr.rating && gr.rating !== ex.rating) && 'rating',
+    readingStatus !== ex.readingStatus && 'readingStatus',
     reviewUpdated && 'reviewDescription',
-    Boolean(!ex.readDateFinished && gr.readDateFinished) && 'readDateFinished',
-    Boolean(!ex.readDateStarted && gr.readDateStarted) && 'readDateStarted',
+    (readDateFinished ?? null) !== (ex.readDateFinished ?? null) && 'readDateFinished',
+    (readDateStarted ?? null) !== (ex.readDateStarted ?? null) && 'readDateStarted',
     !ex.coverImageId && 'coverImage',
   ].filter((field): field is string => Boolean(field));
 
@@ -179,8 +235,9 @@ export function computeBookDiff(
       notes: ex.notes,
       notesText: ex.notesText,
       rating: gr.rating ?? ex.rating ?? null,
-      readDateFinished: ex.readDateFinished ?? gr.readDateFinished ?? null,
-      readDateStarted: ex.readDateStarted ?? gr.readDateStarted ?? null,
+      readDateFinished,
+      readDateStarted,
+      readingStatus,
       reviewDescription: reviewUpdated ? gr.reviewDescription : ex.reviewDescription,
       reviewText: reviewUpdated ? gr.reviewText : ex.reviewText,
       title,
@@ -188,11 +245,23 @@ export function computeBookDiff(
   };
 }
 
+const CLEARABLE_CMA_BOOK_KEYS = new Set([
+  'isbn',
+  'notes',
+  'rating',
+  'readDateFinished',
+  'readDateStarted',
+  'reviewDescription',
+]);
+
 export function buildCmaBookFields(
   merged: MergedBookFields,
   locale = DEFAULT_LOCALE,
 ): Record<string, Record<string, unknown>> {
-  const fields: Record<string, Record<string, unknown>> = { title: { [locale]: merged.title } };
+  const fields: Record<string, Record<string, unknown>> = {
+    readingStatus: { [locale]: merged.readingStatus },
+    title: { [locale]: merged.title },
+  };
   if (merged.author) fields.author = { [locale]: merged.author };
   if (typeof merged.isbn === 'number' && Number.isFinite(merged.isbn))
     fields.isbn = { [locale]: merged.isbn };
@@ -208,4 +277,20 @@ export function buildCmaBookFields(
   if (merged.reviewDescription) fields.reviewDescription = { [locale]: merged.reviewDescription };
   if (merged.notes) fields.notes = { [locale]: merged.notes };
   return fields;
+}
+
+export function mergeCmaBookFields(
+  rawFields: Record<string, unknown> | null | undefined,
+  merged: MergedBookFields,
+  locale = DEFAULT_LOCALE,
+): Record<string, unknown> {
+  const nextFields = buildCmaBookFields(merged, locale);
+  const preserved = rawFields
+    ? Object.fromEntries(
+        Object.entries(rawFields).filter(
+          ([key]) => !CLEARABLE_CMA_BOOK_KEYS.has(key) || Object.hasOwn(nextFields, key),
+        ),
+      )
+    : {};
+  return { ...preserved, ...nextFields };
 }

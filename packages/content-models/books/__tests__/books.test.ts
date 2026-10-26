@@ -3,6 +3,8 @@ import {
   cleanWhitespace,
   DEFAULT_SHELVES,
   decodeCoverImageBase64,
+  isBackfilledBookReadDate,
+  isDuplicateTitle,
   isUsableGoodreadsCoverUrl,
   MAX_COVER_IMAGE_BYTES,
   normalizeContentfulAssetUrl,
@@ -19,8 +21,10 @@ import {
 import {
   buildCmaBookFields,
   computeBookDiff,
+  findDuplicateContentfulEntries,
   findMatchingContentfulEntry,
   type MergedBookFields,
+  mergeCmaBookFields,
   type NormalizedContentfulBookEntry,
   normalizeContentfulBookEntry,
 } from '../contentfulBook';
@@ -234,6 +238,7 @@ describe('goodreadsRss & contentfulBook', () => {
     expect(diff.action).toBe('update');
     expect(diff.changedFields).toEqual([
       'rating',
+      'readingStatus',
       'reviewDescription',
       'readDateFinished',
       'readDateStarted',
@@ -242,6 +247,7 @@ describe('goodreadsRss & contentfulBook', () => {
     expect(diff.merged.notesText).toBe('Keep these private notes intact.');
     const cmaFields = buildCmaBookFields(diff.merged);
     expect(cmaFields.rating).toEqual({ 'en-US': 5 });
+    expect(cmaFields.readingStatus).toEqual({ 'en-US': 'read' });
     expect(cmaFields.notes).toEqual({ 'en-US': existingNotesDoc });
     expect(cleanWhitespace(' a  b ')).toBe('a b');
     expect(normalizeReviewText('a\n\nb')).toBe('a\n\nb');
@@ -253,5 +259,96 @@ describe('goodreadsRss & contentfulBook', () => {
       ReadingStatus,
     ] = [null, firstItem, diff.merged, firstItem.status];
     expect(_typeCheck[1].title).toBe('Dune');
+  });
+
+  it('keeps undated Goodreads read books undated with readingStatus="read", clears legacy backfilled dates, and preserves manual finish dates', () => {
+    const undatedXml = `<rss><channel><item>
+      <book_id>231804</book_id><title><![CDATA[The Outsiders]]></title><author_name>S.E. Hinton</author_name>
+      <isbn13>9780140385724</isbn13><user_rating>5</user_rating>
+      <user_read_at></user_read_at>
+      <user_date_added>Mon, 24 Jul 2023 11:46:49 -0700</user_date_added>
+      <user_date_created>Mon, 24 Jul 2023 11:46:49 -0700</user_date_created>
+    </item></channel></rss>`;
+
+    const [outsiders] = parseGoodreadsRssXml(undatedXml, 'read');
+    if (!outsiders) throw new Error('expected parsed undated item');
+    expect(outsiders.status).toBe('read');
+    expect(outsiders.readDateFinished).toBeNull();
+    expect(outsiders.readDateStarted).toBeNull();
+
+    const backfilledEntry = normalizeContentfulBookEntry({
+      fields: {
+        author: { 'en-US': 'S.E. Hinton' },
+        coverImage: { 'en-US': { sys: { id: 'cov-outsiders' } } },
+        isbn: { 'en-US': 9780140385724 },
+        rating: { 'en-US': 5 },
+        readDateFinished: { 'en-US': '2023-07-24T06:00:00Z' },
+        readDateStarted: { 'en-US': '2023-07-24T06:00:00Z' },
+        title: { 'en-US': 'The Outsiders' },
+      },
+      sys: { id: '7E3C0190-93BB-403C-BCF5-D92EA76DDB85', publishedVersion: 2, version: 3 },
+    });
+
+    expect(isBackfilledBookReadDate(backfilledEntry)).toBe(true);
+    const diff = computeBookDiff(outsiders, backfilledEntry);
+    expect(diff.action).toBe('update');
+    expect(diff.changedFields).toEqual(['readingStatus', 'readDateFinished', 'readDateStarted']);
+    expect(diff.merged.readingStatus).toBe('read');
+    expect(diff.merged.readDateFinished).toBeNull();
+    expect(diff.merged.readDateStarted).toBeNull();
+
+    const mergedRaw = mergeCmaBookFields(backfilledEntry.rawFields, diff.merged);
+    expect(mergedRaw.readingStatus).toEqual({ 'en-US': 'read' });
+    expect(mergedRaw).not.toHaveProperty('readDateFinished');
+    expect(mergedRaw).not.toHaveProperty('readDateStarted');
+
+    // Manual override in Saga/Contentful (e.g. 2011) is preserved when Goodreads user_read_at is empty
+    const manualOverrideEntry = normalizeContentfulBookEntry({
+      fields: {
+        author: { 'en-US': 'S.E. Hinton' },
+        coverImage: { 'en-US': { sys: { id: 'cov-outsiders' } } },
+        isbn: { 'en-US': 9780140385724 },
+        rating: { 'en-US': 5 },
+        readDateFinished: { 'en-US': '2011-05-15T00:00:00Z' },
+        readingStatus: { 'en-US': 'read' },
+        title: { 'en-US': 'The Outsiders' },
+      },
+      sys: { id: '7E3C0190-93BB-403C-BCF5-D92EA76DDB85', publishedVersion: 2, version: 3 },
+    });
+    const manualDiff = computeBookDiff(outsiders, manualOverrideEntry);
+    expect(manualDiff.action).toBe('skip');
+    expect(manualDiff.merged.readDateFinished).toBe('2011-05-15T00:00:00Z');
+  });
+
+  it('normalizes curly apostrophes, avoids false substring collisions, and prioritizes published entries', () => {
+    expect(
+      isDuplicateTitle(
+        "The Hitchhiker's Guide to the Galaxy",
+        'The Hitchhiker\u2019s Guide to the Galaxy',
+      ),
+    ).toBe(true);
+    expect(isDuplicateTitle('American Gods', 'American Gods: Tenth Anniversary')).toBe(true);
+    expect(isDuplicateTitle('Eva Luna', 'The Stories of Eva Luna')).toBe(false);
+
+    const draft = normalizeContentfulBookEntry({
+      fields: {
+        author: { 'en-US': 'Douglas Adams' },
+        title: { 'en-US': 'The Hitchhiker\u2019s Guide to the Galaxy' },
+      },
+      sys: { id: 'DRAFT-1', version: 1 },
+    });
+    const published = normalizeContentfulBookEntry({
+      fields: {
+        author: { 'en-US': 'Douglas Adams' },
+        title: { 'en-US': "The Hitchhiker's Guide to the Galaxy" },
+      },
+      sys: { id: 'PUB-1', publishedVersion: 2, version: 3 },
+    });
+
+    const query = { author: 'Douglas Adams', title: "The Hitchhiker's Guide to the Galaxy" };
+    expect(findMatchingContentfulEntry(query, [draft, published])?.id).toBe('PUB-1');
+    expect(
+      findDuplicateContentfulEntries(query, 'PUB-1', [draft, published]).map((e) => e.id),
+    ).toEqual(['DRAFT-1']);
   });
 });

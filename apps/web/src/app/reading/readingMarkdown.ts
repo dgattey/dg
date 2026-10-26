@@ -5,11 +5,11 @@ import { readingRoute } from '@dg/shared-core/routes/app';
 import { getBooks } from '../../services/contentful';
 import { relatedPageLinksMarkdown } from '../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../metadata';
-import { extractBookYear } from './readingHelpers';
+import { extractBookYear, sortBooks } from './readingHelpers';
 
 export async function getReadingMarkdown(): Promise<string> {
   try {
-    const books = await getBooks();
+    const books = sortBooks(await getBooks());
     const sections: Array<string> = [
       '# Reading',
       `> Books read, star ratings, and notes by year from ${SITE_NAME}`,

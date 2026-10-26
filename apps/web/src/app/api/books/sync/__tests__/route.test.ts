@@ -89,6 +89,7 @@ describe('Books mutation/sync API route', () => {
       rating: 5,
       readDateFinished: '2026-01-10T00:00:00Z',
       readDateStarted: '2026-01-01T00:00:00Z',
+      readingStatus: 'read',
       reviewText: 'Great read.',
       title: 'Fahrenheit 451',
       version: 4,

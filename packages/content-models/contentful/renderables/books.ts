@@ -1,6 +1,7 @@
 import {
   cleanWhitespace,
   extractPlainTextFromRichText,
+  isReadingStatus,
   normalizeContentfulAssetUrl,
   type ReadingStatus,
 } from '../../books/bookDomain';
@@ -22,15 +23,22 @@ export type RenderableBook = {
 };
 
 /**
- * Derives reading status from `readDateFinished` and `readDateStarted`, matching Saga (`Book.swift`).
+ * Resolves `readingStatus` from the explicit Contentful `readingStatus` field when set,
+ * falling back to `readDateFinished` and `readDateStarted`.
  */
 export function deriveReadingStatus({
   readDateFinished,
   readDateStarted,
+  readingStatus,
 }: {
   readDateFinished?: string | null;
   readDateStarted?: string | null;
+  readingStatus?: string | null;
 }): ReadingStatus {
+  const trimmedStatus = cleanWhitespace(readingStatus);
+  if (isReadingStatus(trimmedStatus)) {
+    return trimmedStatus;
+  }
   if (cleanWhitespace(readDateFinished)) {
     return 'read';
   }
@@ -45,7 +53,11 @@ export function toRenderableBook(book: Book | null | undefined): RenderableBook 
   const author = cleanWhitespace(book?.author);
   const readDateFinished = cleanWhitespace(book?.readDateFinished) || null;
   const readDateStarted = cleanWhitespace(book?.readDateStarted) || null;
-  const readingStatus = deriveReadingStatus({ readDateFinished, readDateStarted });
+  const readingStatus = deriveReadingStatus({
+    readDateFinished,
+    readDateStarted,
+    readingStatus: book?.readingStatus,
+  });
   if (!title || !author || readingStatus === 'notStarted') {
     return null;
   }
