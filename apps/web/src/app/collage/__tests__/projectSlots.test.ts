@@ -9,6 +9,7 @@ import {
   projectTagTone,
   WORK_FRAMES,
   workSheetFrames,
+  workSheetGridAreas,
 } from '../projectSlots';
 import { PAPER_TONES } from '../types';
 
@@ -118,6 +119,25 @@ describe('projectSlots', () => {
       ['gn', 'Genera'],
       ['js', 'Jumpstart'],
     ]);
+  });
+
+  it('starts the wider big map below the first frame and blanks missing frames', () => {
+    const rows = (areas: string) =>
+      areas.match(/"[^"]+"/g)?.map((row) => row.slice(1, -1).split(' '));
+    const full = workSheetGridAreas({ c1: true, ws: true });
+    const wide = rows(full.areas) ?? [];
+    const firstFrameRows = wide.flatMap((row, index) => (row.includes('c1') ? [index] : []));
+    const bigMapRow = wide.findIndex((row) => row.includes('bm'));
+    expect(Math.max(...firstFrameRows)).toBeLessThan(bigMapRow);
+    expect(wide[bigMapRow]?.filter((area) => area === 'bm').length).toBeGreaterThan(
+      wide.find((row) => row.includes('lt'))?.filter((area) => area === 'lt').length ?? 0,
+    );
+    expect(full.compactRowGapPx).toBe(52);
+
+    const bare = workSheetGridAreas({ c1: false, ws: false });
+    expect(bare.areas).not.toMatch(/c1|ws/);
+    expect(bare.compactAreas).not.toMatch(/c1|ws/);
+    expect(rows(bare.areas)?.every((row) => row.length === 12)).toBe(true);
   });
 
   it('derives a contrasting tab tone for every paper tone and project slot', () => {

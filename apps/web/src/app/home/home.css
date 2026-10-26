@@ -15,7 +15,7 @@
   grid-template-areas:
     "headline headline headline headline headline headline headline portrait portrait portrait portrait portrait"
     "intro intro intro intro intro intro intro portrait portrait portrait portrait portrait"
-    "map map map map map map map portrait portrait portrait portrait portrait";
+    ". . . . . map map map map map map map";
   grid-template-rows: auto auto 1fr;
   column-gap: 0;
 }
@@ -87,14 +87,12 @@
 .home__intro :is(h1, h2, h3, h4, h5, h6) {
   margin: 0;
 }
+/* Tucks under the portrait, leaving the corner below the intro to Now playing. */
 .home__map {
   position: relative;
   z-index: 2;
   grid-area: map;
-  /* Reaches into the slack beside the centered portrait. */
-  width: min(calc(100% + 48px), 780px);
-  margin-top: 76px;
-  margin-left: 8px;
+  margin-top: 60px;
 }
 .home__mapPaper {
   width: 100%;
@@ -139,18 +137,24 @@
 }
 .home__workGrid {
   grid-template-areas: var(--grid-areas);
-  row-gap: var(--grid-row-gap);
   column-gap: var(--gap);
+}
+/* The rail's Now playing rises beside it, so the first frame drops to meet the latest ride. */
+.home__workGrid > [data-slot="c1"] {
+  margin-top: 96px;
+}
+.home__workGrid > [data-slot="ws"] {
+  align-self: end;
 }
 .home__codaGrid {
-  grid-template-areas: ". . . . . . . . li li li li";
+  grid-template-areas: ". . . li li li li . . . . .";
   column-gap: var(--gap);
 }
-/* Rises past the sheet's padding so the sleeve straddles the torn top edge. */
+/* Rises past the sheet's padding into the hello sheet's corner below the intro. */
 .home__spotifySlot {
   position: relative;
   z-index: 1;
-  margin-top: calc(-1 * var(--sp-top) - 168px);
+  margin-top: calc(-1 * var(--sp-top) - 330px);
   isolation: isolate;
   will-change: transform;
 }
@@ -184,19 +188,12 @@
     calc(var(--edge-br) + var(--rim)) calc(var(--edge-bl) + var(--rim));
 }
 /*
- * Every route around home up top, the latest print stepped down and left so the
- * two only share a corner south of SF. It stays inside its own columns, leaving
- * the gutter clear for the Watershed card beside it.
+ * Wide grids hand the card's pieces straight to the work grid's rail. The latest
+ * print and the ticket pair share an inset, and the big map steps out past both.
  */
 .home__strava {
-  position: relative;
-  display: grid;
-  grid-area: st;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  row-gap: 16px;
-  column-gap: 14px;
-  align-items: start;
-  padding-top: 36px;
+  --rail-inset: 24px;
+  display: contents;
 }
 .home__stravaHeading {
   position: absolute;
@@ -205,11 +202,13 @@
   z-index: 4;
   margin: 0;
 }
+/* Drops the tag and sticker that hang above its top edge clear of the ticket pair. */
 .home__stravaAtlas {
   position: relative;
   z-index: 1;
-  grid-row: 1;
-  grid-column: 3 / -1;
+  grid-area: bm;
+  width: calc(100% - var(--rail-inset));
+  margin-top: 44px;
 }
 .home__stravaAtlasLink,
 .home__stravaAtlasLink:hover {
@@ -267,10 +266,13 @@
   z-index: 3;
   width: 124px;
 }
+/* Sits on its row's floor, which the first frame may push lower, so the tickets stay tucked under it. */
 .home__stravaLatest {
   z-index: 2;
-  grid-row: 2;
-  grid-column: 1 / 8;
+  grid-area: lt;
+  align-self: end;
+  width: min(352px, 100% - var(--rail-inset));
+  margin: 98px 0 0 var(--rail-inset);
 }
 .home__stravaWhen {
   position: absolute;
@@ -279,19 +281,21 @@
   z-index: 3;
   width: 136px;
 }
+/* Centered under the latest print, tucked just below its bottom edge. */
 .home__stravaSide {
   z-index: 2;
-  display: grid;
-  grid-row: 2;
-  grid-column: 8 / -1;
-  gap: 16px;
-  align-self: start;
-  justify-items: end;
-  margin-top: 26px;
+  display: flex;
+  grid-area: tk;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: center;
+  width: min(352px, 100% - var(--rail-inset));
+  padding-top: 4px;
+  margin: 4px 0 0 var(--rail-inset);
 }
-/* Settles beside the gatefold's middle instead of leaving a gap below it. */
-.home__workGrid > [data-slot="ws"] {
-  align-self: center;
+/* Matching widths keep the pair balanced. */
+.home__stravaSide > * {
+  min-width: 152px;
 }
 /* Whole-card links on the homepage zoom a touch as they lift, so they feel alike. */
 @media (prefers-reduced-motion: no-preference) {
@@ -520,17 +524,55 @@
   }
 }
 
+/* Narrower grids share two rows between the frames and the whole Strava card. */
 @media (max-width: 1180px) {
-  .home__stravaLatest {
-    grid-column: 1 / -1;
+  .home__helloGrid {
+    grid-template-areas:
+      "headline headline headline headline headline headline headline portrait portrait portrait portrait portrait"
+      "intro intro intro intro intro intro intro portrait portrait portrait portrait portrait"
+      "map map map map map map map portrait portrait portrait portrait portrait";
+  }
+  /* Reaches into the slack beside the centered portrait. */
+  .home__map {
+    width: min(calc(100% + 48px), 780px);
+    margin-top: 76px;
+    margin-left: 8px;
+  }
+  .home__workGrid {
+    grid-template-areas: var(--grid-areas-compact);
+    row-gap: var(--grid-row-gap-compact);
+  }
+  .home__workGrid > [data-slot="c1"] {
+    margin-top: 0;
+  }
+  /* Settles beside the Strava card's middle instead of leaving a gap below it. */
+  .home__workGrid > [data-slot="ws"] {
+    align-self: center;
+  }
+  .home__spotifySlot {
+    margin-top: calc(-1 * var(--sp-top) - 168px);
+  }
+  .home__strava {
+    position: relative;
+    display: grid;
+    grid-area: st;
+    row-gap: 16px;
+    align-items: start;
+    padding-top: 36px;
+  }
+  .home__stravaLatest,
+  .home__stravaSide,
+  .home__stravaAtlas {
+    grid-area: auto;
+    width: auto;
+    margin: 0;
   }
   .home__stravaSide {
-    display: flex;
     flex-wrap: wrap;
-    grid-row: 3;
-    grid-column: 1 / -1;
-    gap: 14px;
-    justify-content: flex-end;
+    padding-top: 0;
+  }
+  .home__stravaAtlas {
+    margin-top: 30px;
   }
 }
 
@@ -581,13 +623,6 @@
     width: 100%;
     max-width: 480px;
     padding-top: 12px;
-  }
-  .home__stravaAtlas {
-    grid-column: 1 / -1;
-  }
-  .home__stravaLatest {
-    grid-column: 1 / -1;
-    margin-top: 12px;
   }
   .home__stravaTotal {
     top: -28px;

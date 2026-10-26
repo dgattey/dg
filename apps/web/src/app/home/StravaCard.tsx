@@ -14,9 +14,9 @@ import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 
 /**
- * The homepage's Strava gatefold: every route around home up top, linking to
- * `/activities` with the lifetime total sealed on its corner, the latest outing's
- * print stepped down beside this year's miles and San Francisco street coverage.
+ * The homepage's Strava rail: the latest outing's print, then San Francisco street
+ * coverage and this year's miles as a ticket pair, then every route around home,
+ * linking to `/activities` with the lifetime total sealed on its corner.
  */
 export function StravaCard({ history }: { history: StravaHistory | null }) {
   if (!history) {
@@ -29,6 +29,37 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
   const sfShare = sfCoverage.city.streetMeters > 0 ? formatShare(sfCoverage.city.share) : null;
   return (
     <div className="home__strava" data-slot="st">
+      <RoutePolaroid
+        className="home__stravaLatest"
+        outing={latest}
+        tileSource={getTileSource()}
+        tiltDeg={-1.8}
+      >
+        <Scallop className="home__stravaWhen" size="sticker" tiltDeg={10} tone="vermilion">
+          <span className="strava__sealKey" data-typography="caption">
+            {SPORT_DETAILS[latest.sport].latest}
+          </span>
+          <span data-typography="label">
+            <RelativeTime date={latest.startDate} hasTooltip={false} isCapitalized />
+          </span>
+        </Scallop>
+      </RoutePolaroid>
+      <div className="home__stravaSide">
+        {sfShare ? (
+          <Stub kind="stamp" size="sm" tiltDeg={-2.5} tone="cream">
+            <span className="strava__sealKey" data-typography="meta">
+              SF streets
+            </span>
+            <span data-typography="title-md">{sfShare}</span>
+          </Stub>
+        ) : null}
+        <Stub kind="ticket" size="sm" tiltDeg={2} tone="ochre">
+          <span className="strava__sealKey" data-typography="meta">
+            This year
+          </span>
+          <span data-typography="title-md">{formatMiles(thisYear.distanceMeters)} mi</span>
+        </Stub>
+      </div>
       <div className="home__stravaAtlas collageLift">
         <PageTransitionLink
           className="home__stravaAtlasLink"
@@ -66,37 +97,6 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
             <span data-typography="label">{formatMiles(totals.distanceMeters)} mi</span>
           </Scallop>
         </PageTransitionLink>
-      </div>
-      <RoutePolaroid
-        className="home__stravaLatest"
-        outing={latest}
-        tileSource={getTileSource()}
-        tiltDeg={-1.8}
-      >
-        <Scallop className="home__stravaWhen" size="sticker" tiltDeg={10} tone="vermilion">
-          <span className="strava__sealKey" data-typography="caption">
-            {SPORT_DETAILS[latest.sport].latest}
-          </span>
-          <span data-typography="label">
-            <RelativeTime date={latest.startDate} hasTooltip={false} isCapitalized />
-          </span>
-        </Scallop>
-      </RoutePolaroid>
-      <div className="home__stravaSide">
-        {sfShare ? (
-          <Stub kind="stamp" size="sm" tiltDeg={2.4} tone="cream">
-            <span className="strava__sealKey" data-typography="meta">
-              SF streets
-            </span>
-            <span data-typography="title-md">{sfShare}</span>
-          </Stub>
-        ) : null}
-        <Stub kind="ticket" size="sm" tiltDeg={-3.2} tone="ochre">
-          <span className="strava__sealKey" data-typography="meta">
-            This year
-          </span>
-          <span data-typography="title-md">{formatMiles(thisYear.distanceMeters)} mi</span>
-        </Stub>
       </div>
     </div>
   );
