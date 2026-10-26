@@ -28,7 +28,7 @@ type UseAtlasGesturesParams = {
   liveBasisRef: RefObject<TransformBasis>;
   onCenterChange?: (center: Point) => void;
   onCommitViewport: (next: { boundsKey: string; center: Point; zoom: number } | null) => void;
-  preRenderRef: RefObject<((center: Point, zoom: number) => void) | null>;
+  preRenderRef: RefObject<((center: Point, zoom: number, onReady?: () => void) => void) | null>;
   tilesRef: RefObject<HTMLDivElement | null>;
   width: number;
 };
@@ -178,8 +178,17 @@ export function useAtlasGestures({
       st.wheelTimer = setTimeout(() => {
         st.wheelTimer = null;
         st.cachedRect = null;
-        preRenderRef.current?.(st.liveCenter, st.liveZoom);
-        commitGesture(st.liveCenter, st.liveZoom, false);
+        const settleCenter = st.liveCenter;
+        const settleZoom = st.liveZoom;
+        if (preRenderRef.current) {
+          preRenderRef.current(settleCenter, settleZoom, () => {
+            if (!st.dragging && st.wheelTimer === null && st.animFrame === null) {
+              commitGesture(settleCenter, settleZoom, false);
+            }
+          });
+        } else {
+          commitGesture(settleCenter, settleZoom, false);
+        }
       }, WHEEL_SETTLE_MS);
     };
 
@@ -216,8 +225,17 @@ export function useAtlasGestures({
     const handleMouseUp = () => {
       if (!st.dragging) return;
       st.dragging = false;
-      preRenderRef.current?.(st.liveCenter, st.liveZoom);
-      commitGesture(st.liveCenter, st.liveZoom, false);
+      const settleCenter = st.liveCenter;
+      const settleZoom = st.liveZoom;
+      if (preRenderRef.current) {
+        preRenderRef.current(settleCenter, settleZoom, () => {
+          if (!st.dragging && st.wheelTimer === null && st.animFrame === null) {
+            commitGesture(settleCenter, settleZoom, false);
+          }
+        });
+      } else {
+        commitGesture(settleCenter, settleZoom, false);
+      }
     };
 
     tilesEl.addEventListener('wheel', handleWheel, { passive: false });
@@ -249,7 +267,18 @@ export function useAtlasGestures({
     }
     g.targetCenter = targetCenter;
     g.targetZoom = targetZoom;
-    preRenderRef.current?.(targetCenter, targetZoom);
+
+    let animDone = false;
+    let bitmapReady = !preRenderRef.current;
+    const finishIfReady = () => {
+      if (animDone && bitmapReady && !g.dragging && g.wheelTimer === null && g.animFrame === null) {
+        commitGesture(targetCenter, targetZoom, isReset);
+      }
+    };
+    preRenderRef.current?.(targetCenter, targetZoom, () => {
+      bitmapReady = true;
+      finishIfReady();
+    });
 
     const startRef = mercatorRefPoint(g.liveCenter);
     const endRef = mercatorRefPoint(targetCenter);
@@ -261,7 +290,10 @@ export function useAtlasGestures({
       const eased = t * (2 - t);
       if (t >= 1) {
         g.animFrame = null;
-        commitGesture(targetCenter, targetZoom, isReset);
+        g.liveRef = endRef;
+        syncGestureTransform(targetCenter, targetZoom);
+        animDone = true;
+        finishIfReady();
         return;
       }
       const nextRef = {

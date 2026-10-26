@@ -183,7 +183,7 @@ type AtlasRoutesCanvasProps = {
   height: number;
   hostRef: RefObject<HTMLElement | null>;
   liveBasisRef: RefObject<TransformBasis>;
-  preRenderRef: RefObject<((center: Point, zoom: number) => void) | null>;
+  preRenderRef: RefObject<((center: Point, zoom: number, onReady?: () => void) => void) | null>;
   tones: ReadonlyArray<string>;
   visible: ReadonlySet<number> | null;
   visibleKey: string;
@@ -212,6 +212,7 @@ export function AtlasRoutesCanvas({
   const reqIdRef = useRef(0);
   const sentRoutesRef = useRef<ReadonlyArray<WorkerRouteEntry> | null>(null);
   const lastRenderKeyRef = useRef('');
+  const onReadyCallbacksRef = useRef(new Map<number, () => void>());
   const paletteCacheRef = useRef<{
     casingColor: string;
     dark: boolean;
@@ -227,6 +228,8 @@ export function AtlasRoutesCanvas({
 
     worker.onmessage = (event: MessageEvent) => {
       const { bitmap, dpr, height: bh, id, scale, tx, ty, width: bw } = event.data;
+      const onReady = onReadyCallbacksRef.current.get(id);
+      onReadyCallbacksRef.current.delete(id);
       const canvas = canvasRef.current;
       if (id < reqIdRef.current || !canvas) {
         bitmap?.close?.();
@@ -249,6 +252,7 @@ export function AtlasRoutesCanvas({
           path.setAttribute('d', '');
         }
       }
+      onReady?.();
     };
 
     return () => {
@@ -260,10 +264,13 @@ export function AtlasRoutesCanvas({
     };
   }, [basisRef, canvasRef, hostRef, liveBasisRef]);
 
-  const dispatchRender = (targetCenter: Point, targetZoom: number) => {
+  const dispatchRender = (targetCenter: Point, targetZoom: number, onReady?: () => void) => {
     const worker = workerRef.current;
     const canvas = canvasRef.current;
-    if (!worker || !canvas || width <= 0 || height <= 0) return;
+    if (!worker || !canvas || width <= 0 || height <= 0) {
+      onReady?.();
+      return;
+    }
     if (sentRoutesRef.current !== workerRoutes) {
       sentRoutesRef.current = workerRoutes;
       worker.postMessage({ routes: workerRoutes, type: 'routes' });
@@ -272,6 +279,7 @@ export function AtlasRoutesCanvas({
     const renderKey = `${visibleKey}|${dark ? 1 : 0}|${width}x${height}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
     if (lastRenderKeyRef.current === renderKey) {
       applyRelativeTransform(canvas, liveBasisRef.current, basisRef.current);
+      onReady?.();
       return;
     }
     lastRenderKeyRef.current = renderKey;
@@ -291,6 +299,9 @@ export function AtlasRoutesCanvas({
     const { casingColor, toneColors } = paletteCacheRef.current;
     const zoomFactor = Math.max(0, Math.min(1, (targetZoom - 4) / (15 - 4)));
     reqIdRef.current += 1;
+    if (onReady) {
+      onReadyCallbacksRef.current.set(reqIdRef.current, onReady);
+    }
     worker.postMessage({
       casingColor,
       casingWidth: 2 + zoomFactor * 5,

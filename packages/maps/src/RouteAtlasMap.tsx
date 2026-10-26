@@ -110,7 +110,9 @@ export function RouteAtlasMap({
   const hostRef = useRef<HTMLElement>(null);
   const tilesRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const preRenderRef = useRef<((center: Point, zoom: number) => void) | null>(null);
+  const preRenderRef = useRef<((center: Point, zoom: number, onReady?: () => void) => void) | null>(
+    null,
+  );
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
   const activeBounds = view ?? bounds;
