@@ -120,11 +120,6 @@ export function checkScallopPadding(
 
 const lastCompound = (selector: string): string => selector.split(/[\s>+~]+/).at(-1) ?? '';
 
-/**
- * Card heads swap their subtitle for a hover readout. A wrapping head moves that
- * subtitle onto a new line once the readout outgrows the space beside the title, which
- * drags the rows under the pointer away and makes the hover flicker.
- */
 export function checkCardHeadStable(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
@@ -169,10 +164,6 @@ export function checkCardHeadStable(
   return violations;
 }
 
-/**
- * A tag hung over a card's top edge and inside its right edge covers the end of the
- * card head. Each one needs a bounded width and a `:has(> tag)` rule that pads the head.
- */
 export function checkCornerTagRoom(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
@@ -219,10 +210,6 @@ export function checkCornerTagRoom(
   return violations;
 }
 
-/**
- * A `repeat(n, …)` grid whose column gaps alone are wider than a phone collapses every
- * track to zero and pushes full-width children past the page edge.
- */
 export function checkGridGapsFit(cssFiles: ReadonlyMap<string, string>): Array<StructureViolation> {
   const rulesByFile = new Map([...cssFiles].map(([file, content]) => [file, cssRules(content)]));
   const overrides = new Map<string, Array<GridOverride>>();
@@ -267,16 +254,11 @@ export function checkHeaderAboveSticky(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
   const rulesByFile = new Map([...cssFiles].map(([file, content]) => [file, cssRules(content)]));
-  let headerZ: number | undefined;
-  for (const rules of rulesByFile.values()) {
-    for (const rule of rules) {
-      if (!rule.media && rule.selectors.includes('.chrome__header')) {
-        const z = Number(declaration(rule.body, 'z-index'));
-        if (Number.isFinite(z)) headerZ = z;
-      }
-    }
-  }
-  if (headerZ === undefined) return [];
+  const headerZ = [...rulesByFile.values()]
+    .flat()
+    .find((r) => !r.media && r.selectors.includes('.chrome__header'));
+  const maxZ = Number(declaration(headerZ?.body ?? '', 'z-index'));
+  if (!Number.isFinite(maxZ)) return [];
   const violations: Array<StructureViolation> = [];
   for (const [file, rules] of rulesByFile) {
     for (const rule of rules) {
@@ -285,17 +267,68 @@ export function checkHeaderAboveSticky(
         !rule.selectors.includes('.chrome__header') &&
         declaration(rule.body, 'position') === 'sticky' &&
         Number.isFinite(z) &&
-        z >= headerZ
+        z >= maxZ
       ) {
         violations.push({
           file,
           line: lineAt(cssFiles.get(file) ?? '', rule.index),
-          message: `Sticky rule \`${rule.selectors.join(', ')}\` has z-index ${z}, which must be below \`.chrome__header\` (z-index ${headerZ}) so the header dropdown paints on top`,
+          message: `Sticky rule \`${rule.selectors.join(', ')}\` has z-index ${z}, which must be below \`.chrome__header\` (z-index ${maxZ}) so the header dropdown paints on top`,
           rule: 'css-header-above-sticky',
         });
       }
     }
   }
+  return violations;
+}
+
+export function checkHomepageConsistency(
+  cssFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const homeFile = 'apps/web/src/app/home/home.css';
+  const collageFile = 'apps/web/src/app/collage/collage.css';
+  const home = cssFiles.get(homeFile);
+  const collage = cssFiles.get(collageFile);
+  if (!home || !collage) return [];
+  const violations: Array<StructureViolation> = [];
+  const check = (isHome: boolean, sel: string, ok: (b: string) => boolean, message: string) => {
+    const raw = isHome ? home : collage;
+    const rule = cssRules(raw).find((r) => !r.media && r.selectors.join(',') === sel);
+    if (rule && !ok(rule.body)) {
+      const file = isHome ? homeFile : collageFile;
+      violations.push({
+        file,
+        line: lineAt(raw, rule.index),
+        message,
+        rule: 'css-homepage-consistency',
+      });
+    }
+  };
+  check(true, '.home__hello', (b) => declaration(b, '--sp-top') === '40px', 'Set --sp-top: 40px');
+  check(true, '.home__headline', (b) => !declaration(b, 'padding-top'), 'Drop padding-top');
+  check(
+    true,
+    '.home__frameCard',
+    (b) => Boolean(declaration(b, '--frame-radius')),
+    'Set --frame-radius',
+  );
+  check(
+    true,
+    '.home__frameShot',
+    (b) => declaration(b, 'border-radius') === 'var(--nested-radius)',
+    'Use --nested-radius',
+  );
+  check(
+    true,
+    '.home__sideRowWrap',
+    (b) => Boolean(declaration(b, '--row-radius')),
+    'Set --row-radius',
+  );
+  check(
+    false,
+    '[data-role="side-project-mark"] img',
+    (b) => Boolean(declaration(b, 'border-radius')?.includes('--mark-pad')),
+    'Use --mark-pad',
+  );
   return violations;
 }
 
@@ -308,5 +341,6 @@ export function checkCssGeometry(cssFiles: ReadonlyMap<string, string>): Array<S
     ...checkHeaderAboveSticky(cssFiles),
     ...checkFooterCurtainReveal(cssFiles),
     ...checkHeaderLogoAlignment(cssFiles),
+    ...checkHomepageConsistency(cssFiles),
   ];
 }
