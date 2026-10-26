@@ -108,7 +108,15 @@ export function StravaAtlas({
   regions: ReadonlyArray<AtlasRegion>;
   tileSource: TileSource;
 }) {
-  const { all, city, setCity } = useFilteredOutings();
+  const {
+    all,
+    atlasCustomBounds,
+    atlasRegion,
+    fitKey,
+    followAtlasCenter,
+    framedRegion,
+    selectRegion,
+  } = useFilteredOutings();
   const routesCacheRef = useRef<{
     all: typeof all;
     routes: ReturnType<typeof toMapRoutes>;
@@ -116,23 +124,26 @@ export function StravaAtlas({
   if (!routesCacheRef.current || routesCacheRef.current.all !== all) {
     routesCacheRef.current = { all, routes: toMapRoutes(all) };
   }
-  const region = regions.find(({ key }) => key === city) ?? regions[0] ?? null;
+  const framed = framedRegion ? (regions.find(({ key }) => key === framedRegion) ?? null) : null;
+  const view = atlasCustomBounds ?? framed?.bounds ?? null;
   return (
     <>
       <RouteAtlasMap
         bounds={bounds}
+        fitKey={fitKey}
         label="Map of every route I've tracked on Strava"
+        onCenterChange={followAtlasCenter}
         routes={routesCacheRef.current.routes}
         tileSource={tileSource}
-        view={region?.bounds ?? null}
+        view={view}
       />
       {regions.length > 1 ? (
         <PaperStrip
           className="strava__regions"
           label="Zoom to region"
-          onSelect={setCity}
+          onSelect={selectRegion}
           options={regions}
-          selected={region?.key ?? city}
+          selected={atlasRegion}
         />
       ) : null}
     </>

@@ -8,7 +8,7 @@ import {
 
 export type MapRoute = { id: number; polyline: string; tone: string };
 
-type DecodedRoute = { id: number; points: Array<Point>; tone: string };
+export type DecodedRoute = { id: number; points: Array<Point>; tone: string };
 
 export type GeoBounds = [southWest: Point, northEast: Point];
 
@@ -18,8 +18,14 @@ export type FramedPath = { d: string; tone: string };
 
 const CELL_DEGREES = 0.5;
 const TRIM_FRACTION = 0.02;
+const HOME_LAT_RADIUS = 0.17;
+const HOME_LNG_RADIUS = 0.32;
 const PIXEL_TOLERANCE = 0.6;
 const FRAME_MARGIN = 24;
+const MERCATOR_MAX_LATITUDE = 85.05112878;
+
+export const MERCATOR_REF_ZOOM = 12;
+const MERCATOR_REF_SCALE = 256 * 2 ** MERCATOR_REF_ZOOM;
 const GAP_KM = 5;
 const KM_PER_DEGREE = 111.32;
 
@@ -103,6 +109,14 @@ export function homeBounds(routes: ReadonlyArray<DecodedRoute>): GeoBounds | nul
     return null;
   }
   const [row, column] = densest;
+  const homeStarts = starts.filter(([latitude, longitude]) => {
+    const [startRow, startColumn] = cellOf([latitude, longitude]);
+    return Math.abs(startRow - row) <= 1 && Math.abs(startColumn - column) <= 1;
+  });
+  const startLats = homeStarts.map(([latitude]) => latitude).toSorted((a, b) => a - b);
+  const startLngs = homeStarts.map(([, longitude]) => longitude).toSorted((a, b) => a - b);
+  const medianLat = startLats[Math.floor(startLats.length / 2)] ?? 0;
+  const medianLng = startLngs[Math.floor(startLngs.length / 2)] ?? 0;
   const nearby = routes.flatMap(({ points }) => {
     const [startRow, startColumn] = cellOf(points[0] ?? [0, 0]);
     return Math.abs(startRow - row) <= 1 && Math.abs(startColumn - column) <= 1 ? points : [];
@@ -110,8 +124,8 @@ export function homeBounds(routes: ReadonlyArray<DecodedRoute>): GeoBounds | nul
   const [south, north] = trimmedRange(nearby.map(([latitude]) => latitude));
   const [west, east] = trimmedRange(nearby.map(([, longitude]) => longitude));
   return [
-    [south, west],
-    [north, east],
+    [Math.max(south, medianLat - HOME_LAT_RADIUS), Math.max(west, medianLng - HOME_LNG_RADIUS)],
+    [Math.min(north, medianLat + HOME_LAT_RADIUS), Math.min(east, medianLng + HOME_LNG_RADIUS)],
   ];
 }
 
@@ -128,10 +142,10 @@ const isNearFrame = (
   margin: number,
 ) => x > -margin && x < width + margin && y > -margin && y < height + margin;
 
-export function framePaths(
-  frame: RouteFrame,
+function inkPaths(
   routes: ReadonlyArray<DecodedRoute>,
-  margin = FRAME_MARGIN,
+  projectLeg: (points: Array<Point>) => Array<{ x: number; y: number }>,
+  onScreen: (pixel: { x: number; y: number }) => boolean,
 ): Array<FramedPath> {
   const byTone = new Map<string, Array<string>>();
   const seenByTone = new Map<string, Set<string>>();
@@ -147,8 +161,8 @@ export function framePaths(
       byTone.set(tone, runs);
     }
     for (const leg of routeLegs(points)) {
-      const pixels = projectRouteToPixels({ ...frame, points: leg });
-      if (!pixels.some((pixel) => isNearFrame(pixel, frame, margin))) {
+      const pixels = projectLeg(leg);
+      if (!pixels.some(onScreen)) {
         continue;
       }
       const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]);
@@ -176,9 +190,7 @@ export function framePaths(
         if (!a || !b) {
           continue;
         }
-        const nearA = isNearFrame({ x: a[0], y: a[1] }, frame, margin);
-        const nearB = isNearFrame({ x: b[0], y: b[1] }, frame, margin);
-        if (!nearA && !nearB) {
+        if (!onScreen({ x: a[0], y: a[1] }) && !onScreen({ x: b[0], y: b[1] })) {
           flush();
           prev = null;
           continue;
@@ -206,6 +218,61 @@ export function framePaths(
   return [...byTone].flatMap(([tone, runs]) =>
     runs.length > 0 ? [{ d: runs.join(''), tone }] : [],
   );
+}
+
+export function framePaths(
+  frame: RouteFrame,
+  routes: ReadonlyArray<DecodedRoute>,
+  margin = FRAME_MARGIN,
+): Array<FramedPath> {
+  return inkPaths(
+    routes,
+    (points) => projectRouteToPixels({ ...frame, points }),
+    (pixel) => isNearFrame(pixel, frame, margin),
+  );
+}
+
+export function mercatorRefPoint([latitude, longitude]: Point): { x: number; y: number } {
+  const clamped = Math.max(-MERCATOR_MAX_LATITUDE, Math.min(MERCATOR_MAX_LATITUDE, latitude));
+  const latRad = (clamped * Math.PI) / 180;
+  return {
+    x: ((longitude + 180) / 360) * MERCATOR_REF_SCALE,
+    y: ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * MERCATOR_REF_SCALE,
+  };
+}
+
+export function mercatorPaths(routes: ReadonlyArray<DecodedRoute>): Array<FramedPath> {
+  return inkPaths(
+    routes,
+    (points) => points.map(mercatorRefPoint),
+    () => true,
+  );
+}
+
+export function routeBounds(polyline: string): GeoBounds | null {
+  try {
+    const points = decodePolyline(polyline);
+    const first = points[0];
+    if (!first || points.length < 2) {
+      return null;
+    }
+    let minLat = first[0];
+    let maxLat = first[0];
+    let minLng = first[1];
+    let maxLng = first[1];
+    for (const [latitude, longitude] of points) {
+      minLat = Math.min(minLat, latitude);
+      maxLat = Math.max(maxLat, latitude);
+      minLng = Math.min(minLng, longitude);
+      maxLng = Math.max(maxLng, longitude);
+    }
+    return [
+      [minLat, minLng],
+      [maxLat, maxLng],
+    ];
+  } catch {
+    return null;
+  }
 }
 
 export function routeSilhouette(polyline: string, size: number, padding: number) {

@@ -238,7 +238,7 @@ describe('StravaHistorySections', () => {
       screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
     ).toEqual([
       'Recent routes',
-      'San Francisco streets',
+      'San Francisco',
       'Climbing by month',
       'Recent activities',
       'Longest rides',
@@ -275,23 +275,37 @@ describe('StravaHistorySections', () => {
     expect(within(streets()).getByText('Mission · 75.0%')).toBeInTheDocument();
   });
 
-  it('prints the newest outings in order, each captioned with its sport and day', () => {
+  it('prints the newest outings of the active sport, and seals only the latest overall', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     renderSections(full);
 
-    const recent = screen.getByRole('region', { name: 'Recent routes' });
-    const prints = within(recent).getAllByRole('link');
-    expect(prints.map((print) => print.getAttribute('aria-label'))).toEqual([
+    const recent = () => screen.getByRole('region', { name: 'Recent routes' });
+    const labels = () =>
+      within(recent())
+        .getAllByRole('link')
+        .map((print) => print.getAttribute('aria-label'));
+
+    expect(labels()).toEqual(['Presidio loop on Strava', 'Marin century on Strava']);
+    const [first] = within(recent()).getAllByRole('link');
+    expect(first).toHaveAttribute('href', 'https://www.strava.com/activities/1');
+    expect(first).toHaveTextContent('Ride2 days ago · Oct 20Presidio loop');
+    expect(within(first as HTMLElement).getByText('Latest')).toBeInTheDocument();
+    expect(first).toHaveTextContent('Fog burned off by the bridge.');
+
+    await user.click(getDesktopButton('All sports'));
+    expect(labels()).toEqual([
       'Presidio loop on Strava',
       'Lake Merritt run on Strava',
       'Tahoe rim hike on Strava',
     ]);
-    expect(prints[0]).toHaveAttribute('href', 'https://www.strava.com/activities/1');
-    expect(prints[0]).toHaveTextContent('Ride2 days ago · Oct 20Presidio loop');
-    expect(within(prints[0] as HTMLElement).getByText('Latest')).toBeInTheDocument();
-    expect(prints[0]).toHaveTextContent('Fog burned off by the bridge.');
+    const prints = within(recent()).getAllByRole('link');
     expect(prints[1]).toHaveTextContent('Run4 days ago · Oct 18Lake Merritt run');
     expect(prints[2]).toHaveTextContent('Hike');
     expect(prints[2]).toHaveTextContent('Jul 4Tahoe rim hike');
+
+    await user.click(getDesktopButton('Hikes'));
+    expect(labels()).toEqual(['Tahoe rim hike on Strava']);
+    expect(within(recent()).queryByText('Latest')).not.toBeInTheDocument();
   });
 
   it('totals and lists whatever the sport and time filters pick', async () => {

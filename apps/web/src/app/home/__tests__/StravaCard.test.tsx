@@ -133,22 +133,50 @@ describe('StravaCard', () => {
   it('opens the atlas from a map of the routes around home, counting every route', () => {
     renderCard(history);
 
-    expect(screen.getByRole('heading', { name: 'Exercise stats' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Big map' })).toBeInTheDocument();
     const atlas = screen.getByRole('link', { name: 'Big map' });
     expect(atlas).toHaveAttribute('href', '/activities');
     expect(inkedTones(atlas)).toEqual(['cobalt', 'vermilion']);
     expect(within(atlas).getByText('3 routes')).toBeInTheDocument();
+    expect(within(atlas).getByText('0.7× around Earth')).toBeInTheDocument();
+    expect(within(atlas).getByText('Explore big map →')).toBeInTheDocument();
   });
 
-  it('links the latest print to the outing on Strava with how long ago it was', () => {
+  it('links the latest print to the outing on Strava with its sport and how long ago it was', () => {
     renderCard(history);
 
     const print = screen.getByRole('link', { name: 'Goals on Strava' });
     expect(print).toHaveAttribute('href', 'https://www.strava.com/activities/101');
     expect(inkedTones(print)).toEqual(['cobalt']);
     expect(within(print).getByText('15.9 mi')).toBeInTheDocument();
-    expect(within(print).getByText('Latest')).toBeInTheDocument();
+    expect(within(print).getByText('Latest ride')).toBeInTheDocument();
     expect(within(print).getByText('2 days ago')).toBeInTheDocument();
+  });
+
+  it('names each sport in sentence case on the latest sticker', () => {
+    const { rerender } = renderCard({ ...history, latest: { ...latest, sport: 'ski' } });
+    expect(screen.getByText('Latest ski')).toBeInTheDocument();
+
+    rerender(
+      <ServerTimeProvider serverTime={NOW}>
+        <StravaCard history={{ ...history, latest: { ...latest, sport: 'hike' } }} />
+      </ServerTimeProvider>,
+    );
+    expect(screen.getByText('Latest hike')).toBeInTheDocument();
+
+    rerender(
+      <ServerTimeProvider serverTime={NOW}>
+        <StravaCard history={{ ...history, latest: { ...latest, sport: 'run' } }} />
+      </ServerTimeProvider>,
+    );
+    expect(screen.getByText('Latest run')).toBeInTheDocument();
+
+    rerender(
+      <ServerTimeProvider serverTime={NOW}>
+        <StravaCard history={{ ...history, latest: { ...latest, sport: 'other' } }} />
+      </ServerTimeProvider>,
+    );
+    expect(screen.getByText('Latest outing')).toBeInTheDocument();
   });
 
   it('sticks on this year’s miles and seals the atlas with the lifetime total', () => {

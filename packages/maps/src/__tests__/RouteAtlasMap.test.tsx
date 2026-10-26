@@ -29,7 +29,7 @@ const ROUTES: ReadonlyArray<MapRoute> = [
 ];
 
 describe('RouteAtlasMap', () => {
-  it('renders an offline sketch without zoom controls when tileSource is offline', () => {
+  it('renders offline placeholder tiles, Mercator route paths, and zoom controls when tileSource is offline', () => {
     const html = renderToString(
       <RouteAtlasMap
         bounds={BOUNDS}
@@ -40,9 +40,10 @@ describe('RouteAtlasMap', () => {
     );
 
     expect(html).toContain('aria-label="Route atlas"');
-    expect(html).not.toContain('aria-label="Zoom in"');
+    expect(html).toContain('aria-label="Zoom in"');
     expect(html).toContain('data-tone="cobalt"');
     expect(html).toContain('data-tone="vermilion"');
+    expect(html).toContain('data:image/svg+xml,');
   });
 
   it('renders Stadia tiles, filtered route paths, and zoom controls when online', () => {
@@ -66,5 +67,8 @@ describe('RouteAtlasMap', () => {
     expect(html).toContain('pointer-events:none');
     expect(html).toContain('data-tone="cobalt"');
     expect(html).not.toContain('data-tone="vermilion"');
+    expect(html).toContain('vector-effect="non-scaling-stroke"');
+    expect(html).toMatch(/scale\(\d+\.\d{6}\)/);
+    expect(html).toMatch(/d="M\d{5,}/);
   });
 });

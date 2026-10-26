@@ -102,7 +102,7 @@ export function PaperStrip<Key extends string>({
   label: string;
   onSelect: (key: Key) => void;
   options: ReadonlyArray<PaperStripOption<Key>>;
-  selected: Key;
+  selected: Key | null;
 }) {
   return (
     <fieldset

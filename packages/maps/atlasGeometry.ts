@@ -1,13 +1,14 @@
-import 'server-only';
-
 import type { CoverageCity } from '@dg/content-models/strava/StreetCoverage';
+import type { Point } from 'pigeon-maps';
 import {
   boundsWithin,
   decodeRoutes,
   type GeoBounds,
   homeBounds,
   type MapRoute,
+  routeBounds,
 } from './src/routeFrame';
+import { decodePolyline } from './src/routeGeometry';
 
 const BAY_AREA: GeoBounds = [
   [37.35, -122.8],
@@ -45,3 +46,85 @@ export const atlasRegions = (routes: ReadonlyArray<MapRoute>): Array<AtlasRegion
     return bounds ? [{ bounds, key, label }] : [];
   });
 };
+
+export function regionForPoint([latitude, longitude]: [number, number]): CoverageCity | null {
+  for (const { box, key } of ATLAS_REGIONS) {
+    const [[south, west], [north, east]] = box;
+    if (latitude >= south && latitude <= north && longitude >= west && longitude <= east) {
+      return key;
+    }
+  }
+  return null;
+}
+
+const NEAR_DEGREES = 0.35;
+const PAD_LAT = 0.025;
+const PAD_LNG = 0.035;
+
+const centerOf = ([[south, west], [north, east]]: GeoBounds): Point => [
+  (south + north) / 2,
+  (west + east) / 2,
+];
+
+const openedRoute = (polyline: string): { bounds: GeoBounds; start: Point } | null => {
+  const bounds = routeBounds(polyline);
+  if (!bounds) {
+    return null;
+  }
+  try {
+    const start = decodePolyline(polyline)[0];
+    return start ? { bounds, start } : null;
+  } catch {
+    return null;
+  }
+};
+
+export function latestRouteView(
+  polylines: ReadonlyArray<string>,
+  regions: ReadonlyArray<AtlasRegion>,
+): { bounds: GeoBounds; region: CoverageCity | null } | null {
+  let latest: { bounds: GeoBounds; start: Point } | null = null;
+  for (const polyline of polylines) {
+    latest = openedRoute(polyline);
+    if (latest) {
+      break;
+    }
+  }
+  if (!latest) {
+    return null;
+  }
+  const region = regionForPoint(centerOf(latest.bounds));
+  if (region !== null) {
+    const matched = regions.find((item) => item.key === region);
+    return { bounds: matched?.bounds ?? latest.bounds, region };
+  }
+  let south = latest.bounds[0][0];
+  let west = latest.bounds[0][1];
+  let north = latest.bounds[1][0];
+  let east = latest.bounds[1][1];
+  for (const polyline of polylines) {
+    const route = openedRoute(polyline);
+    if (!route) {
+      continue;
+    }
+    const [startLat, startLng] = route.start;
+    const [latestLat, latestLng] = latest.start;
+    if (
+      Math.abs(startLat - latestLat) > NEAR_DEGREES ||
+      Math.abs(startLng - latestLng) > NEAR_DEGREES
+    ) {
+      continue;
+    }
+    south = Math.min(south, route.bounds[0][0]);
+    west = Math.min(west, route.bounds[0][1]);
+    north = Math.max(north, route.bounds[1][0]);
+    east = Math.max(east, route.bounds[1][1]);
+  }
+  return {
+    bounds: [
+      [south - PAD_LAT, west - PAD_LNG],
+      [north + PAD_LAT, east + PAD_LNG],
+    ],
+    region: null,
+  };
+}

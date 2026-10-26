@@ -9,7 +9,6 @@ import { type CSSProperties, useId, useRef, useState } from 'react';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperStrip } from '../collage/PaperPills';
-import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { coverageRoutePath } from './coverageRoutePath';
 import { formatShare, type NeighborhoodCoverage, summarizeCoverage } from './coverageStats';
@@ -164,7 +163,6 @@ export function StreetCoverageSection({
   coverage: Readonly<Record<CoverageCity, StreetCoverage>>;
 }) {
   const { city: chosenCity, outings, setCity, span, sport } = useFilteredOutings();
-  const headingId = useId();
   const cities = COVERAGE_CITIES.filter((key) =>
     byCity[key].neighborhoods.some((hood) => hood.streetMeters > 0),
   );
@@ -201,23 +199,7 @@ export function StreetCoverageSection({
   }
   const [top] = summary.ranked;
   return (
-    <section aria-labelledby={headingId} className="streets">
-      <div className="streets__eyebrow">
-        <h2 className="strava__tagHeading" id={headingId}>
-          <PaperTag tiltDeg={-2} tone="black">
-            {cityName} streets
-          </PaperTag>
-        </h2>
-        {cities.length > 1 ? (
-          <PaperStrip
-            className="streets__cities"
-            label="Street coverage city"
-            onSelect={setCity}
-            options={cities.map((key) => ({ key, label: CITIES[key].name }))}
-            selected={city}
-          />
-        ) : null}
-      </div>
+    <section aria-label={`${cityName} streets`} className="streets">
       <ul className="streets__callouts">
         <li className="streets__seal">
           <Scallop tiltDeg={-5} tone="cobalt">
@@ -255,8 +237,11 @@ export function StreetCoverageSection({
         </li>
       </ul>
       <CityCoverageCards
+        cities={cities}
+        city={city}
         cityName={cityName}
         key={city}
+        onSelectCity={setCity}
         routes={routes}
         summary={summary}
         viewBox={coverage.viewBox}
@@ -266,12 +251,18 @@ export function StreetCoverageSection({
 }
 
 function CityCoverageCards({
+  cities,
+  city,
   cityName,
+  onSelectCity,
   routes,
   summary,
   viewBox,
 }: {
+  cities: ReadonlyArray<CoverageCity>;
+  city: CoverageCity;
   cityName: string;
+  onSelectCity: (city: CoverageCity) => void;
   routes: string;
   summary: ReturnType<typeof summarizeCoverage>;
   viewBox: string;
@@ -285,10 +276,25 @@ function CityCoverageCards({
     <>
       <PaperCard className="streets__mapCard" innerClassName="strava__pad" tiltDeg={-0.6}>
         <div className="streets__head">
-          <h3 className="strava__heading" data-typography="title-md">
-            {focused?.name ?? cityName}
-          </h3>
+          {cities.length > 1 ? (
+            <PaperStrip
+              className="streets__cities"
+              label="Street coverage city"
+              onSelect={onSelectCity}
+              options={cities.map((key) => ({ key, label: CITIES[key].name }))}
+              selected={city}
+            />
+          ) : (
+            <h2 className="strava__heading" data-typography="title-md">
+              {cityName}
+            </h2>
+          )}
           <span className="streets__figures">
+            {focused ? (
+              <span className="streets__focusName" data-typography="title-md">
+                {focused.name}
+              </span>
+            ) : null}
             <span className="streets__focusShare" data-typography="stat-md">
               {formatShare((focused ?? summary.city).share)}
             </span>

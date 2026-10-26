@@ -4,6 +4,10 @@ import {
   frameAround,
   framePaths,
   homeBounds,
+  MERCATOR_REF_ZOOM,
+  mercatorPaths,
+  mercatorRefPoint,
+  routeBounds,
   routeLegs,
   routeSilhouette,
 } from '../routeFrame';
@@ -81,6 +85,40 @@ describe('route frames', () => {
     ];
     expect(routeLegs([...mission, ...oakland, [37.9, -122.0]])).toEqual([mission, oakland]);
     expect(routeLegs(loop([37.77, -122.42]))).toEqual([loop([37.77, -122.42])]);
+  });
+
+  it('projects the equator onto the middle of the zoom 12 world', () => {
+    expect(MERCATOR_REF_ZOOM).toBe(12);
+    expect(mercatorRefPoint([0, 0])).toEqual({ x: 524_288, y: 524_288 });
+    const north = mercatorRefPoint([40, -122]);
+    const south = mercatorRefPoint([37, -122]);
+    expect(north.y).toBeLessThan(south.y);
+    expect(mercatorRefPoint([90, 0]).y).toBe(mercatorRefPoint([85.05112878, 0]).y);
+  });
+
+  it('inks one mercator path per tone, independent of any viewport', () => {
+    const decoded = decodeRoutes([...bay, ...away]);
+    const paths = mercatorPaths(decoded);
+    expect(paths.map(({ tone }) => tone)).toEqual(['vermilion', 'cobalt', 'viridian']);
+    expect(paths.map(({ d }) => d)).toEqual(mercatorPaths(decoded).map(({ d }) => d));
+    expect(paths[0]?.d).toMatch(/^M\d{4,} /);
+  });
+
+  it('bounds a polyline and rejects one that is not a route', () => {
+    expect(
+      routeBounds(
+        encodePolyline([
+          [10, 20],
+          [12, 18],
+          [11, 22],
+        ]),
+      ),
+    ).toEqual([
+      [10, 18],
+      [12, 22],
+    ]);
+    expect(routeBounds(encodePolyline([[10, 20]]))).toBeNull();
+    expect(routeBounds('_')).toBeNull();
   });
 
   it('fits a lone route into a silhouette square', () => {

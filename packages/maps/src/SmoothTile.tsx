@@ -16,6 +16,7 @@ export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
       <img
         alt=""
         data-map-tile-img=""
+        decoding="async"
         loading="lazy"
         onLoad={tileLoaded}
         src={tile.url}
@@ -40,7 +41,7 @@ export function useHostSize(
 
   useEffect(() => {
     const element = ref.current;
-    if (disabled || !element) {
+    if (disabled || !element || typeof ResizeObserver === 'undefined') {
       return;
     }
     const observer = new ResizeObserver(([entry]) => {
