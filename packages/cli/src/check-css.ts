@@ -197,9 +197,17 @@ function checkFontSystem(file: string, raw: string): Array<StructureViolation> {
           );
         }
       }
-      if (!rule.selectors.some((s) => s.startsWith('[data-typography='))) continue;
       const family = declaration(rule.body, 'font-family');
       const weight = declaration(rule.body, 'font-weight');
+      const color = declaration(rule.body, 'color');
+      if (color && color !== 'inherit' && !rule.selectors.includes('[data-typography="code"]')) {
+        flag(
+          rule.index,
+          'Typography role selectors must inherit color',
+          'css-typography-color-inheritance',
+        );
+      }
+      if (!rule.selectors.some((s) => s.startsWith('[data-typography='))) continue;
       if (family === 'var(--display)' && weight !== '700') {
         flag(rule.index, 'Display roles must use font-weight: 700', 'css-font-weight');
       }
@@ -226,6 +234,16 @@ export function checkTypeScale(cssFiles: ReadonlyMap<string, string>): Array<Str
     const clean = stripCssComments(content).replace(FONT_FACE_BLOCK, (block) =>
       block.replace(/[^\n]/g, ' '),
     );
+    const badInheritance = clean.match(/\.(?:paperInner|collageRoot)\s+\[data-typography\]/);
+    if (badInheritance?.index !== undefined) {
+      violations.push({
+        file,
+        line: lineAt(clean, badInheritance.index),
+        message:
+          'Do not override `[data-typography]` color with higher-specificity descendant selectors; `:where([data-typography])` already inherits color',
+        rule: 'css-typography-color-inheritance',
+      });
+    }
     if (enforceSingleOwner && file !== TYPOGRAPHY_CSS_FILE) {
       for (const match of clean.matchAll(TYPOGRAPHY_PROPERTY_DECLARATION)) {
         const prop = match[1] ?? 'font';

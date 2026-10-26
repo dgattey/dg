@@ -107,6 +107,7 @@ function HeadingWithId({
 const renderOptions = (
   links: RenderableRichTextContent['links'],
   variant: TypographyVariant,
+  mdVariant?: TypographyVariant,
 ): Options => {
   const assetMap = new Map<string, RenderableAssetWithSys>();
   links.assets.block.forEach((asset) => {
@@ -151,7 +152,7 @@ const renderOptions = (
         </HeadingWithId>
       ),
       [BLOCKS.PARAGRAPH]: (_, children) => (
-        <Typography data-rich-paragraph="" variant={variant}>
+        <Typography data-rich-paragraph="" data-typography-md={mdVariant} variant={variant}>
           {children}
         </Typography>
       ),
@@ -172,12 +173,15 @@ const renderOptions = (
 export function RichText({
   json,
   links,
+  mdVariant,
   variant = 'prose-lg',
-}: RenderableRichTextContent & { variant?: TypographyVariant }) {
+}: RenderableRichTextContent & { mdVariant?: TypographyVariant; variant?: TypographyVariant }) {
   if (!isRichTextDocument(json)) {
     return null;
   }
   return (
-    <div data-rich-text="">{documentToReactComponents(json, renderOptions(links, variant))}</div>
+    <div data-rich-text="">
+      {documentToReactComponents(json, renderOptions(links, variant, mdVariant))}
+    </div>
   );
 }

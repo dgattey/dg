@@ -10,8 +10,14 @@ export function cx(...parts: Array<string | false | null | undefined>): string {
 }
 
 export function paperToneVars(tone: PaperTone, tiltDeg = 0): CssVars {
+  const on =
+    tone === 'leaf'
+      ? 'light-dark(var(--cream), var(--ink-on-cream))'
+      : tone in PAPER_INK_TONES
+        ? 'var(--ink-on-cream)'
+        : 'var(--cream)';
   return {
-    '--on': tone in PAPER_INK_TONES ? 'var(--ink-on-cream)' : 'var(--cream)',
+    '--on': on,
     '--pc': `var(--${tone})`,
     '--r': `${tiltDeg}deg`,
   };

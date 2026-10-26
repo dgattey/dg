@@ -39,12 +39,22 @@
   margin: 0;
   text-wrap: balance;
 }
+.reading__bookTitle,
+.reading__featureTitle,
+.reading__author {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
 .reading__author,
 .reading__meta {
   margin: 0;
 }
 .reading__author {
-  color: color-mix(in oklab, currentColor 78%, transparent);
+  color: color-mix(in oklab, currentColor 82%, var(--pc, transparent));
 }
 .reading__meta {
   margin-top: 4px;
@@ -276,6 +286,15 @@
   .reading__heroPrint {
     width: min(54%, 180px);
     margin-inline-start: 8px;
+  }
+  .reading__card--review,
+  .reading__card--feature {
+    rotate: calc(var(--r, 0deg) * 0.35);
+  }
+  .reading__seal {
+    top: -10px;
+    right: -10px;
+    width: 48px;
   }
   .reading__layout .reading__card .reading__reviewInner {
     grid-template-areas:

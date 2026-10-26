@@ -255,5 +255,23 @@ describe('ReadingShelf', () => {
 
     expect(mobileHeaderBlock).not.toContain('position: relative;');
     expect(collageCss).not.toContain('--site-header-height: 0px;');
+
+    const clampBlock =
+      readingCss.match(
+        /\.reading__bookTitle,\s*\.reading__featureTitle,\s*\.reading__author\s*\{([^}]*)\}/,
+      )?.[1] ?? '';
+    expect(clampBlock).toContain('-webkit-line-clamp: 3;');
+    expect(clampBlock).toContain('line-clamp: 3;');
+
+    render(<ReadingShelf books={SHELF_BOOKS} />);
+    expect(screen.getByRole('heading', { level: 2, name: /^The Path Made Clear/ })).toHaveAttribute(
+      'title',
+      "The Path Made Clear: Discovering Your Life's Direction and Purpose",
+    );
+    expect(screen.getByRole('heading', { level: 3, name: 'Dune' })).toHaveAttribute(
+      'title',
+      'Dune',
+    );
+    expect(screen.getByText('Frank Herbert')).toHaveAttribute('title', 'Frank Herbert');
   });
 });

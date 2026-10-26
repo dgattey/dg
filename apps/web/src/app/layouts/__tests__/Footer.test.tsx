@@ -401,46 +401,29 @@ describe('Footer', () => {
     window.scrollY = 1500;
     window.dispatchEvent(new Event('scroll'));
     expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
-  });
+    expect(footer?.style.getPropertyValue('--footer-offset')).toBe('0px');
 
-  it('applies the same scroll-driven --footer-progress reveal on .collageSheet.collageField pages', async () => {
-    mockGetFooterContent.mockResolvedValue({
-      description: SAMPLE_DESCRIPTION,
-      links: SAMPLE_LINKS,
-    });
-
-    const ui = await Footer();
-    const { container } = render(
-      <ServerTimeProvider serverTime={1_760_000_000_000}>
-        <div className="collageRoot">
-          <div className="collageSheet collageField">music page content</div>
-          {ui}
-        </div>
-      </ServerTimeProvider>,
-    );
-
-    const sheet = container.querySelector<HTMLElement>('.collageSheet');
-    const footer = container.querySelector<HTMLElement>('.chrome__footer');
-    expect(sheet).not.toBeNull();
-    expect(footer).not.toBeNull();
-
-    Object.defineProperty(footer, 'offsetHeight', { configurable: true, value: 400 });
+    Object.defineProperty(footer, 'offsetHeight', { configurable: true, value: 640 });
     Object.defineProperty(document.documentElement, 'scrollHeight', {
       configurable: true,
-      value: 2400,
+      value: 2000,
     });
-    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 900 });
-    Object.defineProperty(window, 'scrollY', { configurable: true, value: 1300, writable: true });
-
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 560 });
+    window.scrollY = 1000;
     window.dispatchEvent(new Event('scroll'));
-    expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('0.5000');
+    expect(footer?.style.getPropertyValue('--footer-offset')).toBe('124px');
 
-    window.scrollY = 1500;
+    window.scrollY = 1400;
+    window.dispatchEvent(new Event('scroll'));
+    expect(footer?.style.getPropertyValue('--footer-offset')).toBe('40px');
+
+    window.scrollY = 1440;
     window.dispatchEvent(new Event('scroll'));
     expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
+    expect(footer?.style.getPropertyValue('--footer-offset')).toBe('0px');
   });
 
-  it('continues shrinking the sheet even when prefers-reduced-motion is reduce', async () => {
+  it('applies the same scroll-driven --footer-progress reveal on .collageSheet.collageField pages and under prefers-reduced-motion', async () => {
     const originalMatchMedia = window.matchMedia;
     window.matchMedia = jest.fn().mockImplementation((query: string) => ({
       addEventListener: jest.fn(),
@@ -463,7 +446,7 @@ describe('Footer', () => {
       const { container } = render(
         <ServerTimeProvider serverTime={1_760_000_000_000}>
           <div className="collageRoot">
-            <div className="collageSheet">page content with backdrop</div>
+            <div className="collageSheet collageField">music page content</div>
             {ui}
           </div>
         </ServerTimeProvider>,
@@ -480,8 +463,12 @@ describe('Footer', () => {
         value: 2400,
       });
       Object.defineProperty(window, 'innerHeight', { configurable: true, value: 900 });
-      Object.defineProperty(window, 'scrollY', { configurable: true, value: 1500, writable: true });
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: 1300, writable: true });
 
+      window.dispatchEvent(new Event('scroll'));
+      expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('0.5000');
+
+      window.scrollY = 1500;
       window.dispatchEvent(new Event('scroll'));
       expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
     } finally {

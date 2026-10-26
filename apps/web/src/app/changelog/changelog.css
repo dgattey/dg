@@ -147,7 +147,7 @@
   border-radius: 7px 9px 6px 8px;
 }
 .changelog__kindBadge[data-kind="major"] {
-  color: var(--cream);
+  color: var(--ink-on-cream);
   background: var(--vermilion);
 }
 .changelog__kindBadge[data-kind="minor"] {

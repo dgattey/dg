@@ -71,10 +71,10 @@ export function ReadingHero({
           <BookCover book={book} preload={true} width={240} />
         </div>
         <div className="reading__featureBody">
-          <h2 className="reading__featureTitle" data-typography="stat-md">
+          <h2 className="reading__featureTitle" data-typography="stat-md" title={book.title}>
             {book.title}
           </h2>
-          <p className="reading__author" data-typography="prose-lg">
+          <p className="reading__author" data-typography="prose-lg" title={book.author}>
             {book.author}
           </p>
           <p className="reading__meta" data-typography="meta">

@@ -753,7 +753,7 @@
 
 /* Depth and loyalty */
 .stats__cell--max {
-  color: var(--vermilion);
+  color: color-mix(in oklab, var(--vermilion) 76%, var(--ink-on-cream));
 }
 .stats__table {
   width: 100%;

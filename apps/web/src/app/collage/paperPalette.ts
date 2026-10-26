@@ -8,7 +8,7 @@ export const PAPER_PALETTE = {
   black: '#1d1a15',
   cerulean: '#4f8ec1',
   chartreuse: '#b7c25a',
-  cobalt: '#3a60c2',
+  cobalt: '#2c4db0',
   cream: '#f7f1e2',
   ink: '#1d1a15',
   leaf: '#3d7b4b',
