@@ -142,14 +142,55 @@ const isNearFrame = (
   margin: number,
 ) => x > -margin && x < width + margin && y > -margin && y < height + margin;
 
-function inkPaths(
-  routes: ReadonlyArray<DecodedRoute>,
+export type RoundedLeg = ReadonlyArray<readonly [number, number]>;
+
+const mercatorLegsCache = new WeakMap<DecodedRoute, ReadonlyArray<RoundedLeg>>();
+
+function roundSimplifiedLeg(
+  leg: Array<Point>,
   projectLeg: (points: Array<Point>) => Array<{ x: number; y: number }>,
+  onScreen: (pixel: { x: number; y: number }) => boolean,
+): RoundedLeg | null {
+  const pixels = projectLeg(leg);
+  if (!pixels.some(onScreen)) {
+    return null;
+  }
+  const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]);
+  const rounded: Array<readonly [number, number]> = [];
+  for (const { x, y } of simplified) {
+    const point = [Math.round(x), Math.round(y)] as const;
+    const prev = rounded.at(-1);
+    if (!prev || prev[0] !== point[0] || prev[1] !== point[1]) {
+      rounded.push(point);
+    }
+  }
+  return rounded.length > 1 ? rounded : null;
+}
+
+export function mercatorLegsOf(route: DecodedRoute): ReadonlyArray<RoundedLeg> {
+  const cached = mercatorLegsCache.get(route);
+  if (cached) {
+    return cached;
+  }
+  const legs = routeLegs(route.points).flatMap((leg) => {
+    const rounded = roundSimplifiedLeg(
+      leg,
+      (points) => points.map(mercatorRefPoint),
+      () => true,
+    );
+    return rounded ? [rounded] : [];
+  });
+  mercatorLegsCache.set(route, legs);
+  return legs;
+}
+
+function inkRoundedLegs(
+  routes: ReadonlyArray<{ legs: ReadonlyArray<RoundedLeg>; tone: string }>,
   onScreen: (pixel: { x: number; y: number }) => boolean,
 ): Array<FramedPath> {
   const byTone = new Map<string, Array<string>>();
   const seenByTone = new Map<string, Set<string>>();
-  for (const { points, tone } of routes) {
+  for (const { legs, tone } of routes) {
     let seen = seenByTone.get(tone);
     if (!seen) {
       seen = new Set<string>();
@@ -160,20 +201,7 @@ function inkPaths(
       runs = [];
       byTone.set(tone, runs);
     }
-    for (const leg of routeLegs(points)) {
-      const pixels = projectLeg(leg);
-      if (!pixels.some(onScreen)) {
-        continue;
-      }
-      const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]);
-      const rounded: Array<readonly [number, number]> = [];
-      for (const { x, y } of simplified) {
-        const point = [Math.round(x), Math.round(y)] as const;
-        const prev = rounded.at(-1);
-        if (!prev || prev[0] !== point[0] || prev[1] !== point[1]) {
-          rounded.push(point);
-        }
-      }
+    for (const rounded of legs) {
       let start: readonly [number, number] | null = null;
       let prev: readonly [number, number] | null = null;
       let steps: Array<string> = [];
@@ -220,6 +248,23 @@ function inkPaths(
   );
 }
 
+function inkPaths(
+  routes: ReadonlyArray<DecodedRoute>,
+  projectLeg: (points: Array<Point>) => Array<{ x: number; y: number }>,
+  onScreen: (pixel: { x: number; y: number }) => boolean,
+): Array<FramedPath> {
+  return inkRoundedLegs(
+    routes.map(({ points, tone }) => ({
+      legs: routeLegs(points).flatMap((leg) => {
+        const rounded = roundSimplifiedLeg(leg, projectLeg, onScreen);
+        return rounded ? [rounded] : [];
+      }),
+      tone,
+    })),
+    onScreen,
+  );
+}
+
 export function framePaths(
   frame: RouteFrame,
   routes: ReadonlyArray<DecodedRoute>,
@@ -242,9 +287,8 @@ export function mercatorRefPoint([latitude, longitude]: Point): { x: number; y: 
 }
 
 export function mercatorPaths(routes: ReadonlyArray<DecodedRoute>): Array<FramedPath> {
-  return inkPaths(
-    routes,
-    (points) => points.map(mercatorRefPoint),
+  return inkRoundedLegs(
+    routes.map((route) => ({ legs: mercatorLegsOf(route), tone: route.tone })),
     () => true,
   );
 }

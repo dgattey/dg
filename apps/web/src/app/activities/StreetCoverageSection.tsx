@@ -21,28 +21,18 @@ const CITIES = {
   sd: { name: 'San Diego', short: 'SD' },
   sf: { name: 'San Francisco', short: 'SF' },
 } as const satisfies Record<CoverageCity, { name: string; short: string }>;
-/** Lower bounds of each fill tier, cream through viridian. */
 const TIER_FLOORS = [0, 0.1, 0.25, 0.5, 0.75] as const;
 
 const tierOf = (share: number) => TIER_FLOORS.filter((floor) => share >= floor).length - 1;
 
-/** The neighborhood a map event landed on, read from the shape's `data-index`. */
 const neighborhoodAt = (target: EventTarget) => {
   const index = target instanceof Element ? target.getAttribute('data-index') : null;
   return index === null ? null : Number(index);
 };
 
-const milesOf = ({
-  riddenMeters,
-  streetMeters,
-}: Pick<NeighborhoodCoverage, 'riddenMeters' | 'streetMeters'>) =>
-  `${formatMiles(riddenMeters)} of ${formatMiles(streetMeters)} mi`;
+const milesOf = (item: Pick<NeighborhoodCoverage, 'riddenMeters' | 'streetMeters'>) =>
+  `${formatMiles(item.riddenMeters)} of ${formatMiles(item.streetMeters)} mi`;
 
-/**
- * A paper-cut map of the neighborhoods, filled by how much of each is ridden,
- * with the routes traced over the land and under the cuts between pieces.
- * Pointer only: the leaderboard beside it is the keyboard and screen reader path.
- */
 function NeighborhoodMap({
   focused,
   neighborhoods,
@@ -66,9 +56,7 @@ function NeighborhoodMap({
       className="streets__map"
       onClick={(event) => {
         const index = neighborhoodAt(event.target);
-        if (index !== null) {
-          onPick(index);
-        }
+        if (index !== null) onPick(index);
       }}
       onPointerLeave={() => onHover(null)}
       onPointerOver={(event) => onHover(neighborhoodAt(event.target))}
@@ -194,9 +182,7 @@ export function StreetCoverageSection({
     };
   }
   const { routes, summary } = cacheRef.current;
-  if (summary.city.streetMeters === 0) {
-    return null;
-  }
+  if (summary.city.streetMeters === 0) return null;
   const [top] = summary.ranked;
   return (
     <section aria-label={`${cityName} streets`} className="streets">

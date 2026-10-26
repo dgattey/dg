@@ -66,15 +66,24 @@ const centerOf = ([[south, west], [north, east]]: GeoBounds): Point => [
   (west + east) / 2,
 ];
 
+const openedRouteCache = new Map<string, { bounds: GeoBounds; start: Point } | null>();
+
 const openedRoute = (polyline: string): { bounds: GeoBounds; start: Point } | null => {
+  if (openedRouteCache.has(polyline)) {
+    return openedRouteCache.get(polyline) ?? null;
+  }
   const bounds = routeBounds(polyline);
   if (!bounds) {
+    openedRouteCache.set(polyline, null);
     return null;
   }
   try {
     const start = decodePolyline(polyline)[0];
-    return start ? { bounds, start } : null;
+    const result = start ? { bounds, start } : null;
+    openedRouteCache.set(polyline, result);
+    return result;
   } catch {
+    openedRouteCache.set(polyline, null);
     return null;
   }
 };

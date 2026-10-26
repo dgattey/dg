@@ -16,6 +16,7 @@ import {
   type ReactNode,
   startTransition,
   use,
+  useRef,
   useState,
 } from 'react';
 import { FilterBar } from '../collage/FilterBar';
@@ -164,6 +165,21 @@ export function StravaFilters({
   const visible =
     span.kind === 'all' ? sportOutings : sportOutings.filter((outing) => inSpan(span, outing));
   const filtered = sport !== 'all' || span.kind !== 'all';
+  const visibleSetRef = useRef<{
+    outings: typeof outings;
+    set: ReadonlySet<number> | null;
+    span: Span;
+    sport: SportFilter;
+  } | null>(null);
+  if (
+    !visibleSetRef.current ||
+    visibleSetRef.current.outings !== outings ||
+    visibleSetRef.current.sport !== sport ||
+    visibleSetRef.current.span !== span
+  ) {
+    const set = filtered ? new Set(visible.map(({ id }) => id)) : null;
+    visibleSetRef.current = { outings, set, span, sport };
+  }
   const bumpFit = () => setFitKey((key) => key + 1);
   const selectRegion = (nextCity: CoverageCity) => {
     setCityState(nextCity);
@@ -315,9 +331,7 @@ export function StravaFilters({
           </PillMenu>
         </PaperPills>
       </FilterBar>
-      <VisibleRoutes value={filtered ? new Set(visible.map(({ id }) => id)) : null}>
-        {children}
-      </VisibleRoutes>
+      <VisibleRoutes value={visibleSetRef.current.set}>{children}</VisibleRoutes>
     </FilteredOutings>
   );
 }

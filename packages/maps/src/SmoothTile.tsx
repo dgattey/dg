@@ -3,8 +3,65 @@
 import type { TileComponentProps } from 'pigeon-maps';
 import { type CSSProperties, type RefObject, useEffect, useState } from 'react';
 
-/** Lazy, so a hidden scheme's tiles never load until that scheme shows. */
+const rasterTileCache = new Map<string, string>();
+const pendingRasterLoads = new Map<string, Promise<string>>();
+
+function rasterizeSvgDataUri(svgUri: string): Promise<string> {
+  const cached = rasterTileCache.get(svgUri);
+  if (cached) {
+    return Promise.resolve(cached);
+  }
+  const existing = pendingRasterLoads.get(svgUri);
+  if (existing) {
+    return existing;
+  }
+  const promise = new Promise<string>((resolve) => {
+    const img = new Image(256, 256);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, 256, 256);
+        const pngUri = canvas.toDataURL('image/png');
+        rasterTileCache.set(svgUri, pngUri);
+        resolve(pngUri);
+        return;
+      }
+      resolve(svgUri);
+    };
+    img.onerror = () => resolve(svgUri);
+    img.src = svgUri;
+  });
+  pendingRasterLoads.set(svgUri, promise);
+  return promise;
+}
+
 export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
+  const isSvgData = tile.url.startsWith('data:image/svg+xml,');
+  const [rasterUrl, setRasterUrl] = useState<string | null>(() =>
+    isSvgData ? (rasterTileCache.get(tile.url) ?? null) : null,
+  );
+
+  useEffect(() => {
+    if (!isSvgData || rasterTileCache.has(tile.url)) {
+      return;
+    }
+    let cancelled = false;
+    void rasterizeSvgDataUri(tile.url).then((pngUri) => {
+      if (!cancelled) {
+        setRasterUrl(pngUri);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isSvgData, tile.url]);
+
+  const resolvedUrl = isSvgData
+    ? (rasterUrl ?? rasterTileCache.get(tile.url) ?? tile.url)
+    : tile.url;
   const tileVars = {
     '--tile-h': `${tile.height}px`,
     '--tile-left': `${tile.left}px`,
@@ -19,7 +76,7 @@ export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
         decoding="async"
         loading="lazy"
         onLoad={tileLoaded}
-        src={tile.url}
+        src={resolvedUrl}
         srcSet={tile.srcSet}
       />
     </div>
