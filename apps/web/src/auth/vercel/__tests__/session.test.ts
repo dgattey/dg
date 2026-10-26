@@ -22,63 +22,55 @@ describe('Vercel session cookie and dev console authorization', () => {
     process.env.VERCEL_APP_CLIENT_SECRET = originalSecret;
   });
 
-  it('round-trips a signed session for the site owner', () => {
+  it('round-trips a signed session', () => {
     const signed = signSession({
-      email: 'hi@dylangattey.com',
+      email: 'owner@example.com',
       id: 'user_sub_123',
       name: 'Dylan',
     });
 
     expect(signed).toBeTruthy();
     expect(parseVercelSessionCookie(signed ?? undefined)).toEqual({
-      email: 'hi@dylangattey.com',
+      email: 'owner@example.com',
       id: 'user_sub_123',
       name: 'Dylan',
     });
   });
 
-  it('authorizes only the site owner by Vercel user ID, username, or owner email', () => {
+  it('authorizes only the site owner by username or SHA-256 user ID digest', () => {
     expect(
       isAuthorizedVercelUser({
-        email: 'other@example.com',
-        id: 'Zd6kYbHOXbM1fi2NHCmuSSDP',
-      }),
-    ).toBe(true);
-    expect(
-      isAuthorizedVercelUser({
-        email: 'other@example.com',
         id: 'user_other',
         username: 'dgattey',
       }),
     ).toBe(true);
     expect(
       isAuthorizedVercelUser({
-        email: 'dylan.gattey@gmail.com',
         id: 'user_other',
+        username: 'DGATTEY',
       }),
     ).toBe(true);
     expect(
       isAuthorizedVercelUser({
-        email: 'stranger@example.com',
         id: 'user_stranger',
         username: 'stranger',
       }),
     ).toBe(false);
-    expect(signSession({ email: 'stranger@example.com', id: 'user_stranger' })).toBeNull();
+    expect(isAuthorizedVercelUser({})).toBe(false);
   });
 
   it('rejects tampered cookies', () => {
-    const signed = signSession({ email: 'hi@dylangattey.com', id: 'x' });
+    const signed = signSession({ email: 'owner@example.com', id: 'x' });
     expect(signed).toBeTruthy();
     expect(parseVercelSessionCookie(`${signed}tampered`)).toBeNull();
   });
 
   it('rejects expired cookies', () => {
     const issuedAt = 1_700_000_000_000;
-    const signed = signSession({ email: 'hi@dylangattey.com', id: 'x' }, issuedAt);
+    const signed = signSession({ email: 'owner@example.com', id: 'x' }, issuedAt);
     expect(signed).toBeTruthy();
     expect(parseVercelSessionCookie(signed ?? undefined, issuedAt + 1_000)).toEqual({
-      email: 'hi@dylangattey.com',
+      email: 'owner@example.com',
       id: 'x',
     });
     expect(
@@ -87,7 +79,7 @@ describe('Vercel session cookie and dev console authorization', () => {
   });
 
   it('requires a valid signed owner session in production and allows local dev without a cookie', () => {
-    const signed = signSession({ email: 'hi@dylangattey.com', id: 'user_sub_123' });
+    const signed = signSession({ email: 'owner@example.com', id: 'user_sub_123' });
 
     mockEnv({ NODE_ENV: 'production' });
     expect(isDevConsoleAccessAllowed(undefined)).toBe(false);

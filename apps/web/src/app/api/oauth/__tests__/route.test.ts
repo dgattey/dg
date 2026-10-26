@@ -183,8 +183,8 @@ describe('OAuth Route', () => {
       expect(mockSaveOauthState).not.toHaveBeenCalled();
 
       const signed = signSession({
-        email: 'dylan.gattey@gmail.com',
-        id: 'Zd6kYbHOXbM1fi2NHCmuSSDP',
+        email: 'owner@example.com',
+        id: 'user_owner_test',
       });
       const authedResponse = await GET(
         createGetRequest(

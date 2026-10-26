@@ -202,10 +202,10 @@ describe('Vercel auth callback route', () => {
       })
       .mockResolvedValueOnce({
         json: async () => ({
-          email: 'dylan.gattey@gmail.com',
+          email: 'owner@example.com',
           name: 'Dylan Gattey',
           preferred_username: 'dgattey',
-          sub: 'Zd6kYbHOXbM1fi2NHCmuSSDP',
+          sub: 'user_owner_test',
         }),
         ok: true,
       }) as unknown as typeof fetch;
@@ -226,8 +226,8 @@ describe('Vercel auth callback route', () => {
     expect(response.status).toBe(307);
     expect(response.headers.get('Location')).toBe('https://example.com/dev-console');
     expect(parseVercelSessionCookie(cookieStore.get(VERCEL_SESSION_COOKIE))).toEqual({
-      email: 'dylan.gattey@gmail.com',
-      id: 'Zd6kYbHOXbM1fi2NHCmuSSDP',
+      email: 'owner@example.com',
+      id: 'user_owner_test',
       name: 'Dylan Gattey',
     });
   });
