@@ -31,7 +31,7 @@
   z-index: 2;
   justify-self: center;
   width: min(100%, var(--portrait-width));
-  margin-top: 44px;
+  margin-top: 18px;
 }
 .print__portraitLink {
   position: relative;

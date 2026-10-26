@@ -106,4 +106,32 @@ describe('GatteySitesCard', () => {
     const { container } = render(<GatteySitesCard projects={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('sets --mark-scale when a loaded mark image has transparent outer padding', () => {
+    const origGetContext = HTMLCanvasElement.prototype.getContext;
+    Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+      configurable: true,
+      value: () => ({
+        drawImage: () => undefined,
+        getImageData: () => {
+          const data = new Uint8ClampedArray(10 * 10 * 4);
+          for (let y = 1; y <= 8; y += 1) {
+            for (let x = 1; x <= 8; x += 1) {
+              data[(y * 10 + x) * 4 + 3] = 255;
+            }
+          }
+          return { data };
+        },
+      }),
+    });
+
+    const { container } = render(<GatteySitesCard projects={projects.slice(0, 1)} />);
+    const img = container.querySelector('img') as HTMLImageElement;
+    Object.defineProperty(img, 'naturalWidth', { configurable: true, value: 10 });
+    Object.defineProperty(img, 'naturalHeight', { configurable: true, value: 10 });
+    img.dispatchEvent(new Event('load'));
+
+    expect(img.style.getPropertyValue('--mark-scale')).toBe('1.250');
+    HTMLCanvasElement.prototype.getContext = origGetContext;
+  });
 });

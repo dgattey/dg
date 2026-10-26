@@ -96,7 +96,6 @@ export async function SiteMapDirectory() {
                 <li className="siteMap__appItem" key={project.url}>
                   <PaperCard
                     className="siteMap__appCard collageLift"
-                    edge={even ? 'quad-a' : 'quad-d'}
                     innerClassName="siteMap__appCardInner"
                     tiltDeg={even ? 0.6 : -0.6}
                     tone="cream"

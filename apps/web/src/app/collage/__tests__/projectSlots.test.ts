@@ -30,8 +30,8 @@ describe('projectSlots', () => {
     expect(moreWorkFrames(slots.moreWork).map(({ gridArea }) => gridArea)).toEqual([
       'mg',
       'cn',
-      'js',
       'gn',
+      'js',
     ]);
   });
 
@@ -70,11 +70,12 @@ describe('projectSlots', () => {
     expect(projectTagMeta({ creationDate: null, type: 'Website' })).toBeNull();
   });
 
-  it('pairs a wide third project with gn and a regular fourth project with js in More work', () => {
+  it('preserves newest-first order with Genera (gn) before Jumpstart (js) in More work', () => {
     const moreWork = [
       {
         key: 'p-2',
         project: {
+          creationDate: '2021-09-01',
           layout: 'regular',
           thumbnail: { height: 640, url: 'https://images.test/merge.webp', width: 640 },
           title: 'Merge',
@@ -83,6 +84,7 @@ describe('projectSlots', () => {
       {
         key: 'p-3',
         project: {
+          creationDate: '2021-01-01',
           layout: 'regular',
           thumbnail: { height: 1000, url: 'https://images.test/canal.png', width: 1000 },
           title: 'Canal',
@@ -91,6 +93,7 @@ describe('projectSlots', () => {
       {
         key: 'p-4',
         project: {
+          creationDate: '2020-05-01',
           layout: 'wide',
           thumbnail: { height: 1302, url: 'https://images.test/genera.png', width: 2874 },
           title: 'Genera',
@@ -99,6 +102,7 @@ describe('projectSlots', () => {
       {
         key: 'p-5',
         project: {
+          creationDate: '2019-06-01',
           layout: 'regular',
           thumbnail: { height: 1001, url: 'https://images.test/jumpstart.png', width: 1000 },
           title: 'Jumpstart',
@@ -111,8 +115,8 @@ describe('projectSlots', () => {
     ).toEqual([
       ['mg', 'Merge'],
       ['cn', 'Canal'],
-      ['js', 'Jumpstart'],
       ['gn', 'Genera'],
+      ['js', 'Jumpstart'],
     ]);
   });
 

@@ -100,13 +100,21 @@
   color: var(--soft);
 }
 
+.siteMap__appCard {
+  --row-radius: 16px;
+  --edge-tl: var(--row-radius);
+  --edge-tr: var(--row-radius);
+  --edge-br: var(--row-radius);
+  --edge-bl: var(--row-radius);
+  --edge-radius: var(--row-radius);
+}
 .siteMap__appCardInner {
   height: 100%;
   box-shadow: inset 5px 0 0 var(--vermilion);
 }
 .siteMap__appRow {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
   gap: 16px;
   align-items: center;
   height: 100%;
@@ -115,19 +123,7 @@
   text-decoration: none;
 }
 .siteMap__appMark {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 5px;
-  background: color-mix(in srgb, var(--ink-on-cream) 6%, var(--cream));
-  border-radius: 12px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-on-cream) 12%, transparent);
   transition: transform 0.2s ease;
-}
-.siteMap__appMark img {
-  max-height: 100%;
 }
 @media (prefers-reduced-motion: no-preference) {
   .siteMap__appRow:hover .siteMap__appMark,

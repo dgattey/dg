@@ -46,23 +46,20 @@ export function CollageProjectFrame({
   const frame = (
     <PaperCard
       className="home__frameCard"
-      edge={style.edge}
       innerClassName="home__framePad"
       tiltDeg={style.tiltDeg}
       tone="cream"
     >
       <span className="home__frameShot" style={printStyle}>
-        <span className="print__print">
-          <Image
-            alt={project.title}
-            cover={true}
-            height={project.thumbnail.height}
-            quality={60}
-            sizes={{ extraLarge: 760, large: 760, medium: 760, small: 380, tiny: 380 }}
-            url={project.thumbnail.url}
-            width={project.thumbnail.width}
-          />
-        </span>
+        <Image
+          alt={project.title}
+          cover={true}
+          height={project.thumbnail.height}
+          quality={60}
+          sizes={{ extraLarge: 760, large: 760, medium: 760, small: 380, tiny: 380 }}
+          url={project.thumbnail.url}
+          width={project.thumbnail.width}
+        />
       </span>
     </PaperCard>
   );
