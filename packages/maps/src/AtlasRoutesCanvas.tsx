@@ -2,7 +2,13 @@
 
 import type { Point } from 'pigeon-maps';
 import { type RefObject, useEffect, useRef } from 'react';
-import { type FramedPath, MERCATOR_REF_ZOOM, mercatorRefPoint } from './routeFrame';
+import {
+  type DecodedRoute,
+  MERCATOR_REF_ZOOM,
+  mercatorLegsOf,
+  mercatorRefPoint,
+  type RoundedLeg,
+} from './routeFrame';
 
 const MERCATOR_REF_SCALE = 256 * 2 ** MERCATOR_REF_ZOOM;
 
@@ -10,6 +16,12 @@ export type TransformBasis = {
   scale: number;
   tx: number;
   ty: number;
+};
+
+export type WorkerRouteEntry = {
+  id: number;
+  legs: ReadonlyArray<RoundedLeg>;
+  tone: string;
 };
 
 export function computeTransformBasis(
@@ -53,6 +65,14 @@ export function unprojectMercatorRef({ x, y }: { x: number; y: number }): Point 
   return [(latitudeRadians * 180) / Math.PI, longitude];
 }
 
+export function buildWorkerRoutes(decoded: ReadonlyArray<DecodedRoute>): Array<WorkerRouteEntry> {
+  return decoded.map((route) => ({
+    id: route.id,
+    legs: mercatorLegsOf(route),
+    tone: route.tone,
+  }));
+}
+
 function resolveCssVarColor(styles: CSSStyleDeclaration, varName: string, dark: boolean): string {
   const raw = styles.getPropertyValue(varName).trim();
   if (raw.startsWith('light-dark(') && raw.endsWith(')')) {
@@ -66,46 +86,40 @@ function resolveCssVarColor(styles: CSSStyleDeclaration, varName: string, dark: 
 }
 
 const WORKER_SCRIPT = `
-let cachedPathsKey = '';
-let parsedPaths = [];
+let allRoutes = [];
 let offscreen = null;
 let ctx = null;
 
-function parsePathChunks(d) {
-  const chunks = [];
-  const parts = d.split(/(?=M)/);
-  for (let p = 0; p < parts.length; p++) {
-    const part = parts[p];
-    if (!part) continue;
-    const nums = part.slice(1).trim().split(/[l\\s]+/).map(Number);
-    if (nums.length < 4) continue;
-    let x = nums[0], y = nums[1];
-    let minX = x, maxX = x, minY = y, maxY = y;
-    const coords = new Int32Array(nums.length);
-    coords[0] = x; coords[1] = y;
-    for (let i = 2; i < nums.length; i += 2) {
-      x += nums[i]; y += nums[i + 1];
-      if (x < minX) minX = x; if (x > maxX) maxX = x;
-      if (y < minY) minY = y; if (y > maxY) maxY = y;
-      coords[i] = x; coords[i + 1] = y;
-    }
-    chunks.push({ minX, maxX, minY, maxY, coords });
+function packLeg(leg) {
+  const len = leg.length;
+  const coords = new Int32Array(len * 2);
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (let i = 0; i < len; i++) {
+    const x = leg[i][0];
+    const y = leg[i][1];
+    coords[i * 2] = x;
+    coords[i * 2 + 1] = y;
+    if (x < minX) minX = x;
+    if (x > maxX) maxX = x;
+    if (y < minY) minY = y;
+    if (y > maxY) maxY = y;
   }
-  return chunks;
+  return { minX, maxX, minY, maxY, coords };
 }
 
 self.onmessage = (event) => {
   const msg = event.data;
-  if (msg.type === 'paths') {
-    if (msg.pathsKey !== cachedPathsKey) {
-      cachedPathsKey = msg.pathsKey;
-      parsedPaths = msg.paths.map((item) => ({ tone: item.tone, chunks: parsePathChunks(item.d) }));
-    }
+  if (msg.type === 'routes') {
+    allRoutes = msg.routes.map((r) => ({
+      id: r.id,
+      tone: r.tone,
+      chunks: r.legs.map(packLeg),
+    }));
     return;
   }
   if (msg.type !== 'render') return;
 
-  const { id, width, height, dpr, scale, tx, ty, casingColor, casingWidth, lineWidth, toneColors } = msg;
+  const { id, width, height, dpr, scale, tx, ty, casingColor, casingWidth, lineWidth, toneColors, visibleIds } = msg;
   const pixelW = Math.max(1, Math.round(width * dpr));
   const pixelH = Math.max(1, Math.round(height * dpr));
   if (!offscreen || offscreen.width !== pixelW || offscreen.height !== pixelH) {
@@ -117,20 +131,29 @@ self.onmessage = (event) => {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
+  const visibleSet = visibleIds ? new Set(visibleIds) : null;
   const margin = 16;
   const vMinX = (-tx - margin) / scale, vMaxX = (width - tx + margin) / scale;
   const vMinY = (-ty - margin) / scale, vMaxY = (height - ty + margin) / scale;
 
-  const built = [];
-  for (let i = 0; i < parsedPaths.length; i++) {
-    const entry = parsedPaths[i];
-    const p2 = new Path2D();
-    const seen = new Set();
-    const chunks = entry.chunks;
-    let hasSegments = false;
+  const byTone = new Map();
+  const seenByTone = new Map();
+
+  for (let r = 0; r < allRoutes.length; r++) {
+    const route = allRoutes[r];
+    if (visibleSet && !visibleSet.has(route.id)) continue;
+    const chunks = route.chunks;
+    let p2 = byTone.get(route.tone);
+    let seen = seenByTone.get(route.tone);
     for (let c = 0; c < chunks.length; c++) {
       const chunk = chunks[c];
       if (chunk.maxX < vMinX || chunk.minX > vMaxX || chunk.maxY < vMinY || chunk.minY > vMaxY) continue;
+      if (!p2) {
+        p2 = new Path2D();
+        seen = new Set();
+        byTone.set(route.tone, p2);
+        seenByTone.set(route.tone, seen);
+      }
       const coords = chunk.coords;
       let prevX = -999999, prevY = -999999, started = false;
       for (let j = 0; j < coords.length; j += 2) {
@@ -150,26 +173,24 @@ self.onmessage = (event) => {
           seen.add(edgeKey);
           if (!started) { p2.moveTo(ax, ay); started = true; }
           p2.lineTo(bx, by);
-          hasSegments = true;
         }
         prevX = sx; prevY = sy;
       }
     }
-    if (hasSegments) built.push({ color: toneColors[entry.tone] || '#2c4db0', p2 });
   }
 
-  if (built.length > 0) {
+  if (byTone.size > 0) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = casingColor;
     ctx.globalAlpha = 0.8;
     ctx.lineWidth = casingWidth;
-    for (let i = 0; i < built.length; i++) ctx.stroke(built[i].p2);
+    for (const p2 of byTone.values()) ctx.stroke(p2);
     ctx.globalAlpha = 1;
     ctx.lineWidth = lineWidth;
-    for (let i = 0; i < built.length; i++) {
-      ctx.strokeStyle = built[i].color;
-      ctx.stroke(built[i].p2);
+    for (const [tone, p2] of byTone.entries()) {
+      ctx.strokeStyle = toneColors[tone] || '#2c4db0';
+      ctx.stroke(p2);
     }
   }
 
@@ -186,10 +207,13 @@ type AtlasRoutesCanvasProps = {
   height: number;
   hostRef: RefObject<HTMLElement | null>;
   liveBasisRef: RefObject<TransformBasis>;
-  paths: ReadonlyArray<FramedPath>;
-  pathsKey: string;
+  onCanvasReady: () => void;
   preRenderRef: RefObject<((center: Point, zoom: number) => void) | null>;
+  tones: ReadonlyArray<string>;
+  visible: ReadonlySet<number> | null;
+  visibleKey: string;
   width: number;
+  workerRoutes: ReadonlyArray<WorkerRouteEntry>;
   zoom: number;
 };
 
@@ -201,16 +225,20 @@ export function AtlasRoutesCanvas({
   height,
   hostRef,
   liveBasisRef,
-  paths,
-  pathsKey,
+  onCanvasReady,
   preRenderRef,
+  tones,
+  visible,
+  visibleKey,
   width,
+  workerRoutes,
   zoom,
 }: AtlasRoutesCanvasProps) {
   const workerRef = useRef<Worker | null>(null);
   const reqIdRef = useRef(0);
-  const sentPathsKeyRef = useRef('');
+  const sentRoutesRef = useRef<ReadonlyArray<WorkerRouteEntry> | null>(null);
   const lastRenderKeyRef = useRef('');
+  const readyCalledRef = useRef(false);
 
   useEffect(() => {
     if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') {
@@ -242,8 +270,12 @@ export function AtlasRoutesCanvas({
       const nextBasis = { scale, tx, ty };
       basisRef.current = nextBasis;
       applyRelativeTransform(canvas, liveBasisRef.current, nextBasis);
-      if (hostRef.current && hostRef.current.dataset.canvasReady !== 'true') {
-        hostRef.current.dataset.canvasReady = 'true';
+      if (!readyCalledRef.current) {
+        readyCalledRef.current = true;
+        if (hostRef.current) {
+          hostRef.current.dataset.canvasReady = 'true';
+        }
+        onCanvasReady();
       }
     };
 
@@ -251,10 +283,10 @@ export function AtlasRoutesCanvas({
       worker.terminate();
       URL.revokeObjectURL(url);
       workerRef.current = null;
-      sentPathsKeyRef.current = '';
+      sentRoutesRef.current = null;
       lastRenderKeyRef.current = '';
     };
-  }, [basisRef, canvasRef, hostRef, liveBasisRef]);
+  }, [basisRef, canvasRef, hostRef, liveBasisRef, onCanvasReady]);
 
   const dispatchRender = (targetCenter: Point, targetZoom: number) => {
     const worker = workerRef.current;
@@ -262,12 +294,12 @@ export function AtlasRoutesCanvas({
     if (!worker || !canvas || width <= 0 || height <= 0) {
       return;
     }
-    if (sentPathsKeyRef.current !== pathsKey) {
-      sentPathsKeyRef.current = pathsKey;
-      worker.postMessage({ paths, pathsKey, type: 'paths' });
+    if (sentRoutesRef.current !== workerRoutes) {
+      sentRoutesRef.current = workerRoutes;
+      worker.postMessage({ routes: workerRoutes, type: 'routes' });
     }
     const basis = computeTransformBasis(targetCenter, targetZoom, width, height);
-    const renderKey = `${pathsKey}|${dark ? 1 : 0}|${width}x${height}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
+    const renderKey = `${visibleKey}|${dark ? 1 : 0}|${width}x${height}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
     if (lastRenderKeyRef.current === renderKey) {
       applyRelativeTransform(canvas, liveBasisRef.current, basisRef.current);
       return;
@@ -278,7 +310,7 @@ export function AtlasRoutesCanvas({
     const styles = getComputedStyle(root);
     const casingColor = resolveCssVarColor(styles, dark ? '--black' : '--cream', dark);
     const toneColors: Record<string, string> = {};
-    for (const { tone } of paths) {
+    for (const tone of tones) {
       toneColors[tone] = resolveCssVarColor(styles, `--${tone}`, dark);
     }
 
@@ -300,6 +332,7 @@ export function AtlasRoutesCanvas({
       tx: basis.tx,
       ty: basis.ty,
       type: 'render',
+      visibleIds: visible ? [...visible] : null,
       width,
     });
   };

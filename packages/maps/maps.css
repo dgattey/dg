@@ -48,7 +48,6 @@
   height: var(--tile-h);
   overflow: hidden;
   opacity: 0;
-  transition: opacity 0.2s;
 }
 
 [data-map-tile][data-active="true"] {

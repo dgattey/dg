@@ -7,9 +7,11 @@ import { VisibleRoutes } from '../VisibleRoutes';
 import {
   AtlasRoutesCanvas,
   applyRelativeTransform,
+  buildWorkerRoutes,
   computeTransformBasis,
   type TransformBasis,
   unprojectMercatorRef,
+  type WorkerRouteEntry,
 } from './AtlasRoutesCanvas';
 import { RouteSvgPaths } from './RouteSvgPaths';
 import {
@@ -36,18 +38,6 @@ const WHEEL_PIXELS_PER_ZOOM = 150;
 const WHEEL_SETTLE_MS = 140;
 const BUTTON_ANIM_MS = 150;
 
-type AtlasRoutesOverlayProps = {
-  center: Point;
-  dark: boolean;
-  height: number;
-  left?: number;
-  mapState?: { center: Point; height: number; width: number; zoom: number };
-  paths: ReadonlyArray<FramedPath>;
-  top?: number;
-  width: number;
-  zoom: number;
-};
-
 export function AtlasRoutesOverlay({
   center,
   dark,
@@ -58,20 +48,24 @@ export function AtlasRoutesOverlay({
   top,
   width,
   zoom,
-}: AtlasRoutesOverlayProps) {
+}: {
+  center: Point;
+  dark: boolean;
+  height: number;
+  left?: number;
+  mapState?: { center: Point; height: number; width: number; zoom: number };
+  paths: ReadonlyArray<FramedPath>;
+  top?: number;
+  width: number;
+  zoom: number;
+}) {
   const liveCenter = mapState?.center ?? center;
   const liveZoom = mapState?.zoom ?? zoom;
-  const liveWidth = mapState?.width ?? width;
-  const liveHeight = mapState?.height ?? height;
   const centerRef = mercatorRefPoint(liveCenter);
   const scale = 2 ** (liveZoom - MERCATOR_REF_ZOOM);
-  const cx = left ?? liveWidth / 2;
-  const cy = top ?? liveHeight / 2;
-  const translateX = cx - centerRef.x * scale;
-  const translateY = cy - centerRef.y * scale;
+  const translateX = (left ?? (mapState?.width ?? width) / 2) - centerRef.x * scale;
+  const translateY = (top ?? (mapState?.height ?? height) / 2) - centerRef.y * scale;
   const zoomFactor = Math.max(0, Math.min(1, (liveZoom - 4) / (15 - 4)));
-  const casingWidth = 2 + zoomFactor * 5;
-  const lineWidth = 1 + zoomFactor * 2.5;
 
   return (
     <svg aria-hidden="true" data-atlas-overlay="">
@@ -81,8 +75,8 @@ export function AtlasRoutesOverlay({
         <RouteSvgPaths
           casingOpacity={0.8}
           casingStroke={dark ? 'var(--black)' : 'var(--cream)'}
-          casingWidth={casingWidth}
-          lineWidth={lineWidth}
+          casingWidth={2 + zoomFactor * 5}
+          lineWidth={1 + zoomFactor * 2.5}
           paths={paths}
         />
       </g>
@@ -90,11 +84,7 @@ export function AtlasRoutesOverlay({
   );
 }
 
-type ViewportSnapshot = {
-  boundsKey: string;
-  center: Point;
-  zoom: number;
-};
+type ViewportSnapshot = { boundsKey: string; center: Point; zoom: number };
 
 type RouteAtlasMapProps = {
   bounds: GeoBounds;
@@ -108,6 +98,9 @@ type RouteAtlasMapProps = {
 
 const visibleKeyOf = (visible: ReadonlySet<number> | null) =>
   visible ? [...visible].toSorted((a, b) => a - b).join(',') : '*';
+
+const distinctTonesOf = (routes: ReadonlyArray<DecodedRoute>): Array<FramedPath> =>
+  [...new Set(routes.map(({ tone }) => tone))].map((tone) => ({ d: '', tone }));
 
 export function RouteAtlasMap({
   bounds,
@@ -124,17 +117,30 @@ export function RouteAtlasMap({
   const preRenderRef = useRef<((center: Point, zoom: number) => void) | null>(null);
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
+  const [canvasReady, setCanvasReady] = useState(false);
   const activeBounds = view ?? bounds;
   const boundsKey = `${fitKey}:${activeBounds[0][0]},${activeBounds[0][1]}:${activeBounds[1][0]},${activeBounds[1][1]}`;
 
   const size = useHostSize(hostRef, DEFAULT_SIZE, { round: true });
   const [viewportState, setViewportState] = useState<ViewportSnapshot | null>(null);
 
-  const decodedRef = useRef<{ decoded: Array<DecodedRoute>; routes: typeof routes } | null>(null);
+  const decodedRef = useRef<{
+    decoded: Array<DecodedRoute>;
+    routes: typeof routes;
+    tones: Array<string>;
+    workerRoutes: Array<WorkerRouteEntry>;
+  } | null>(null);
   if (!decodedRef.current || decodedRef.current.routes !== routes) {
-    decodedRef.current = { decoded: decodeRoutes(routes), routes };
+    const decoded = decodeRoutes(routes);
+    decodedRef.current = {
+      decoded,
+      routes,
+      tones: [...new Set(decoded.map(({ tone }) => tone))],
+      workerRoutes: buildWorkerRoutes(decoded),
+    };
   }
   const pathsRef = useRef<{
+    canvasReady: boolean;
     paths: Array<FramedPath>;
     routes: typeof routes;
     visible: typeof visible;
@@ -143,17 +149,28 @@ export function RouteAtlasMap({
   if (
     !pathsRef.current ||
     pathsRef.current.routes !== routes ||
-    pathsRef.current.visible !== visible
+    pathsRef.current.visible !== visible ||
+    pathsRef.current.canvasReady !== canvasReady
   ) {
-    const visibleKey = visibleKeyOf(visible);
+    const visibleKey =
+      pathsRef.current && pathsRef.current.visible === visible
+        ? pathsRef.current.visibleKey
+        : visibleKeyOf(visible);
     if (
       !pathsRef.current ||
       pathsRef.current.routes !== routes ||
-      pathsRef.current.visibleKey !== visibleKey
+      pathsRef.current.visibleKey !== visibleKey ||
+      pathsRef.current.canvasReady !== canvasReady
     ) {
       const decoded = decodedRef.current.decoded;
       const filtered = visible ? decoded.filter(({ id }) => visible.has(id)) : decoded;
-      pathsRef.current = { paths: mercatorPaths(filtered), routes, visible, visibleKey };
+      pathsRef.current = {
+        canvasReady,
+        paths: canvasReady ? distinctTonesOf(filtered) : mercatorPaths(filtered),
+        routes,
+        visible,
+        visibleKey,
+      };
     } else {
       pathsRef.current.visible = visible;
     }
@@ -168,7 +185,7 @@ export function RouteAtlasMap({
   const activeCenter = customViewport?.center ?? defaultFrame.center;
   const activeZoom = customViewport?.zoom ?? defaultFrame.zoom;
   const paths = pathsRef.current.paths;
-  const pathsKey = pathsRef.current.visibleKey;
+  const visibleKey = pathsRef.current.visibleKey;
 
   const initialBasis = computeTransformBasis(activeCenter, activeZoom, size.width, size.height);
   const basisRef = useRef<TransformBasis>(initialBasis);
@@ -178,6 +195,7 @@ export function RouteAtlasMap({
   const gestureRef = useRef({
     animFrame: null as number | null,
     boundsKey,
+    cachedRect: null as DOMRect | null,
     defaultCenter: defaultFrame.center,
     defaultZoom: defaultFrame.zoom,
     dragging: false,
@@ -265,9 +283,9 @@ export function RouteAtlasMap({
         cancelAnimationFrame(st.animFrame);
         st.animFrame = null;
       }
-      const rect = tilesEl.getBoundingClientRect();
-      const px = event.clientX - rect.left;
-      const py = event.clientY - rect.top;
+      st.cachedRect ??= tilesEl.getBoundingClientRect();
+      const px = event.clientX - st.cachedRect.left;
+      const py = event.clientY - st.cachedRect.top;
       const addToZoom = -event.deltaY / WHEEL_PIXELS_PER_ZOOM;
       const nextZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, st.liveZoom + addToZoom));
       const prevScale = 2 ** (st.liveZoom - MERCATOR_REF_ZOOM);
@@ -287,14 +305,13 @@ export function RouteAtlasMap({
       }
       st.wheelTimer = setTimeout(() => {
         st.wheelTimer = null;
+        st.cachedRect = null;
         commitGesture(st.liveCenter, st.liveZoom, false);
       }, WHEEL_SETTLE_MS);
     };
 
     const handleMouseDown = (event: MouseEvent) => {
-      if (event.button !== 0) {
-        return;
-      }
+      if (event.button !== 0) return;
       event.preventDefault();
       if (st.animFrame !== null) {
         cancelAnimationFrame(st.animFrame);
@@ -311,24 +328,18 @@ export function RouteAtlasMap({
     };
 
     const handleMouseMove = (event: MouseEvent) => {
-      if (!st.dragging) {
-        return;
-      }
-      const dx = event.clientX - st.dragStartX;
-      const dy = event.clientY - st.dragStartY;
+      if (!st.dragging) return;
       const scale = 2 ** (st.liveZoom - MERCATOR_REF_ZOOM);
       const nextCenter = unprojectMercatorRef({
-        x: st.dragStartCenterRef.x - dx / scale,
-        y: st.dragStartCenterRef.y - dy / scale,
+        x: st.dragStartCenterRef.x - (event.clientX - st.dragStartX) / scale,
+        y: st.dragStartCenterRef.y - (event.clientY - st.dragStartY) / scale,
       });
       st.targetCenter = nextCenter;
       syncGestureTransform(nextCenter, st.liveZoom);
     };
 
     const handleMouseUp = () => {
-      if (!st.dragging) {
-        return;
-      }
+      if (!st.dragging) return;
       st.dragging = false;
       commitGesture(st.liveCenter, st.liveZoom, false);
     };
@@ -338,12 +349,8 @@ export function RouteAtlasMap({
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     return () => {
-      if (st.wheelTimer !== null) {
-        clearTimeout(st.wheelTimer);
-      }
-      if (st.animFrame !== null) {
-        cancelAnimationFrame(st.animFrame);
-      }
+      if (st.wheelTimer !== null) clearTimeout(st.wheelTimer);
+      if (st.animFrame !== null) cancelAnimationFrame(st.animFrame);
       tilesEl.removeEventListener('wheel', handleWheel);
       tilesEl.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mousemove', handleMouseMove);
@@ -381,12 +388,13 @@ export function RouteAtlasMap({
         commitGesture(targetCenter, targetZoom, isReset);
         return;
       }
-      const curZoom = startZoom + (targetZoom - startZoom) * eased;
-      const curCenter = unprojectMercatorRef({
-        x: startRef.x + (endRef.x - startRef.x) * eased,
-        y: startRef.y + (endRef.y - startRef.y) * eased,
-      });
-      syncGestureTransform(curCenter, curZoom);
+      syncGestureTransform(
+        unprojectMercatorRef({
+          x: startRef.x + (endRef.x - startRef.x) * eased,
+          y: startRef.y + (endRef.y - startRef.y) * eased,
+        }),
+        startZoom + (targetZoom - startZoom) * eased,
+      );
       g.animFrame = requestAnimationFrame(step);
     };
     g.animFrame = requestAnimationFrame(step);
@@ -403,7 +411,7 @@ export function RouteAtlasMap({
           defaultHeight={DEFAULT_SIZE.height}
           defaultWidth={DEFAULT_SIZE.width}
           defaultZoom={defaultFrame.zoom}
-          dprs={[1, 2]}
+          dprs={tileSource.mode === 'offline' ? [] : [1, 2]}
           maxZoom={MAX_ZOOM}
           metaWheelZoom={false}
           metaWheelZoomWarning=""
@@ -435,10 +443,13 @@ export function RouteAtlasMap({
         height={size.height}
         hostRef={hostRef}
         liveBasisRef={liveBasisRef}
-        paths={paths}
-        pathsKey={pathsKey}
+        onCanvasReady={() => setCanvasReady(true)}
         preRenderRef={preRenderRef}
+        tones={decodedRef.current.tones}
+        visible={visible}
+        visibleKey={visibleKey}
         width={size.width}
+        workerRoutes={decodedRef.current.workerRoutes}
         zoom={activeZoom}
       />
       <ZoomControls

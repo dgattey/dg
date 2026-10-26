@@ -4,6 +4,8 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 28px 40px;
   align-items: start;
+  contain-intrinsic-size: auto 680px;
+  content-visibility: auto;
 }
 .streets [data-tier="0"] {
   --tier: color-mix(in oklab, var(--ink-on-cream) 9%, var(--cream));

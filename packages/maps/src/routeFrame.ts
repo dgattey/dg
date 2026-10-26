@@ -142,7 +142,7 @@ const isNearFrame = (
   margin: number,
 ) => x > -margin && x < width + margin && y > -margin && y < height + margin;
 
-type RoundedLeg = ReadonlyArray<readonly [number, number]>;
+export type RoundedLeg = ReadonlyArray<readonly [number, number]>;
 
 const mercatorLegsCache = new WeakMap<DecodedRoute, ReadonlyArray<RoundedLeg>>();
 
@@ -167,7 +167,7 @@ function roundSimplifiedLeg(
   return rounded.length > 1 ? rounded : null;
 }
 
-function mercatorLegsOf(route: DecodedRoute): ReadonlyArray<RoundedLeg> {
+export function mercatorLegsOf(route: DecodedRoute): ReadonlyArray<RoundedLeg> {
   const cached = mercatorLegsCache.get(route);
   if (cached) {
     return cached;
