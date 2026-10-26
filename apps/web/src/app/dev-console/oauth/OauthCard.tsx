@@ -4,6 +4,7 @@ import { getOauthStatus } from '@dg/services/oauth/getOauthStatus';
 import { capitalize } from '@dg/shared-core/formatting/capitalize';
 import type { OauthProviderKey } from '@dg/shared-core/routes/api';
 import { oauthConnectRoute } from '@dg/shared-core/routes/api';
+import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { Skeleton } from '@dg/ui/core/Skeleton';
 import { Typography } from '@dg/ui/core/Typography';
 import { connection } from 'next/server';
@@ -58,7 +59,7 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
       </div>
       {status.expiresAt ? (
         <Typography color="var(--dg-palette-text-secondary)" variant="meta">
-          Access token expires at {status.expiresAt.toLocaleString()}
+          Access token expiry: <RelativeTime date={status.expiresAt} />
         </Typography>
       ) : null}
     </>
