@@ -5,10 +5,10 @@
   },
   "description": "Dylan Gattey's public website, implemented in NextJS in a monorepo",
   "devDependencies": {
-    "@biomejs/biome": "2.5.15",
+    "@biomejs/biome": "2.6.3",
     "@dg/tsconfig": "workspace:*",
     "@typescript/native": "catalog:",
-    "turbo": "2.11.7",
+    "turbo": "2.11.10",
     "typescript": "catalog:"
   },
   "engines": {

@@ -1,12 +1,9 @@
 import 'server-only';
 
-import {
-  hasDevConsoleCredentials,
-  isDevConsoleAccessAllowed,
-  timingSafeEqualStrings,
-} from '@dg/services/auth/devConsoleBasicAuth';
+import { timingSafeEqualStrings } from '@dg/services/auth/devConsoleBasicAuth';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { type NextRequest, NextResponse } from 'next/server';
+import { isDevConsoleAccessAllowed, VERCEL_SESSION_COOKIE } from '../../auth/vercel/session';
 
 const BEARER_PREFIX = 'Bearer ';
 
@@ -39,15 +36,9 @@ export function redirectToConsoleWithAuthError(request: NextRequest, reason: str
   return redirectToConsole(request, { reason, vercel_auth: 'error' });
 }
 
-export function requireDevConsoleBasicAuth(request: NextRequest): NextResponse | null {
-  if (isDevConsoleAccessAllowed(request.headers.get('authorization'))) {
+export function requireDevConsoleAuth(request: NextRequest): NextResponse | null {
+  if (isDevConsoleAccessAllowed(request.cookies.get(VERCEL_SESSION_COOKIE)?.value)) {
     return null;
   }
-  if (!hasDevConsoleCredentials()) {
-    return new NextResponse('Not Found', { status: 404 });
-  }
-  return new NextResponse('Authentication required', {
-    headers: { 'WWW-Authenticate': 'Basic realm="Dev Console"' },
-    status: 401,
-  });
+  return jsonError('Authentication required', 401);
 }

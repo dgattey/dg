@@ -7,8 +7,7 @@ import { clearCookieOptions } from './cookieOptions';
 import { VERCEL_SESSION_COOKIE } from './session';
 
 /**
- * Clears the signed Vercel Flags session, then reloads the console so the
- * proxy evaluates flags without it.
+ * Clears the signed Vercel session cookie, then reloads `/dev-console`.
  */
 export async function signOutOfVercel(): Promise<never> {
   const cookieStore = await cookies();

@@ -15,33 +15,33 @@ verifyDepsBeforeRun: false
 # Replaces onlyBuiltDependencies. Anything not listed here is blocked from
 # running install scripts, and pnpm fails the install rather than warning.
 allowBuilds:
-  '@parcel/watcher': false
-  '@swc/core': true
+  "@parcel/watcher": false
+  "@swc/core": true
   esbuild: true
   sharp: true
   unrs-resolver: true
 
 catalog:
-  '@contentful/rich-text-types': 17.2.7
-  '@testing-library/dom': 10.4.2
-  '@testing-library/jest-dom': 7.0.1
-  '@testing-library/react': 16.3.3
-  '@testing-library/user-event': 14.6.7
-  '@types/jest': 30.0.0
-  '@types/node': 26.6.4
-  '@types/react': 19.3.0
-  '@types/react-dom': 19.3.0
-  '@typescript/native': npm:typescript@7.0.2
+  "@contentful/rich-text-types": 17.2.7
+  "@testing-library/dom": 10.4.2
+  "@testing-library/jest-dom": 7.0.1
+  "@testing-library/react": 16.3.3
+  "@testing-library/user-event": 14.6.8
+  "@types/jest": 30.0.0
+  "@types/node": 26.6.5
+  "@types/react": 19.3.0
+  "@types/react-dom": 19.3.0
+  "@typescript/native": npm:typescript@7.0.2
   babel-plugin-react-compiler: 1.0.0
   dotenv-mono: 1.5.1
   graphql: 16.14.2
   graphql-request: 7.4.0
   jest: 30.5.2
   jest-environment-jsdom: 30.5.2
-  lucide-react: 1.52.0
-  next: 16.3.8
-  react: 19.3.0
-  react-dom: 19.3.0
+  lucide-react: 1.61.0
+  next: 16.4.3
+  react: 19.3.1
+  react-dom: 19.3.1
   server-only: 0.0.1
   sharp: 0.35.5
   tsx: 4.23.15
@@ -60,5 +60,3 @@ overrides:
 # and adds a minimumReleaseAgeExclude entry when a pinned version is newer than
 # that. Pruning drops each entry once the lockfile no longer records it.
 minimumReleaseAgeExcludePrune: true
-minimumReleaseAgeExclude:
-  - lucide-react@1.52.0

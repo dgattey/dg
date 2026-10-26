@@ -2,14 +2,16 @@
  * @jest-environment node
  */
 
+import { mockEnv } from '@dg/testing/mocks';
 import {
-  entitiesFromSessionCookie,
+  isAuthorizedVercelUser,
+  isDevConsoleAccessAllowed,
   parseVercelSessionCookie,
   signSession,
   VERCEL_SESSION_COOKIE,
 } from '../session';
 
-describe('Vercel session cookie', () => {
+describe('Vercel session cookie and dev console authorization', () => {
   const originalSecret = process.env.VERCEL_APP_CLIENT_SECRET;
 
   beforeEach(() => {
@@ -20,7 +22,7 @@ describe('Vercel session cookie', () => {
     process.env.VERCEL_APP_CLIENT_SECRET = originalSecret;
   });
 
-  it('round-trips a signed session', () => {
+  it('round-trips a signed session for the site owner', () => {
     const signed = signSession({
       email: 'hi@dylangattey.com',
       id: 'user_sub_123',
@@ -35,18 +37,48 @@ describe('Vercel session cookie', () => {
     });
   });
 
+  it('authorizes only the site owner by Vercel user ID, username, or owner email', () => {
+    expect(
+      isAuthorizedVercelUser({
+        email: 'other@example.com',
+        id: 'Zd6kYbHOXbM1fi2NHCmuSSDP',
+      }),
+    ).toBe(true);
+    expect(
+      isAuthorizedVercelUser({
+        email: 'other@example.com',
+        id: 'user_other',
+        username: 'dgattey',
+      }),
+    ).toBe(true);
+    expect(
+      isAuthorizedVercelUser({
+        email: 'dylan.gattey@gmail.com',
+        id: 'user_other',
+      }),
+    ).toBe(true);
+    expect(
+      isAuthorizedVercelUser({
+        email: 'stranger@example.com',
+        id: 'user_stranger',
+        username: 'stranger',
+      }),
+    ).toBe(false);
+    expect(signSession({ email: 'stranger@example.com', id: 'user_stranger' })).toBeNull();
+  });
+
   it('rejects tampered cookies', () => {
-    const signed = signSession({ email: 'a@b.com', id: 'x' });
+    const signed = signSession({ email: 'hi@dylangattey.com', id: 'x' });
     expect(signed).toBeTruthy();
     expect(parseVercelSessionCookie(`${signed}tampered`)).toBeNull();
   });
 
   it('rejects expired cookies', () => {
     const issuedAt = 1_700_000_000_000;
-    const signed = signSession({ email: 'a@b.com', id: 'x' }, issuedAt);
+    const signed = signSession({ email: 'hi@dylangattey.com', id: 'x' }, issuedAt);
     expect(signed).toBeTruthy();
     expect(parseVercelSessionCookie(signed ?? undefined, issuedAt + 1_000)).toEqual({
-      email: 'a@b.com',
+      email: 'hi@dylangattey.com',
       id: 'x',
     });
     expect(
@@ -54,18 +86,19 @@ describe('Vercel session cookie', () => {
     ).toBeNull();
   });
 
-  it('returns empty entities when cookie is absent', () => {
-    expect(entitiesFromSessionCookie(undefined)).toEqual({});
-  });
-
-  it('returns user entities when cookie is present', () => {
+  it('requires a valid signed owner session in production and allows local dev without a cookie', () => {
     const signed = signSession({ email: 'hi@dylangattey.com', id: 'user_sub_123' });
-    expect(entitiesFromSessionCookie(signed ?? undefined)).toEqual({
-      user: { email: 'hi@dylangattey.com', id: 'user_sub_123' },
-    });
+
+    mockEnv({ NODE_ENV: 'production' });
+    expect(isDevConsoleAccessAllowed(undefined)).toBe(false);
+    expect(isDevConsoleAccessAllowed('invalid.cookie')).toBe(false);
+    expect(isDevConsoleAccessAllowed(signed ?? undefined)).toBe(true);
+
+    mockEnv({ NODE_ENV: 'development' });
+    expect(isDevConsoleAccessAllowed(undefined)).toBe(true);
   });
 
-  it('exports the cookie name used by identify', () => {
-    expect(VERCEL_SESSION_COOKIE).toBe('vercel_flags_session');
+  it('exports the session cookie name', () => {
+    expect(VERCEL_SESSION_COOKIE).toBe('vercel_session');
   });
 });
