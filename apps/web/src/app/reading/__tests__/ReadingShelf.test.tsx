@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { ReadingShelf } from '../ReadingShelf';
 import {
   bookCardKind,
+  bookFilterKeys,
   featuredBook,
   readingFilterOptions,
   shelfSections,
@@ -111,6 +112,14 @@ describe('readingHelpers', () => {
       'Finished',
       '5 stars',
       'Notes',
+    ]);
+    expect(bookFilterKeys(IN_PROGRESS)).toEqual(['reading']);
+    expect(bookFilterKeys(SHELF_BOOKS[0] ?? IN_PROGRESS)).toEqual(['finished', 'notes']);
+    expect(bookFilterKeys(SHELF_BOOKS[2] ?? IN_PROGRESS)).toEqual(['finished', 'fiveStars']);
+    expect(bookFilterKeys(SHELF_BOOKS[3] ?? IN_PROGRESS)).toEqual([
+      'finished',
+      'fiveStars',
+      'notes',
     ]);
   });
 
@@ -221,6 +230,11 @@ describe('ReadingShelf', () => {
 
     expect(screen.queryByRole('heading', { name: 'Pachinko' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Dune' })).toBeInTheDocument();
+    const year2026 = screen.getByRole('region', { name: '2026' });
+    expect(
+      within(year2026).getByRole('heading', { level: 3, name: /^The Path Made Clear/ }),
+    ).toBeInTheDocument();
+    expect(within(year2026).getByText('2 books')).toBeInTheDocument();
   });
 
   it('keeps year section headings sticky with consistent width below the site header across desktop and mobile layouts', () => {

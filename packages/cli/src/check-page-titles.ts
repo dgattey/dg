@@ -70,22 +70,16 @@ export function checkFooterCurtainReveal(
   const chrome = cssFiles.get(chromeFile);
   if (!collage || !chrome) return [];
 
-  const sheetRule = cssRules(collage).find(
-    (r) => !r.media && r.selectors.includes('.collageSheet'),
-  );
-  const rootRule = cssRules(collage).find((r) => !r.media && r.selectors.includes('.collageRoot'));
-  const bleedRule = cssRules(collage).find(
-    (r) => !r.media && r.selectors.includes('.collageBleed'),
-  );
-  const footerRule = cssRules(chrome).find(
-    (r) => !r.media && r.selectors.includes('.chrome__footer'),
-  );
-  const nowWrapRule = cssRules(chrome).find(
-    (r) => !r.media && r.selectors.includes('.chrome__nowWrap'),
-  );
-  const gridRule = cssRules(chrome).find(
-    (r) => !r.media && r.selectors.includes('.chrome__footerGrid'),
-  );
+  const findCollage = (sel: string) =>
+    cssRules(collage).find((r) => !r.media && r.selectors.includes(sel));
+  const findChrome = (sel: string) =>
+    cssRules(chrome).find((r) => !r.media && r.selectors.includes(sel));
+  const sheetRule = findCollage('.collageSheet');
+  const rootRule = findCollage('.collageRoot');
+  const bleedRule = findCollage('.collageBleed');
+  const footerRule = findChrome('.chrome__footer');
+  const nowWrapRule = findChrome('.chrome__nowWrap');
+  const gridRule = findChrome('.chrome__footerGrid');
 
   const sheetZ = Number(declaration(sheetRule?.body ?? '', 'z-index'));
   const footerZ = Number(declaration(footerRule?.body ?? '', 'z-index'));
@@ -136,9 +130,8 @@ export function checkFooterCurtainReveal(
       'Set `--sheet-inset: 0px` on `.collageBleed`',
     );
   }
-  for (const r of cssRules(chrome)) {
+  for (const r of cssRules(chrome).filter((rule) => Boolean(rule.media))) {
     if (
-      r.media &&
       r.selectors.includes('.chrome__nowPlaying') &&
       declaration(r.body, 'order')?.startsWith('-')
     ) {
@@ -150,7 +143,6 @@ export function checkFooterCurtainReveal(
       );
     }
     if (
-      r.media &&
       r.selectors.includes('.chrome__colophonNav') &&
       declaration(r.body, 'grid-template-columns')?.includes('repeat(3')
     ) {
@@ -188,34 +180,22 @@ export function checkHeaderLogoAlignment(
     });
 
   if (headerRule && declaration(headerRule.body, 'align-items') !== 'center') {
-    flag(
-      headerRule,
-      'Set `align-items: center` on `.chrome__header` so the logo, Now Playing card, and nav strip share one center axis',
-    );
+    flag(headerRule, 'Set `align-items: center` on `.chrome__header`');
   }
   if (logoRule && declaration(logoRule.body, 'padding') !== '0') {
-    flag(
-      logoRule,
-      'Set `padding: 0` on `.chrome__logo` so the die-cut sticker left edge aligns with the `.collageMain` left rail',
-    );
+    flag(logoRule, 'Set `padding: 0` on `.chrome__logo`');
   }
   const svgHeights = [
     ...(declaration(svgRule?.body ?? '', 'height') ?? '').matchAll(/(\d+(?:\.\d+)?)px/g),
   ].map((m) => Number(m[1]));
   if (svgRule && (svgHeights.length === 0 || Math.max(...svgHeights) < 64)) {
-    flag(
-      svgRule,
-      'Keep `.chrome__logo > svg` desktop height at least 64px so the `dg.` sticker balances the Now Playing card',
-    );
+    flag(svgRule, 'Keep `.chrome__logo > svg` desktop height at least 64px');
   }
   for (const selector of ['.chrome__nowPlaying', '.chrome__nav']) {
     const rule = findRule(selector);
     const mt = declaration(rule?.body ?? '', 'margin-top');
     if (rule && mt && mt !== '0' && mt !== '0px') {
-      flag(
-        rule,
-        `Avoid \`margin-top\` on \`${selector}\` so all header items stay centered on \`.chrome__header\``,
-      );
+      flag(rule, `Avoid \`margin-top\` on \`${selector}\``);
     }
   }
   return violations;
@@ -230,9 +210,7 @@ export function checkNoPageSubtitles(
 ): Array<StructureViolation> {
   const violations: Array<StructureViolation> = [];
   for (const [file, content] of webSources) {
-    if (!file.endsWith('.tsx') || isTestFile(file)) {
-      continue;
-    }
+    if (!file.endsWith('.tsx') || isTestFile(file)) continue;
     for (const match of content.matchAll(PAGE_TITLE_THEN_PARAGRAPH)) {
       violations.push({
         file,
@@ -258,6 +236,11 @@ const SOCIAL_CARD_VARIANT_ADAPTERS = new Set([
   'apps/web/src/app/collage/socialCardVariants.ts',
   'apps/web/src/app/collage/stravaSocialCardVariant.ts',
 ]);
+const READING_SERVER_COMPONENTS = new Set([
+  'apps/web/src/app/reading/ReadingShelf.tsx',
+  'apps/web/src/app/reading/ReadingCards.tsx',
+  'apps/web/src/app/reading/ReadingHero.tsx',
+]);
 const ROUTE_CLASS_OR_IMPORT_IN_SHARED =
   /\b(?:stats|strava|streets|reading|changelog|music|home|siteMap|devConsole|error)__[a-zA-Z0-9_-]+|from\s+['"]\.\.\/(?:music|activities|reading|changelog|site-map|dev-console|home)\//;
 
@@ -270,6 +253,12 @@ export function checkNoDuplicateImplementations(
     return [];
   }
   const rules: ReadonlyArray<readonly [boolean, RegExp, string, string]> = [
+    [
+      READING_SERVER_COMPONENTS.has(relPath) && content.includes('use client'),
+      /^['"]use client['"]/,
+      'reading-shelf-server-component',
+      'Keep ReadingShelf, ReadingCards, and ReadingHero as Server Components and isolate filter state in ReadingFilterController.tsx',
+    ],
     [
       !HOVER_MENU_OWNERS.has(relPath) && content.includes('bindHoverMenu'),
       /\bbindHoverMenu\b/,
