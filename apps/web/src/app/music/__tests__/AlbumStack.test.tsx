@@ -59,4 +59,17 @@ describe('AlbumStack', () => {
     );
     expect(priorities).toEqual(['lazy/auto', 'lazy/auto', 'eager/high']);
   });
+
+  it('requests 300px (1x) and 640px (2x) Spotify CDN variants directly without /_next/image', () => {
+    const hash = '2b497f6bf340faa8812b940c';
+    const spotifyUrl = `https://i.scdn.co/image/ab67616d0000b273${hash}`;
+    render(<AlbumCover alt="Feet of Clay" depth={0} imageUrl={spotifyUrl} sleeveCount={0} />);
+
+    const cover = screen.getByRole('img', { name: 'Feet of Clay' });
+    expect(cover).toHaveAttribute(
+      'srcset',
+      `https://i.scdn.co/image/ab67616d00001e02${hash} 1x, https://i.scdn.co/image/ab67616d0000b273${hash} 2x`,
+    );
+    expect(cover).toHaveAttribute('src', `https://i.scdn.co/image/ab67616d0000b273${hash}`);
+  });
 });

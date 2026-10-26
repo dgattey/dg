@@ -129,7 +129,9 @@ const nextConfig: NextConfig = {
   images: {
     deviceSizes: [640, 828, 1080, 1536],
     formats: ['image/avif', 'image/webp'],
-    imageSizes: [48, 96, 200, 300, 440],
+    imageSizes: [64, 96, 200, 300, 440],
+    loader: 'custom',
+    loaderFile: './src/utils/imageLoader.ts',
     qualities: [60, 65, 75],
     remotePatterns: [
       {

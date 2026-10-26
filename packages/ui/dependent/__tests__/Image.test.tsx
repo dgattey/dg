@@ -45,5 +45,33 @@ describe('Image', () => {
     const image = screen.getByRole('img', { name: 'Still Blessed' });
     expect(image).toHaveAttribute('data-ui-image', 'aspect');
     expect(image.style.getPropertyValue('--img-aspect-ratio')).toBe('34 / 34');
+    expect(image).not.toHaveAttribute('srcset');
+  });
+
+  it('emits responsive srcset for Contentful raster images and leaves SVG assets unoptimized', () => {
+    const { rerender } = render(
+      <Image
+        alt="Cover"
+        height={400}
+        sizes={{ extraLarge: 400 }}
+        url="https://images.ctfassets.net/space/asset/hash/cover.jpg"
+        width={400}
+      />,
+    );
+
+    const raster = screen.getByRole('img', { name: 'Cover' });
+    expect(raster).toHaveAttribute('srcset');
+
+    rerender(
+      <Image
+        alt="Cover"
+        height={400}
+        sizes={{ extraLarge: 400 }}
+        url="https://images.ctfassets.net/space/asset/hash/logo.svg"
+        width={400}
+      />,
+    );
+
+    expect(screen.getByRole('img', { name: 'Cover' })).not.toHaveAttribute('srcset');
   });
 });

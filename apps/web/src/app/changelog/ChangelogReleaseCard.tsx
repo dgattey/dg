@@ -1,6 +1,6 @@
 import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
 import { formatUtcShortDate } from '@dg/shared-core/dates/periodStatus';
-import Image from 'next/image';
+import { Image } from '@dg/ui/dependent/Image';
 import type { CSSProperties } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
@@ -135,8 +135,8 @@ export function ChangelogReleaseCard({
                   }
                   className="changelog__polaroidImg"
                   height={snapshot.height}
-                  sizes="(max-width: 760px) 100vw, 340px"
-                  src={snapshot.url}
+                  sizes={{ extraLarge: 340, small: 760 }}
+                  url={snapshot.url}
                   width={snapshot.width}
                 />
               </div>

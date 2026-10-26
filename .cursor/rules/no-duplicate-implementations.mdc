@@ -18,6 +18,7 @@ Never maintain parallel implementations of the same UI component, menu behavior,
 - **Cutouts, seals, tickets, and stamps:** `CutOut`, `CutLetters`, and `scallopVertices` in `apps/web/src/app/collage/`, plus `Scallop` (`size="seal" | "sticker"`) and `Stub` (`kind="ticket" | "stamp"`, `size="default" | "compact" | "sm" | "xs"`) in `apps/web/src/app/music/stats/StatsShapes.tsx`
 - **Side project marks:** `SideProjectMark` in `apps/web/src/app/home/GatteySitesCard.tsx`
 - **Loading skeletons:** `Skeleton` in `@dg/ui/core/Skeleton` (never define route-local `SkeletonLine` components or raw `data-skeleton` elements)
+- **Images and CDN image loader:** `Image` in `@dg/ui/dependent/Image` and `imageLoader` in `apps/web/src/utils/imageLoader.ts` (never import `next/image` directly in route components)
 - **Maps:** `@dg/maps` (`MapCard`, `RoutePrint`, `RoutePeek`, `RouteAtlasMap`)
 - **Spotify playback status:** `PlaybackStatus` in `apps/web/src/app/spotify/PlaybackStatus.tsx`
 

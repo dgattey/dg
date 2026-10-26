@@ -36,6 +36,8 @@ type ImageProps = {
 };
 
 const COMPACT_DENSITY_MAX_WIDTH = 300;
+const RESIZABLE_IMAGE_URL =
+  /^(?:https:\/\/images\.ctfassets\.net\/(?!.*\.svg(?:$|\?))|https:\/\/i\.scdn\.co\/image\/ab67616d0000(?:b273|1e02|4851)[0-9a-f]{24,32}(?:$|\?)|https:\/\/mosaic\.scdn\.co\/(?:640|300|60)\/[0-9a-f]+(?:$|\?)|\/(?!\/)(?!.*\.svg(?:$|\?)))/i;
 
 export const generateSizesString = (sizes: ImageSizes): string => {
   const sizesString = Object.entries(sizes)
@@ -73,6 +75,7 @@ export function Image({
     !fill && !cover
       ? ({ '--img-aspect-ratio': `${width} / ${height}` } as CSSProperties)
       : undefined;
+  const unoptimized = !RESIZABLE_IMAGE_URL.test(url);
 
   if (maxDisplayWidth <= COMPACT_DENSITY_MAX_WIDTH) {
     const targetWidth = Math.round(maxDisplayWidth);
@@ -88,6 +91,7 @@ export function Image({
         height={targetHeight}
         src={url}
         style={aspectStyle}
+        unoptimized={unoptimized}
         width={targetWidth}
         {...props}
       />
@@ -98,6 +102,7 @@ export function Image({
     alt: title ?? alt,
     sizes: generateSizesString(sizes),
     src: url,
+    unoptimized,
     ...props,
   };
 

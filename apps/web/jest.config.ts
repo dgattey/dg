@@ -10,6 +10,10 @@ const sharedConfig: Config = {
   coverageProvider: 'v8',
   // Next.js 16 patches setImmediate; Jest leak detection recurses via promisify in tests.
   detectLeaks: false,
+  moduleNameMapper: {
+    ...baseConfig.moduleNameMapper,
+    '^next/dist/shared/lib/image-loader$': '<rootDir>/src/utils/imageLoader.ts',
+  },
 };
 
 // Jest 30.5 rejects maxWorkers inside a project, so it stays top-level only.

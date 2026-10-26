@@ -70,16 +70,14 @@ export function checkFooterCurtainReveal(
   const chrome = cssFiles.get(chromeFile);
   if (!collage || !chrome) return [];
 
-  const findCollage = (sel: string) =>
-    cssRules(collage).find((r) => !r.media && r.selectors.includes(sel));
-  const findChrome = (sel: string) =>
-    cssRules(chrome).find((r) => !r.media && r.selectors.includes(sel));
-  const sheetRule = findCollage('.collageSheet');
-  const rootRule = findCollage('.collageRoot');
-  const bleedRule = findCollage('.collageBleed');
-  const footerRule = findChrome('.chrome__footer');
-  const nowWrapRule = findChrome('.chrome__nowWrap');
-  const gridRule = findChrome('.chrome__footerGrid');
+  const baseRule = (css: string, sel: string) =>
+    cssRules(css).find((r) => !r.media && r.selectors.includes(sel));
+  const sheetRule = baseRule(collage, '.collageSheet');
+  const rootRule = baseRule(collage, '.collageRoot');
+  const bleedRule = baseRule(collage, '.collageBleed');
+  const footerRule = baseRule(chrome, '.chrome__footer');
+  const nowWrapRule = baseRule(chrome, '.chrome__nowWrap');
+  const gridRule = baseRule(chrome, '.chrome__footerGrid');
 
   const sheetZ = Number(declaration(sheetRule?.body ?? '', 'z-index'));
   const footerZ = Number(declaration(footerRule?.body ?? '', 'z-index'));
@@ -227,6 +225,10 @@ const HOVER_MENU_OWNERS = new Set([
   'apps/web/src/app/collage/PillMenu.tsx',
   'apps/web/src/app/collage/hoverMenu.ts',
 ]);
+const NEXT_IMAGE_OWNERS = new Set([
+  'apps/web/src/utils/imageLoader.ts',
+  'packages/ui/dependent/Image.tsx',
+]);
 const SKELETON_OWNERS = new Set(['packages/ui/core/Skeleton.tsx', 'packages/ui/theme/index.ts']);
 const UNIT_CONSTANT_OWNERS = new Set([
   'apps/web/src/app/activities/stravaFormat.ts',
@@ -249,9 +251,7 @@ export function checkNoDuplicateImplementations(
   content: string,
   lines?: ReadonlyArray<string>,
 ): Array<StructureViolation> {
-  if (isTestFile(relPath) || relPath.startsWith('packages/cli/')) {
-    return [];
-  }
+  if (isTestFile(relPath) || relPath.startsWith('packages/cli/')) return [];
   const rules: ReadonlyArray<readonly [boolean, RegExp, string, string]> = [
     [
       READING_SERVER_COMPONENTS.has(relPath) && content.includes('use client'),
@@ -264,6 +264,20 @@ export function checkNoDuplicateImplementations(
       /\bbindHoverMenu\b/,
       'no-duplicate-hover-menu',
       'Use HoverMenu or PillMenu from apps/web/src/app/collage/PillMenu.tsx instead of wiring bindHoverMenu directly',
+    ],
+    [
+      !NEXT_IMAGE_OWNERS.has(relPath) && content.includes('next/image'),
+      /\bfrom\s+['"]next\/image['"]/,
+      'no-raw-next-image',
+      'Use Image from @dg/ui/dependent/Image instead of importing next/image directly',
+    ],
+    [
+      relPath === 'apps/web/next.config.ts' &&
+        (!content.includes("loader: 'custom'") ||
+          !content.includes("loaderFile: './src/utils/imageLoader.ts'")),
+      /\bimages\s*:/,
+      'custom-image-loader',
+      'Configure images.loader = "custom" and images.loaderFile = "./src/utils/imageLoader.ts" in next.config.ts so next/image bypasses /_next/image',
     ],
     [
       !SKELETON_OWNERS.has(relPath) &&
@@ -322,16 +336,10 @@ export function checkNoDuplicateImplementations(
   ];
   const active = rules.filter(([enabled]) => enabled);
   if (active.length === 0) return [];
-
   const sourceLines = lines ?? content.split('\n');
-  const violations: Array<StructureViolation> = [];
-  for (let i = 0; i < sourceLines.length; i += 1) {
-    const lineText = sourceLines[i] ?? '';
-    for (const [, pattern, rule, message] of active) {
-      if (pattern.test(lineText)) {
-        violations.push({ file: relPath, line: i + 1, message, rule });
-      }
-    }
-  }
-  return violations;
+  return sourceLines.flatMap((lineText, i) =>
+    active
+      .filter(([, pattern]) => pattern.test(lineText))
+      .map(([, , rule, message]) => ({ file: relPath, line: i + 1, message, rule })),
+  );
 }
