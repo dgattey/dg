@@ -21,7 +21,7 @@ function MoreWorkGrid({
 }) {
   const frames = moreWorkFrames(projects);
   const byArea = new Map(frames.map((frame) => [frame.gridArea, frame]));
-  const order = ['mg', 'sd', 'cn', 'js', 'gn'] as const;
+  const order = ['mg', 'sd', 'cn', 'gn', 'js'] as const;
   const grid = overflow
     ? { areas: MORE_WORK_OVERFLOW_GRID_AREAS, rowGapPx: 56 }
     : moreWorkGridAreas({

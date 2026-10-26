@@ -5,7 +5,7 @@
 
 .spotify__headerSlot {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   justify-items: start;
   min-width: 0;
@@ -34,6 +34,15 @@
   }
   [data-spotify-header-container] {
     max-width: 100%;
+  }
+  [data-art-notes="compact"],
+  [data-thumbnail-outer],
+  [data-album-art] {
+    width: 34px;
+    height: 34px;
+  }
+  [data-compact-text] > [data-tooltip-anchor]:has([data-track-artists]) {
+    display: none;
   }
 }
 

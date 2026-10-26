@@ -1,5 +1,5 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
-import type { PaperEdge, PaperTone } from './types';
+import type { PaperTone } from './types';
 
 export type SlottedProject = {
   key: string;
@@ -12,7 +12,6 @@ export type MoreWorkOverflowUnit = {
 };
 
 export type ProjectFrameStyle = {
-  edge: PaperEdge;
   fieldTone: PaperTone;
   marginTop?: number;
   tagClassName: 'tagBottomLeft' | 'tagBottomRight' | 'tagTopLeft';
@@ -54,35 +53,34 @@ type ProjectFrame<Area extends string> = SlottedProject & {
 export const WORK_FRAMES = [
   {
     gridArea: 'c1',
-    style: { edge: 'quad-a', fieldTone: 'cobalt', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tiltDeg: -0.8 },
+    style: { fieldTone: 'cobalt', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tiltDeg: -0.8 },
   },
   {
     gridArea: 'ws',
-    style: { edge: 'quad-d', fieldTone: 'vermilion', tagClassName: 'tagBottomRight', tagTiltDeg: 2, tiltDeg: 1 },
+    style: { fieldTone: 'vermilion', tagClassName: 'tagBottomRight', tagTiltDeg: 2, tiltDeg: 1 },
   },
 ] satisfies ReadonlyArray<{ gridArea: 'c1' | 'ws'; style: ProjectFrameStyle }>;
 
 export const MORE_WORK_FRAMES = [
   {
     gridArea: 'mg',
-    style: { edge: 'quad-b', fieldTone: 'ochre', tagClassName: 'tagBottomLeft', tagTiltDeg: 3, tiltDeg: -1.6 },
+    style: { fieldTone: 'ochre', tagClassName: 'tagBottomLeft', tagTiltDeg: 3, tiltDeg: -1.6 },
   },
   {
     gridArea: 'cn',
-    style: { edge: 'quad-c', fieldTone: 'vermilion', marginTop: 44, tagClassName: 'tagBottomRight', tagTiltDeg: -2, tiltDeg: 1.4 },
-  },
-  {
-    gridArea: 'js',
-    style: { edge: 'quad-d', fieldTone: 'ochre', marginTop: 10, tagClassName: 'tagTopLeft', tagTiltDeg: 2.5, tiltDeg: -1 },
+    style: { fieldTone: 'vermilion', marginTop: 44, tagClassName: 'tagBottomRight', tagTiltDeg: -2, tiltDeg: 1.4 },
   },
   {
     gridArea: 'gn',
-    style: { edge: 'quad-a', fieldTone: 'cream', tagClassName: 'tagBottomLeft', tagTiltDeg: -2, tiltDeg: 0.7 },
+    style: { fieldTone: 'cream', tagClassName: 'tagBottomLeft', tagTiltDeg: -2, tiltDeg: 0.7 },
   },
-] satisfies ReadonlyArray<{ gridArea: 'mg' | 'cn' | 'js' | 'gn'; style: ProjectFrameStyle }>;
+  {
+    gridArea: 'js',
+    style: { fieldTone: 'ochre', marginTop: 10, tagClassName: 'tagTopLeft', tagTiltDeg: 2.5, tiltDeg: -1 },
+  },
+] satisfies ReadonlyArray<{ gridArea: 'mg' | 'cn' | 'gn' | 'js'; style: ProjectFrameStyle }>;
 
 export const CODA_FRAME_STYLE: ProjectFrameStyle = {
-  edge: 'quad-b',
   fieldTone: 'ultramarine',
   tagClassName: 'tagBottomLeft',
   tagTiltDeg: 3,
@@ -100,7 +98,15 @@ function framesFor<Area extends string>(
 }
 
 export function assignProjectSlots(projects: ReadonlyArray<RenderableProject>) {
-  const slotted = projects.map(
+  const sorted = [...projects].sort((left, right) => {
+    const leftTime = left.creationDate ? Date.parse(left.creationDate) : Number.NEGATIVE_INFINITY;
+    const rightTime = right.creationDate
+      ? Date.parse(right.creationDate)
+      : Number.NEGATIVE_INFINITY;
+    if (leftTime === rightTime) return 0;
+    return rightTime - leftTime;
+  });
+  const slotted = sorted.map(
     (project, index): SlottedProject => ({
       key: `p-${index}`,
       project,
@@ -128,17 +134,7 @@ export function workSheetFrames(projects: ReadonlyArray<SlottedProject>) {
 }
 
 export function moreWorkFrames(projects: ReadonlyArray<SlottedProject>) {
-  const [first, second, third, fourth] = projects;
-  const ordered =
-    first &&
-    second &&
-    third &&
-    fourth &&
-    third.project.layout === 'wide' &&
-    fourth.project.layout !== 'wide'
-      ? [first, second, fourth, third]
-      : projects;
-  return framesFor(ordered, MORE_WORK_FRAMES);
+  return framesFor(projects, MORE_WORK_FRAMES);
 }
 
 export function projectFrameAspectRatio(layout: string | null | undefined): number {
@@ -201,15 +197,15 @@ export function moreWorkGridAreas(slots: { cn: boolean; gn: boolean; js: boolean
     : cn
       ? '"sd sd sd sd sd sd cn cn cn cn cn cn"'
       : fullRow('sd');
-  const rowTwo = js
-    ? gn
-      ? '"js js js js gn gn gn gn gn gn gn gn"'
-      : fullRow('js')
-    : gn
-      ? fullRow('gn')
+  const rowTwo = gn
+    ? js
+      ? '"gn gn gn gn gn gn gn gn js js js js"'
+      : fullRow('gn')
+    : js
+      ? fullRow('js')
       : EMPTY_ROW;
   return gridAreas([rowOne, rowTwo], 56);
 }
 
 export const MORE_WORK_OVERFLOW_GRID_AREAS =
-  '"mg mg mg mg mg mg cn cn cn cn cn cn" "js js js js gn gn gn gn gn gn gn gn"';
+  '"mg mg mg mg mg mg cn cn cn cn cn cn" "gn gn gn gn gn gn gn gn js js js js"';

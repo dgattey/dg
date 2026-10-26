@@ -5,6 +5,7 @@ import {
   checkCornerTagRoom,
   checkGridGapsFit,
   checkHeaderAboveSticky,
+  checkHomepageConsistency,
   checkScallopPadding,
 } from '../check-css-geometry.js';
 import { checkFooterCurtainReveal, checkHeaderLogoAlignment } from '../check-page-titles.js';
@@ -231,6 +232,38 @@ describe('check-css-geometry', () => {
         { line: 3, rule: 'css-header-logo-alignment' },
         { line: 4, rule: 'css-header-logo-alignment' },
         { line: 5, rule: 'css-header-logo-alignment' },
+      ],
+    );
+  });
+
+  it('enforces homepage top padding, project frame rounding, and side-project mark concentricity', () => {
+    const violations = checkHomepageConsistency(
+      new Map([
+        [
+          'apps/web/src/app/home/home.css',
+          [
+            '.home__hello { --sp-top: 14px; }',
+            '.home__headline { padding-top: 4px; }',
+            '.home__frameCard { width: 100%; }',
+            '.home__frameShot { border-radius: 3px; }',
+            '.home__sideRowWrap { width: 100%; }',
+          ].join('\n'),
+        ],
+        [
+          'apps/web/src/app/collage/collage.css',
+          '[data-role="side-project-mark"] { background: var(--cream); }',
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, rule }) => ({ line, rule })),
+      [
+        { line: 1, rule: 'css-homepage-consistency' },
+        { line: 2, rule: 'css-homepage-consistency' },
+        { line: 3, rule: 'css-homepage-consistency' },
+        { line: 4, rule: 'css-homepage-consistency' },
+        { line: 5, rule: 'css-homepage-consistency' },
+        { line: 1, rule: 'css-homepage-consistency' },
       ],
     );
   });
