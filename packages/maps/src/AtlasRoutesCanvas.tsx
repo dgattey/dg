@@ -14,11 +14,7 @@ const MERCATOR_REF_SCALE = 256 * 2 ** MERCATOR_REF_ZOOM;
 
 export type TransformBasis = { scale: number; tx: number; ty: number };
 
-export type WorkerRouteEntry = {
-  id: number;
-  legs: ReadonlyArray<RoundedLeg>;
-  tone: string;
-};
+export type WorkerRouteEntry = { id: number; legs: ReadonlyArray<RoundedLeg>; tone: string };
 
 export function computeTransformBasis(
   center: Point,
@@ -70,13 +66,10 @@ function resolveCssVarColor(styles: CSSStyleDeclaration, varName: string, dark: 
 }
 
 const WORKER_SCRIPT = `
-let allRoutes = [];
-let offscreen = null;
-let ctx = null;
+let allRoutes = [], offscreen = null, ctx = null, cachedBitmaps = new Map();
 
 function packLeg(leg) {
-  const len = leg.length;
-  const coords = new Int32Array(len * 2);
+  const len = leg.length, coords = new Int32Array(len * 2);
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
   for (let i = 0; i < len; i++) {
     const x = leg[i][0], y = leg[i][1];
@@ -87,23 +80,14 @@ function packLeg(leg) {
   return { minX, maxX, minY, maxY, coords };
 }
 
-self.onmessage = (event) => {
-  const msg = event.data;
-  if (msg.type === 'routes') {
-    allRoutes = msg.routes.map((r) => ({ id: r.id, tone: r.tone, chunks: r.legs.map(packLeg) }));
-    return;
-  }
-  if (msg.type !== 'render') return;
-
-  const { id, width, height, dpr, scale, tx, ty, casingColor, casingWidth, lineWidth, toneColors, visibleIds } = msg;
+function renderToBitmap({ width, height, dpr, scale, tx, ty, casingColor, casingWidth, lineWidth, toneColors, visibleIds }) {
   const pixelW = Math.max(1, Math.round(width * dpr));
   const pixelH = Math.max(1, Math.round(height * dpr));
   if (!offscreen || offscreen.width !== pixelW || offscreen.height !== pixelH) {
     offscreen = new OffscreenCanvas(pixelW, pixelH);
     ctx = offscreen.getContext('2d');
   }
-  if (!ctx) return;
-
+  if (!ctx) return null;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, width, height);
 
@@ -111,30 +95,24 @@ self.onmessage = (event) => {
   const margin = 16;
   const vMinX = (-tx - margin) / scale, vMaxX = (width - tx + margin) / scale;
   const vMinY = (-ty - margin) / scale, vMaxY = (height - ty + margin) / scale;
-
-  const byTone = new Map();
-  const seenByTone = new Map();
+  const byTone = new Map(), seenByTone = new Map();
 
   for (let r = 0; r < allRoutes.length; r++) {
     const route = allRoutes[r];
     if (visibleSet && !visibleSet.has(route.id)) continue;
     const chunks = route.chunks;
-    let p2 = byTone.get(route.tone);
-    let seen = seenByTone.get(route.tone);
+    let p2 = byTone.get(route.tone), seen = seenByTone.get(route.tone);
     for (let c = 0; c < chunks.length; c++) {
       const chunk = chunks[c];
       if (chunk.maxX < vMinX || chunk.minX > vMaxX || chunk.maxY < vMinY || chunk.minY > vMaxY) continue;
       if (!p2) {
-        p2 = new Path2D();
-        seen = new Set();
-        byTone.set(route.tone, p2);
-        seenByTone.set(route.tone, seen);
+        p2 = new Path2D(); seen = new Set();
+        byTone.set(route.tone, p2); seenByTone.set(route.tone, seen);
       }
       const coords = chunk.coords;
       let prevX = -999999, prevY = -999999, started = false;
       for (let j = 0; j < coords.length; j += 2) {
-        const sx = Math.round(coords[j] * scale + tx);
-        const sy = Math.round(coords[j + 1] * scale + ty);
+        const sx = Math.round(coords[j] * scale + tx), sy = Math.round(coords[j + 1] * scale + ty);
         if (sx === prevX && sy === prevY) continue;
         if (prevX !== -999999) {
           const inBounds =
@@ -156,22 +134,42 @@ self.onmessage = (event) => {
   }
 
   if (byTone.size > 0) {
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = casingColor;
-    ctx.globalAlpha = 0.8;
-    ctx.lineWidth = casingWidth;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = casingColor; ctx.globalAlpha = 0.8; ctx.lineWidth = casingWidth;
     for (const p2 of byTone.values()) ctx.stroke(p2);
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = lineWidth;
+    ctx.globalAlpha = 1; ctx.lineWidth = lineWidth;
     for (const [tone, p2] of byTone.entries()) {
       ctx.strokeStyle = toneColors[tone] || '#2c4db0';
       ctx.stroke(p2);
     }
   }
+  return offscreen.transferToImageBitmap();
+}
 
-  const bitmap = offscreen.transferToImageBitmap();
-  self.postMessage({ id, scale, tx, ty, width, height, dpr, bitmap }, [bitmap]);
+self.onmessage = (event) => {
+  const msg = event.data;
+  if (msg.type === 'routes') {
+    for (const bmp of cachedBitmaps.values()) bmp.close?.();
+    cachedBitmaps.clear();
+    allRoutes = msg.routes.map((r) => ({ id: r.id, tone: r.tone, chunks: r.legs.map(packLeg) }));
+    return;
+  }
+  if (msg.type === 'prewarm') {
+    if (cachedBitmaps.has(msg.cacheKey)) return;
+    const bmp = renderToBitmap(msg);
+    if (bmp) cachedBitmaps.set(msg.cacheKey, bmp);
+    return;
+  }
+  if (msg.type !== 'render') return;
+  const { id, cacheKey, scale, tx, ty, width, height, dpr } = msg;
+  const cached = cacheKey ? cachedBitmaps.get(cacheKey) : null;
+  if (cached) {
+    cachedBitmaps.delete(cacheKey);
+    self.postMessage({ id, scale, tx, ty, width, height, dpr, bitmap: cached }, [cached]);
+    return;
+  }
+  const bitmap = renderToBitmap(msg);
+  if (bitmap) self.postMessage({ id, scale, tx, ty, width, height, dpr, bitmap }, [bitmap]);
 };
 `;
 
@@ -299,24 +297,31 @@ export function AtlasRoutesCanvas({
     const { casingColor, toneColors } = paletteCacheRef.current;
     const zoomFactor = Math.max(0, Math.min(1, (targetZoom - 4) / (15 - 4)));
     reqIdRef.current += 1;
-    if (onReady) {
-      onReadyCallbacksRef.current.set(reqIdRef.current, onReady);
-    }
-    worker.postMessage({
+    if (onReady) onReadyCallbacksRef.current.set(reqIdRef.current, onReady);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const baseMsg = {
       casingColor,
       casingWidth: 2 + zoomFactor * 5,
-      dpr: Math.min(2, window.devicePixelRatio || 1),
+      dpr,
       height,
-      id: reqIdRef.current,
       lineWidth: 1 + zoomFactor * 2.5,
       scale: basis.scale,
       toneColors,
       tx: basis.tx,
       ty: basis.ty,
+      width,
+    };
+    worker.postMessage({
+      ...baseMsg,
+      cacheKey: renderKey,
+      id: reqIdRef.current,
       type: 'render',
       visibleIds: visible ? [...visible] : null,
-      width,
     });
+    if (visible !== null) {
+      const allKey = `*|${dark ? 1 : 0}|${width}x${height}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
+      worker.postMessage({ ...baseMsg, cacheKey: allKey, type: 'prewarm', visibleIds: null });
+    }
   };
 
   preRenderRef.current = dispatchRender;
