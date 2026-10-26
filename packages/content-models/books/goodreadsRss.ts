@@ -74,21 +74,23 @@ function resolveReadDates({
     return { readDateFinished: null, readDateStarted: null, status: 'notStarted' };
   }
 
-  let readDateStarted = startedFromStarted ?? finishedFromAdded;
-  let readDateFinished = finishedFromRead ?? (isReading ? null : finishedFromAdded);
-
-  if (
-    readDateFinished &&
-    readDateStarted &&
-    Date.parse(readDateFinished) < Date.parse(readDateStarted)
-  ) {
-    if (finishedFromRead !== null) readDateStarted = null;
-    else readDateFinished = null;
+  if (isReading) {
+    return {
+      readDateFinished: null,
+      readDateStarted: startedFromStarted ?? finishedFromAdded,
+      status: 'reading',
+    };
   }
 
-  const status: ReadingStatus =
-    readDateFinished !== null ? 'read' : readDateStarted !== null ? 'reading' : 'notStarted';
-  return { readDateFinished, readDateStarted, status };
+  const readDateFinished = finishedFromRead;
+  const readDateStarted =
+    readDateFinished &&
+    startedFromStarted &&
+    Date.parse(readDateFinished) < Date.parse(startedFromStarted)
+      ? null
+      : startedFromStarted;
+
+  return { readDateFinished, readDateStarted, status: 'read' };
 }
 
 const GOODREADS_SERIES_SUFFIX_PATTERN = /\s*\([^)]*#\d+[^)]*\)\s*$/;

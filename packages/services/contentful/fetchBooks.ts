@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { isDuplicateTitle, normalizeAuthor } from '@dg/content-models/books/bookDomain';
 import {
   type RenderableBook,
   toRenderableBook,
@@ -14,15 +15,22 @@ const PAGE_SIZE = 200;
 
 /**
  * Queries read and currently-reading books from Contentful.
- * Excludes `notStarted` entries (`readDateFinished` and `readDateStarted` both null)
- * at the GraphQL layer so want-to-read entries do not consume page budget, and omits
- * `Book.isbn` because Contentful's GraphQL schema types `isbn` as a 32-bit `Int`
- * which overflows on 13-digit ISBN-13 values.
+ * Includes undated finished books (which carry a `rating` or `reviewDescription` with
+ * `readDateFinished` and `readDateStarted` both null) while excluding unstarted want-to-read
+ * entries, and omits `Book.isbn` because Contentful's GraphQL schema types `isbn` as a 32-bit
+ * `Int` which overflows on 13-digit ISBN-13 values.
  */
 const QUERY = gql`
   query Books($limit: Int!, $skip: Int!) {
     bookCollection(
-      where: { OR: [{ readDateFinished_exists: true }, { readDateStarted_exists: true }] }
+      where: {
+        OR: [
+          { readDateFinished_exists: true }
+          { readDateStarted_exists: true }
+          { rating_exists: true }
+          { reviewDescription_exists: true }
+        ]
+      }
       order: [readDateFinished_DESC, readDateStarted_DESC, title_ASC]
       limit: $limit
       skip: $skip
@@ -68,7 +76,19 @@ export async function fetchBooks(): Promise<Array<RenderableBook>> {
     for (const item of pageItems) {
       const renderable = toRenderableBook(item);
       if (isNotNullish(renderable)) {
-        books.push(renderable);
+        const dupIdx = books.findIndex(
+          (existing) =>
+            normalizeAuthor(existing.author) === normalizeAuthor(renderable.author) &&
+            isDuplicateTitle(existing.title, renderable.title),
+        );
+        if (dupIdx >= 0) {
+          const existing = books[dupIdx];
+          if (existing && renderable.title.length < existing.title.length) {
+            books[dupIdx] = renderable;
+          }
+        } else {
+          books.push(renderable);
+        }
       }
     }
     skip += pageItems.length;

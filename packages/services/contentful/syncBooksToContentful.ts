@@ -16,8 +16,10 @@ import {
 import {
   buildCmaBookFields,
   computeBookDiff,
+  findDuplicateContentfulEntries,
   findMatchingContentfulEntry,
   type MergedBookFields,
+  mergeCmaBookFields,
   type NormalizedContentfulBookEntry,
 } from '@dg/content-models/books/contentfulBook';
 import {
@@ -167,19 +169,7 @@ export async function upsertBookToContentful(
     title: b.title,
   };
 
-  const preservedRawFields = ex
-    ? Object.fromEntries(
-        Object.entries(ex.rawFields).filter(
-          ([key]) =>
-            (key !== 'reviewDescription' || b.reviewPlainText === undefined) &&
-            (key !== 'notes' || b.notesPlainText === undefined),
-        ),
-      )
-    : {};
-  const fields: Record<string, unknown> = {
-    ...preservedRawFields,
-    ...buildCmaBookFields(merged, cma.locale),
-  };
+  const fields = mergeCmaBookFields(ex?.rawFields, merged, cma.locale);
   if (ex) {
     return toOutcome(
       'updated',
@@ -268,7 +258,10 @@ export async function runGoodreadsSync(opts: {
         existing.push(await cma.createAndPublishBook(buildCmaBookFields(m)));
         createdCount += 1;
       } else if (diff.action === 'update' && ex) {
-        const mergedFields = { ...ex.rawFields, ...buildCmaBookFields(m) };
+        for (const dup of findDuplicateContentfulEntries(b, ex.id, existing)) {
+          await cma.unpublishAndDeleteBook(dup.id).catch(() => false);
+        }
+        const mergedFields = mergeCmaBookFields(ex.rawFields, m, cma.locale);
         await cma.updateAndPublishBook(ex.id, ex.version, mergedFields);
         updatedCount += 1;
       }

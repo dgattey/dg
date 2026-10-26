@@ -1,6 +1,7 @@
 import {
   cleanWhitespace,
   extractPlainTextFromRichText,
+  isBackfilledBookReadDate,
   normalizeContentfulAssetUrl,
   type ReadingStatus,
 } from '../../books/bookDomain';
@@ -22,14 +23,19 @@ export type RenderableBook = {
 };
 
 /**
- * Derives reading status from `readDateFinished` and `readDateStarted`, matching Saga (`Book.swift`).
+ * Derives reading status from `readDateFinished` and `readDateStarted`, with a fallback to
+ * `'read'` for undated finished books that carry a star rating or review.
  */
 export function deriveReadingStatus({
+  rating,
   readDateFinished,
   readDateStarted,
+  review,
 }: {
+  rating?: number | null;
   readDateFinished?: string | null;
   readDateStarted?: string | null;
+  review?: string | null;
 }): ReadingStatus {
   if (cleanWhitespace(readDateFinished)) {
     return 'read';
@@ -37,15 +43,37 @@ export function deriveReadingStatus({
   if (cleanWhitespace(readDateStarted)) {
     return 'reading';
   }
+  if ((typeof rating === 'number' && rating >= 1 && rating <= 5) || cleanWhitespace(review)) {
+    return 'read';
+  }
   return 'notStarted';
 }
 
 export function toRenderableBook(book: Book | null | undefined): RenderableBook | null {
   const title = cleanWhitespace(book?.title);
   const author = cleanWhitespace(book?.author);
-  const readDateFinished = cleanWhitespace(book?.readDateFinished) || null;
-  const readDateStarted = cleanWhitespace(book?.readDateStarted) || null;
-  const readingStatus = deriveReadingStatus({ readDateFinished, readDateStarted });
+  const rawReadDateFinished = cleanWhitespace(book?.readDateFinished) || null;
+  const rawReadDateStarted = cleanWhitespace(book?.readDateStarted) || null;
+  const reviewText = book?.reviewDescription?.json
+    ? extractPlainTextFromRichText(book.reviewDescription.json)
+    : '';
+  const rating =
+    typeof book?.rating === 'number' && book.rating >= 1 && book.rating <= 5
+      ? Math.round(book.rating)
+      : null;
+  const backfilled = isBackfilledBookReadDate({
+    readDateFinished: rawReadDateFinished,
+    readDateStarted: rawReadDateStarted,
+    reviewText,
+  });
+  const readDateFinished = backfilled ? null : rawReadDateFinished;
+  const readDateStarted = backfilled ? null : rawReadDateStarted;
+  const readingStatus = deriveReadingStatus({
+    rating,
+    readDateFinished: rawReadDateFinished,
+    readDateStarted,
+    review: reviewText,
+  });
   if (!title || !author || readingStatus === 'notStarted') {
     return null;
   }
@@ -59,14 +87,6 @@ export function toRenderableBook(book: Book | null | undefined): RenderableBook 
           url: thumbnailUrl,
           width: rawCover.width,
         }
-      : null;
-
-  const reviewText = book?.reviewDescription?.json
-    ? extractPlainTextFromRichText(book.reviewDescription.json)
-    : '';
-  const rating =
-    typeof book?.rating === 'number' && book.rating >= 1 && book.rating <= 5
-      ? Math.round(book.rating)
       : null;
 
   return {

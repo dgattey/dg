@@ -3,6 +3,7 @@ import {
   cleanWhitespace,
   DEFAULT_LOCALE,
   extractPlainTextFromRichText,
+  isBackfilledBookReadDate,
   isDuplicateTitle,
   normalizeAuthor,
   parseIsbn13Number,
@@ -101,24 +102,50 @@ export function normalizeContentfulBookEntry(
   };
 }
 
+const prioritizePublishedEntries = (
+  entries: ReadonlyArray<NormalizedContentfulBookEntry>,
+): Array<NormalizedContentfulBookEntry> =>
+  [...entries].sort(
+    (a, b) =>
+      Number(b.isPublished) - Number(a.isPublished) ||
+      Number(b.isbn !== null) - Number(a.isbn !== null),
+  );
+
 export function findMatchingContentfulEntry(
   book: { author?: string | null; id?: string | null; isbn?: number | null; title: string },
   existingEntries: ReadonlyArray<NormalizedContentfulBookEntry>,
 ): NormalizedContentfulBookEntry | null {
+  const prioritized = prioritizePublishedEntries(existingEntries);
   if (book.id) {
-    const byId = existingEntries.find((e) => e.id === book.id);
+    const byId = prioritized.find((e) => e.id === book.id);
     if (byId) return byId;
   }
   if (book.isbn) {
-    const byIsbn = existingEntries.find((e) => e.isbn !== null && e.isbn === book.isbn);
+    const byIsbn = prioritized.find((e) => e.isbn !== null && e.isbn === book.isbn);
     if (byIsbn) return byIsbn;
   }
   const targetAuthor = normalizeAuthor(book.author);
   return targetAuthor
-    ? (existingEntries.find(
+    ? (prioritized.find(
         (e) => normalizeAuthor(e.author) === targetAuthor && isDuplicateTitle(book.title, e.title),
       ) ?? null)
     : null;
+}
+
+export function findDuplicateContentfulEntries(
+  book: { author?: string | null; isbn?: number | null; title: string },
+  canonicalId: string,
+  existingEntries: ReadonlyArray<NormalizedContentfulBookEntry>,
+): Array<NormalizedContentfulBookEntry> {
+  const targetAuthor = normalizeAuthor(book.author);
+  return existingEntries.filter(
+    (e) =>
+      e.id !== canonicalId &&
+      ((book.isbn && e.isbn !== null && e.isbn === book.isbn) ||
+        (Boolean(targetAuthor) &&
+          normalizeAuthor(e.author) === targetAuthor &&
+          isDuplicateTitle(book.title, e.title))),
+  );
 }
 
 const CREATE_FIELDS = [
@@ -158,14 +185,29 @@ export function computeBookDiff(
   const author = ex.author || gr.author;
   const isbn = ex.isbn ?? gr.isbn ?? null;
   const reviewUpdated = Boolean(gr.reviewText) && gr.reviewText !== ex.reviewText;
+  const backfilledDates = isBackfilledBookReadDate(ex);
+  const exFinished = backfilledDates ? null : ex.readDateFinished;
+  const exStarted = backfilledDates ? null : ex.readDateStarted;
+
+  const readDateFinished = gr.readDateFinished
+    ? !exFinished || exFinished.slice(0, 10) !== gr.readDateFinished.slice(0, 10)
+      ? gr.readDateFinished
+      : exFinished
+    : exFinished;
+  const readDateStarted = gr.readDateStarted
+    ? (exStarted ?? gr.readDateStarted)
+    : gr.readDateFinished && exStarted?.slice(0, 10) === gr.readDateFinished.slice(0, 10)
+      ? null
+      : exStarted;
+
   const changedFields = [
     title !== ex.title && 'title',
     author !== ex.author && 'author',
     isbn !== ex.isbn && 'isbn',
     Boolean(gr.rating && gr.rating !== ex.rating) && 'rating',
     reviewUpdated && 'reviewDescription',
-    Boolean(!ex.readDateFinished && gr.readDateFinished) && 'readDateFinished',
-    Boolean(!ex.readDateStarted && gr.readDateStarted) && 'readDateStarted',
+    (readDateFinished ?? null) !== (ex.readDateFinished ?? null) && 'readDateFinished',
+    (readDateStarted ?? null) !== (ex.readDateStarted ?? null) && 'readDateStarted',
     !ex.coverImageId && 'coverImage',
   ].filter((field): field is string => Boolean(field));
 
@@ -179,14 +221,23 @@ export function computeBookDiff(
       notes: ex.notes,
       notesText: ex.notesText,
       rating: gr.rating ?? ex.rating ?? null,
-      readDateFinished: ex.readDateFinished ?? gr.readDateFinished ?? null,
-      readDateStarted: ex.readDateStarted ?? gr.readDateStarted ?? null,
+      readDateFinished,
+      readDateStarted,
       reviewDescription: reviewUpdated ? gr.reviewDescription : ex.reviewDescription,
       reviewText: reviewUpdated ? gr.reviewText : ex.reviewText,
       title,
     },
   };
 }
+
+const CLEARABLE_CMA_BOOK_KEYS = new Set([
+  'isbn',
+  'notes',
+  'rating',
+  'readDateFinished',
+  'readDateStarted',
+  'reviewDescription',
+]);
 
 export function buildCmaBookFields(
   merged: MergedBookFields,
@@ -208,4 +259,20 @@ export function buildCmaBookFields(
   if (merged.reviewDescription) fields.reviewDescription = { [locale]: merged.reviewDescription };
   if (merged.notes) fields.notes = { [locale]: merged.notes };
   return fields;
+}
+
+export function mergeCmaBookFields(
+  rawFields: Record<string, unknown> | null | undefined,
+  merged: MergedBookFields,
+  locale = DEFAULT_LOCALE,
+): Record<string, unknown> {
+  const nextFields = buildCmaBookFields(merged, locale);
+  const preserved = rawFields
+    ? Object.fromEntries(
+        Object.entries(rawFields).filter(
+          ([key]) => !CLEARABLE_CMA_BOOK_KEYS.has(key) || Object.hasOwn(nextFields, key),
+        ),
+      )
+    : {};
+  return { ...preserved, ...nextFields };
 }
