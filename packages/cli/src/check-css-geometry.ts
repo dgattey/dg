@@ -55,11 +55,6 @@ function sealPaddingClearsRing(pad: string): boolean {
   );
 }
 
-/**
- * Seal text clears the dashed ring only when `.stats__scallop--seal` pads to the box
- * inscribed in the ring, 3-part stat seals stay at least 184px wide so wrapped lines do not
- * spill vertically into narrow polar chords, and no per-instance rule overrides scallop padding.
- */
 export function checkScallopPadding(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
@@ -281,6 +276,14 @@ export function checkHeaderAboveSticky(
   return violations;
 }
 
+const RAW_MARK_PROPS = [
+  ['background', 'none'],
+  ['box-shadow', 'none'],
+  ['padding', '0'],
+  ['border-radius', '0'],
+  ['transform', 'none'],
+] as const;
+
 export function checkHomepageConsistency(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
@@ -326,8 +329,8 @@ export function checkHomepageConsistency(
   check(
     false,
     '[data-role="side-project-mark"]',
-    (b) => declaration(b, 'background') === 'none' && declaration(b, 'box-shadow') === 'none',
-    'Keep side-project marks containerless',
+    (b) => RAW_MARK_PROPS.every(([k, v]) => declaration(b, k) === v),
+    'Keep side-project marks untouched',
   );
   return violations;
 }

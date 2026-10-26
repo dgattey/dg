@@ -106,7 +106,7 @@ export async function SiteMapDirectory() {
                       rel="noopener noreferrer"
                       target="_blank"
                     >
-                      <SideProjectMark className="siteMap__appMark" mark={project.mark} />
+                      <SideProjectMark mark={project.mark} />
                       <span className="siteMap__appBody">
                         <span className="siteMap__appHeader">
                           <b className="siteMap__appTitle" data-typography="title-sm">

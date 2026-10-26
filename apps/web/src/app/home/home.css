@@ -536,13 +536,6 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .home__sideRow:hover .home__sideMark,
-  .home__sideRow:focus-visible .home__sideMark {
-    transform: scale(1.1);
-  }
-}
-
 @media (max-width: 820px) {
   /* Leaves room under the map for the sleeve rising out of the work sheet. */
   .home__hello {

@@ -122,15 +122,6 @@
   color: inherit;
   text-decoration: none;
 }
-.siteMap__appMark {
-  transition: transform 0.2s ease;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .siteMap__appRow:hover .siteMap__appMark,
-  .siteMap__appRow:focus-visible .siteMap__appMark {
-    transform: scale(1.08);
-  }
-}
 .siteMap__appBody {
   display: grid;
   gap: 4px;

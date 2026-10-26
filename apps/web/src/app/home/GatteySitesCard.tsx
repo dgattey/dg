@@ -1,5 +1,3 @@
-'use client';
-
 import type {
   RenderableSideProject,
   SideProjectMark as SideProjectMarkAsset,
@@ -16,60 +14,6 @@ type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
 };
 
-function measureAndScale(source: HTMLImageElement, target: HTMLImageElement) {
-  const { naturalHeight: height, naturalWidth: width } = source;
-  if (width === 0 || height === 0) return false;
-  try {
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return true;
-    ctx.drawImage(source, 0, 0);
-    const { data } = ctx.getImageData(0, 0, width, height);
-    let minX = width;
-    let minY = height;
-    let maxX = -1;
-    let maxY = -1;
-    for (let y = 0; y < height; y += 1) {
-      for (let x = 0; x < width; x += 1) {
-        if ((data[(y * width + x) * 4 + 3] ?? 0) > 200) {
-          if (x < minX) minX = x;
-          if (y < minY) minY = y;
-          if (x > maxX) maxX = x;
-          if (y > maxY) maxY = y;
-        }
-      }
-    }
-    if (maxX >= minX && maxY >= minY) {
-      const ratio = Math.max(maxX - minX + 1, maxY - minY + 1) / Math.max(width, height);
-      if (ratio > 0 && ratio < 0.96) {
-        target.style.setProperty('--mark-scale', (1 / ratio).toFixed(3));
-      }
-    }
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function syncMarkScale(node: HTMLSpanElement | null) {
-  const img = node?.querySelector('img');
-  if (!img) return;
-  const apply = () => {
-    if (measureAndScale(img, img)) return;
-    const probe = new window.Image();
-    probe.crossOrigin = 'anonymous';
-    probe.addEventListener('load', () => measureAndScale(probe, img), { once: true });
-    probe.src = img.currentSrc || img.src;
-  };
-  if (img.complete && img.naturalWidth > 0) {
-    apply();
-    return;
-  }
-  img.addEventListener('load', apply, { once: true });
-}
-
 export function SideProjectMark({
   className,
   mark,
@@ -78,16 +22,11 @@ export function SideProjectMark({
   mark: SideProjectMarkAsset;
 }) {
   return (
-    <span
-      aria-hidden="true"
-      className={className}
-      data-role="side-project-mark"
-      ref={syncMarkScale}
-    >
+    <span aria-hidden="true" className={className} data-role="side-project-mark">
       <Image
         alt=""
         height={mark.height}
-        sizes={{ extraLarge: 88 }}
+        sizes={{ extraLarge: 36 }}
         url={mark.url}
         width={mark.width}
       />
