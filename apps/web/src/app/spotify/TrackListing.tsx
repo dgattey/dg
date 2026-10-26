@@ -97,7 +97,7 @@ function TrackMeta({
     .join('');
 
   return (
-    <div data-track-meta={variant}>
+    <>
       <Tooltip title={track.name} whenTruncated>
         {disableLinks ? (
           <Typography
@@ -123,11 +123,6 @@ function TrackMeta({
           </Link>
         )}
       </Tooltip>
-      {isCard ? null : (
-        <span aria-hidden="true" data-compact-sep="" data-typography="caption">
-          ·
-        </span>
-      )}
       <Tooltip title={fullArtists} whenTruncated>
         <Typography
           color={secondaryColor}
@@ -156,7 +151,7 @@ function TrackMeta({
           ))}
         </Typography>
       </Tooltip>
-    </div>
+    </>
   );
 }
 

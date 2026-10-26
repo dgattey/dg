@@ -326,7 +326,7 @@ export function checkHomepageConsistency(
   check(
     false,
     '[data-role="side-project-mark"]',
-    (b) => !declaration(b, 'background') && !declaration(b, 'box-shadow'),
+    (b) => declaration(b, 'background') === 'none' && declaration(b, 'box-shadow') === 'none',
     'Keep side-project marks containerless',
   );
   return violations;

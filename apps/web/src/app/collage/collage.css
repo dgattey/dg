@@ -181,6 +181,12 @@ html:has(.collageRoot) body {
   place-items: center;
   width: var(--mark-size);
   height: var(--mark-size);
+  padding: 0;
+  overflow: hidden;
+  background: none;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: none;
   transform: scale(1);
 }
 [data-role="side-project-mark"] img {
