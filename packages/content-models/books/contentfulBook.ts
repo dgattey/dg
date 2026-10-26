@@ -3,7 +3,6 @@ import {
   cleanWhitespace,
   DEFAULT_LOCALE,
   extractPlainTextFromRichText,
-  isBackfilledBookReadDate,
   isDuplicateTitle,
   normalizeAuthor,
   parseIsbn13Number,
@@ -185,20 +184,26 @@ export function computeBookDiff(
   const author = ex.author || gr.author;
   const isbn = ex.isbn ?? gr.isbn ?? null;
   const reviewUpdated = Boolean(gr.reviewText) && gr.reviewText !== ex.reviewText;
-  const backfilledDates = isBackfilledBookReadDate(ex);
-  const exFinished = backfilledDates ? null : ex.readDateFinished;
-  const exStarted = backfilledDates ? null : ex.readDateStarted;
+  const hasExplicitReadDate = gr.hasExplicitReadDate ?? Boolean(gr.readDateFinished);
 
-  const readDateFinished = gr.readDateFinished
-    ? !exFinished || exFinished.slice(0, 10) !== gr.readDateFinished.slice(0, 10)
-      ? gr.readDateFinished
-      : exFinished
-    : exFinished;
-  const readDateStarted = gr.readDateStarted
-    ? (exStarted ?? gr.readDateStarted)
-    : gr.readDateFinished && exStarted?.slice(0, 10) === gr.readDateFinished.slice(0, 10)
-      ? null
-      : exStarted;
+  const readDateFinished =
+    hasExplicitReadDate && gr.readDateFinished
+      ? !ex.readDateFinished ||
+        ex.readDateFinished.slice(0, 10) !== gr.readDateFinished.slice(0, 10)
+        ? gr.readDateFinished
+        : ex.readDateFinished
+      : (ex.readDateFinished ?? gr.readDateFinished ?? null);
+
+  const sameDaySyntheticStart =
+    !gr.readDateStarted &&
+    Boolean(
+      ex.readDateStarted &&
+        ex.readDateFinished &&
+        ex.readDateStarted.slice(0, 10) === ex.readDateFinished.slice(0, 10),
+    );
+  const readDateStarted = sameDaySyntheticStart
+    ? null
+    : (ex.readDateStarted ?? gr.readDateStarted ?? null);
 
   const changedFields = [
     title !== ex.title && 'title',

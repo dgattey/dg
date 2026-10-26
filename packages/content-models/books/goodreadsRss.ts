@@ -17,6 +17,7 @@ export type GoodreadsBookItem = {
   bookId: string | null;
   bookPublished: string | null;
   goodreadsCoverUrl: string | null;
+  hasExplicitReadDate?: boolean;
   isbn: number | null;
   numPages: number | null;
   rating: number | null;
@@ -55,7 +56,12 @@ function resolveReadDates({
   userDateStarted?: string | null;
   userReadAt?: string | null;
   userShelves?: string | null;
-}): { readDateFinished: string | null; readDateStarted: string | null; status: ReadingStatus } {
+}): {
+  hasExplicitReadDate: boolean;
+  readDateFinished: string | null;
+  readDateStarted: string | null;
+  status: ReadingStatus;
+} {
   const shelvesList = [shelf, ...(userShelves ? userShelves.split(',').map((s) => s.trim()) : [])]
     .filter(Boolean)
     .map((s) => s.toLowerCase());
@@ -71,26 +77,34 @@ function resolveReadDates({
   const startedFromStarted = parseGoodreadsDate(userDateStarted);
 
   if (isToRead && !finishedFromRead) {
-    return { readDateFinished: null, readDateStarted: null, status: 'notStarted' };
-  }
-
-  if (isReading) {
     return {
+      hasExplicitReadDate: false,
       readDateFinished: null,
-      readDateStarted: startedFromStarted ?? finishedFromAdded,
-      status: 'reading',
+      readDateStarted: null,
+      status: 'notStarted',
     };
   }
 
-  const readDateFinished = finishedFromRead;
-  const readDateStarted =
-    readDateFinished &&
-    startedFromStarted &&
-    Date.parse(readDateFinished) < Date.parse(startedFromStarted)
-      ? null
-      : startedFromStarted;
+  let readDateStarted = isReading ? (startedFromStarted ?? finishedFromAdded) : startedFromStarted;
+  let readDateFinished = finishedFromRead ?? (isReading ? null : finishedFromAdded);
 
-  return { readDateFinished, readDateStarted, status: 'read' };
+  if (
+    readDateFinished &&
+    readDateStarted &&
+    Date.parse(readDateFinished) < Date.parse(readDateStarted)
+  ) {
+    if (finishedFromRead !== null) readDateStarted = null;
+    else readDateFinished = null;
+  }
+
+  const status: ReadingStatus =
+    readDateFinished !== null ? 'read' : readDateStarted !== null ? 'reading' : 'notStarted';
+  return {
+    hasExplicitReadDate: finishedFromRead !== null,
+    readDateFinished,
+    readDateStarted,
+    status,
+  };
 }
 
 const GOODREADS_SERIES_SUFFIX_PATTERN = /\s*\([^)]*#\d+[^)]*\)\s*$/;
@@ -130,6 +144,7 @@ export function parseGoodreadsRssXml(xml: string, shelf = 'read'): Array<Goodrea
         upgradeGoodreadsCoverUrl(extractXmlTag(itemXml, 'book_large_image_url')) ??
         upgradeGoodreadsCoverUrl(extractXmlTag(itemXml, 'book_medium_image_url')) ??
         upgradeGoodreadsCoverUrl(extractXmlTag(itemXml, 'book_image_url')),
+      hasExplicitReadDate: dates.hasExplicitReadDate,
       isbn:
         parseIsbn13Number(extractXmlTag(itemXml, 'isbn13')) ??
         parseIsbn13Number(extractXmlTag(itemXml, 'isbn')),
