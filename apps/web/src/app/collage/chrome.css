@@ -4,7 +4,7 @@
   z-index: 50;
   display: flex;
   gap: 14px;
-  align-items: flex-start;
+  align-items: center;
   padding-top: 20px;
   pointer-events: none;
 }
@@ -55,13 +55,15 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__brand {
   display: flex;
   flex-shrink: 0;
+  align-items: center;
+  align-self: stretch;
 }
 .chrome__logo {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 0;
   color: var(--ink);
   text-decoration: none;
   filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
@@ -79,12 +81,11 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__logo > svg {
   display: block;
   width: auto;
-  height: 44px;
+  height: clamp(58px, 6.25vw, 78px);
 }
 .chrome__nowPlaying {
   min-width: 0;
   max-width: min(420px, 52vw);
-  margin-top: 6px;
 }
 .chrome__nowPlayingInner {
   --inset: 7px;
@@ -103,7 +104,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__nav {
   display: flex;
   justify-content: flex-end;
-  margin-top: 8px;
 }
 /* One paper strip holds every link and the theme toggle, so the right side is one piece. */
 .chrome__strip {
@@ -719,26 +719,21 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   .chrome__header {
     flex-wrap: wrap;
     gap: 7px 8px;
-    align-items: center;
     padding-top: 14px;
   }
   .chrome__nowPlaying {
     order: -2;
     max-width: 100%;
-    margin-top: 0;
   }
   .chrome__spacer {
     flex-basis: 100%;
     order: -1;
   }
   .chrome__brand {
-    margin-inline-start: -4px;
-  }
-  .chrome__logo {
-    padding: 2px;
+    align-self: center;
   }
   .chrome__logo > svg {
-    height: 34px;
+    height: clamp(36px, calc(100vw - 333px), 46px);
   }
   .chrome__nav {
     margin: 0 0 0 auto;
