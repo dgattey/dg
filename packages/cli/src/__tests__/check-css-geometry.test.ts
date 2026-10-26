@@ -7,7 +7,7 @@ import {
   checkHeaderAboveSticky,
   checkScallopPadding,
 } from '../check-css-geometry.js';
-import { checkFooterCurtainReveal } from '../check-page-titles.js';
+import { checkFooterCurtainReveal, checkHeaderLogoAlignment } from '../check-page-titles.js';
 
 const FILE = 'apps/web/src/app/music/stats/statsShapes.css';
 
@@ -204,6 +204,33 @@ describe('check-css-geometry', () => {
       [
         { line: 1, rule: 'css-footer-curtain' },
         { line: 3, rule: 'css-footer-curtain' },
+      ],
+    );
+  });
+
+  it('enforces header center alignment, zero logo padding, and desktop logo scale', () => {
+    const violations = checkHeaderLogoAlignment(
+      new Map([
+        [
+          'apps/web/src/app/collage/chrome.css',
+          [
+            '.chrome__header { display: flex; align-items: flex-start; }',
+            '.chrome__logo { padding: 4px; }',
+            '.chrome__logo > svg { height: 44px; }',
+            '.chrome__nowPlaying { margin-top: 6px; }',
+            '.chrome__nav { margin-top: 8px; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, rule }) => ({ line, rule })),
+      [
+        { line: 1, rule: 'css-header-logo-alignment' },
+        { line: 2, rule: 'css-header-logo-alignment' },
+        { line: 3, rule: 'css-header-logo-alignment' },
+        { line: 4, rule: 'css-header-logo-alignment' },
+        { line: 5, rule: 'css-header-logo-alignment' },
       ],
     );
   });
