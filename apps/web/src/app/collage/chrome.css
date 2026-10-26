@@ -27,19 +27,10 @@
   content: "";
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--paper) 72%, transparent) 0%,
-    color-mix(in srgb, var(--paper) 58%, transparent) 38%,
-    color-mix(in srgb, var(--paper) 28%, transparent) 66%,
+    color-mix(in srgb, var(--paper) 82%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 62%, transparent) 38%,
+    color-mix(in srgb, var(--paper) 30%, transparent) 66%,
     color-mix(in srgb, var(--paper) 8%, transparent) 86%,
-    transparent 100%
-  );
-  backdrop-filter: blur(3.5px);
-  mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 38%,
-    rgb(0 0 0 / 0.65) 64%,
-    rgb(0 0 0 / 0.22) 84%,
     transparent 100%
   );
   translate: -50%;
@@ -443,6 +434,25 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   height: 8px;
   background: light-dark(var(--viridian), var(--chartreuse));
   border-radius: 50%;
+}
+@keyframes chromeNowLivePulse {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale3d(1, 1, 1);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+  42% {
+    opacity: 1;
+    transform: scale3d(1.26, 1.26, 1);
+    animation-timing-function: cubic-bezier(0.37, 0, 0.63, 1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chrome__footer:not([data-occluded="true"]) .chrome__nowLive[data-playing="true"] {
+    animation: chromeNowLivePulse 857.14ms infinite;
+    will-change: transform, opacity;
+  }
 }
 .chrome__nowCellLink:hover .chrome__nowValue,
 .chrome__nowCellLink:focus-visible .chrome__nowValue {

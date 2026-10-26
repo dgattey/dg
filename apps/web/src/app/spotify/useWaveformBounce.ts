@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+export type WaveformBounceTweak = 'softened-jitter' | 'pure-breath' | 'upbeat-tempo';
+
 type WaveformBounceOptions = {
   /**
    * Whether the animation is active
@@ -9,112 +11,152 @@ type WaveformBounceOptions = {
    * Scale multiplier for the animation intensity (default: 1)
    */
   intensity?: number;
+  /**
+   * Optional smoothing / tempo tweak on top of the pre-redesign e5174284 equation
+   * (defaults to 'upbeat-tempo' — Tweak C at ~91 BPM / beatFreq = 0.95)
+   */
+  tweak?: WaveformBounceTweak;
 };
 
-/** Skip DOM transform update when change is below these (reduces redundant style/layout work). */
-const THRESHOLD_SCALE = 0.00015;
-const THRESHOLD_Y_PX = 0.025;
-const THRESHOLD_ROT_DEG = 0.03;
+/**
+ * 1,308-frame (`21,800ms` at 60Hz) compositor trajectory of the pre-redesign
+ * (`e5174284`) waveform bounce simulation stepped up to Tweak C (`beatFreq = 0.95`,
+ * `~91 BPM`, with proportional `0.52` and `0.41` dual breath waves, 2-stage
+ * low-pass micro-shimmer, and 5-frame smoothed rotational beat attack).
+ * Running as a single `iterations: Infinity` Web Animation keeps the exact
+ * organic feel 100% on the GPU compositor thread in Firefox and Chrome.
+ */
+export const WAVEFORM_BOUNCE_TOTAL_FRAMES = 1308;
+export const WAVEFORM_BOUNCE_DURATION_MS = (WAVEFORM_BOUNCE_TOTAL_FRAMES * 1000) / 60;
+export const WAVEFORM_BOUNCE_BEAT_FREQ = 0.95;
+
+export function buildPreRedesignBounceKeyframes(
+  intensity = 1,
+  rand: () => number = Math.random,
+  tweak: WaveformBounceTweak = 'upbeat-tempo',
+): Array<Keyframe> {
+  const scale = intensity;
+  const beatFreq = tweak === 'upbeat-tempo' ? WAVEFORM_BOUNCE_BEAT_FREQ : 0.6;
+  const breath1Freq = tweak === 'upbeat-tempo' ? 0.52 : 0.35;
+  const breath2Freq = tweak === 'upbeat-tempo' ? 0.41 : 0.27;
+  const usePureBreath = tweak === 'pure-breath';
+
+  let time = 0;
+  let jitterRaw = 0;
+  let jitterSmooth = 0;
+  let rotImpulse = 0;
+  let rotation = 0;
+  let nudgedThisBeat = false;
+
+  const states: Array<{ finalScale: number; rotDeg: number; step: number; yOffset: number }> = [];
+
+  for (let f = 0; f <= WAVEFORM_BOUNCE_TOTAL_FRAMES; f++) {
+    // Primary: clear beat pulse (snappy bump on each "downbeat") – exaggerated up
+    const beatPhase = Math.sin(time * beatFreq);
+    const beat = beatPhase > 0.88 ? 0.026 * ((beatPhase - 0.88) * 8.3) ** 1.3 * scale : 0;
+
+    // Sub-beats: layered breath (different frequencies so no fixed 2-beat cycle) + smoothed drift
+    const breath1 = Math.sin(time * breath1Freq + 0.5) * 0.005 * scale;
+    const breath2 = Math.sin(time * breath2Freq + 1.1) * 0.004 * scale;
+    let microDrift: number;
+    if (usePureBreath) {
+      microDrift = Math.sin(time * 0.19 + 2.3) * 0.0028 * scale;
+    } else {
+      jitterRaw = jitterRaw * 0.86 + (rand() - 0.5) * 0.0018 * scale;
+      jitterSmooth += (jitterRaw - jitterSmooth) * 0.24;
+      microDrift = jitterSmooth;
+    }
+    const variation = breath1 + breath2 + microDrift;
+
+    const scaleDelta = (beat + variation) * 0.95;
+    // Vertical bounce: lift on beat + breath wobble, in px (negative = up)
+    const yOffset = (beat * 0.8 + variation * 1.3) * -14;
+
+    if (beatPhase > 0.88) {
+      if (!nudgedThisBeat) {
+        nudgedThisBeat = true;
+        const nudgeMag = 0.4 + rand() * 1.5;
+        rotImpulse += (rand() - 0.5) * 2 * nudgeMag * 0.65;
+      }
+    } else if (beatPhase < 0.5) {
+      nudgedThisBeat = false;
+    }
+    // Smooth 5-frame attack into rotImpulse + exponential decay so the 300px
+    // sleeve corners never teleport in a single 16.7ms frame.
+    rotImpulse *= 0.92;
+    rotation = (rotation + (rotImpulse - rotation) * 0.26) * (0.965 + rand() * 0.015);
+    time += 0.16;
+
+    if (f % 2 === 0 || f === WAVEFORM_BOUNCE_TOTAL_FRAMES) {
+      states.push({
+        finalScale: 1 + scaleDelta,
+        rotDeg: rotation,
+        step: f,
+        yOffset,
+      });
+    }
+  }
+
+  const first = states[0];
+  return states.map((s, idx) => {
+    const isLast = idx === states.length - 1 && first !== undefined;
+    const sc = (isLast ? first.finalScale : s.finalScale).toFixed(4);
+    const rot = (isLast ? first.rotDeg : s.rotDeg).toFixed(2);
+    const y = (isLast ? first.yOffset : s.yOffset).toFixed(2);
+    return {
+      offset: Number((s.step / WAVEFORM_BOUNCE_TOTAL_FRAMES).toFixed(5)),
+      transform: `rotate(${rot}deg) scale3d(${sc}, ${sc}, 1) translate3d(0, ${y}px, 0)`,
+    };
+  });
+}
 
 /**
- * Hook that applies a beat-led bounce to a ref when music is playing.
- * Clear rhythmic pulses with subtle organic variation between beats.
- * requestAnimationFrame already caps at display refresh rate; we only write
- * the transform when the change is significant to avoid constant tiny updates.
+ * Hook that applies the pre-redesign (`e5174284`) beat-led waveform bounce
+ * (Tweak C: `beatFreq = 0.95`, ~91 BPM) to a ref when music is playing, running
+ * on the browser's Web Animations compositor thread so Firefox WebRender and
+ * Chrome Blink stay locked at 60fps without main-thread style invalidation.
  */
 export function useWaveformBounce<T extends HTMLElement>({
   isPlaying,
   intensity = 1,
+  tweak = 'upbeat-tempo',
 }: WaveformBounceOptions) {
   const ref = useRef<T>(null);
-  const timeRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
-  const jitterRef = useRef(0);
-  const rotationRef = useRef(0);
-  const nudgedThisBeatRef = useRef(false);
-  const lastScaleRef = useRef(1);
-  const lastYRef = useRef(0);
-  const lastRotRef = useRef(0);
 
   useEffect(() => {
-    if (!isPlaying || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-      if (ref.current) {
-        ref.current.style.transform = 'rotate(0deg) scale3d(1, 1, 1) translate3d(0, 0, 0)';
-      }
+    const element = ref.current;
+    if (!element) {
       return;
     }
 
-    timeRef.current = 0;
-    jitterRef.current = 0;
-    rotationRef.current = 0;
-    nudgedThisBeatRef.current = false;
-    lastScaleRef.current = 1;
-    lastYRef.current = 0;
-    lastRotRef.current = 0;
+    if (!isPlaying || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      delete element.dataset.playing;
+      element.style.transform = '';
+      return;
+    }
 
-    const animate = () => {
-      if (!ref.current) {
-        return;
-      }
+    element.dataset.playing = 'true';
+    if (typeof element.animate !== 'function') {
+      return () => {
+        delete element.dataset.playing;
+      };
+    }
 
-      const time = timeRef.current;
-      const scale = intensity;
-
-      // Primary: clear beat pulse (snappy bump on each "downbeat") – exaggerated up
-      const beatPhase = Math.sin(time * 0.6);
-      const beat = beatPhase > 0.88 ? 0.026 * ((beatPhase - 0.88) * 8.3) ** 1.3 * scale : 0;
-
-      // Sub-beats: layered breath (different frequencies so no fixed 2-beat cycle) + drift
-      const breath1 = Math.sin(time * 0.35 + 0.5) * 0.005 * scale;
-      const breath2 = Math.sin(time * 0.27 + 1.1) * 0.004 * scale;
-      jitterRef.current = jitterRef.current * 0.86 + (Math.random() - 0.5) * 0.0035 * scale;
-      const variation = breath1 + breath2 + jitterRef.current;
-
-      const scaleDelta = (beat + variation) * 0.95;
-      // Vertical bounce: lift on beat + breath wobble, in px (negative = up)
-      const yOffset = (beat * 0.8 + variation * 1.3) * -14;
-
-      if (beatPhase > 0.88) {
-        if (!nudgedThisBeatRef.current) {
-          nudgedThisBeatRef.current = true;
-          const nudgeMag = 0.4 + Math.random() * 1.8;
-          rotationRef.current += (Math.random() - 0.5) * 2 * nudgeMag * 0.9;
-        }
-        rotationRef.current += beat * 10.8 * (Math.random() - 0.5) * scale;
-      } else if (beatPhase < 0.5) {
-        nudgedThisBeatRef.current = false;
-      }
-      rotationRef.current *= 0.96 + Math.random() * 0.025;
-      const finalScale = 1 + scaleDelta;
-      const rotDeg = rotationRef.current;
-
-      const scaleChanged = Math.abs(finalScale - lastScaleRef.current) >= THRESHOLD_SCALE;
-      const yChanged = Math.abs(yOffset - lastYRef.current) >= THRESHOLD_Y_PX;
-      const rotChanged = Math.abs(rotDeg - lastRotRef.current) >= THRESHOLD_ROT_DEG;
-      if (scaleChanged || yChanged || rotChanged) {
-        lastScaleRef.current = finalScale;
-        lastYRef.current = yOffset;
-        lastRotRef.current = rotDeg;
-        ref.current.style.transform = `rotate(${rotDeg}deg) scale3d(${finalScale}, ${finalScale}, 1) translate3d(0, ${yOffset}px, 0)`;
-      }
-
-      timeRef.current += 0.16;
-
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    animate();
+    const animation = element.animate(
+      buildPreRedesignBounceKeyframes(intensity, Math.random, tweak),
+      {
+        duration: WAVEFORM_BOUNCE_DURATION_MS,
+        easing: 'linear',
+        iterations: Number.POSITIVE_INFINITY,
+      },
+    );
 
     return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
+      animation.cancel();
+      delete element.dataset.playing;
+      element.style.transform = '';
     };
-  }, [isPlaying, intensity]);
+  }, [isPlaying, intensity, tweak]);
 
   return ref;
 }

@@ -15,7 +15,7 @@ import { PlaybackStatus } from './PlaybackStatus';
 import { useWaveformBounce } from './useWaveformBounce';
 
 const COMPACT_THUMBNAIL_SIZE = 44;
-const COLLAGE_COMPACT_BOUNCE = 3;
+const COLLAGE_COMPACT_BOUNCE = 1.6;
 
 type ListingVariant = 'card' | 'compact';
 
@@ -37,25 +37,28 @@ function AlbumArtWithNotes({
   children,
   isPlaying,
   noteColor,
-  showNotes = true,
   variant,
 }: {
   bounceIntensity?: number;
   children: ReactNode;
   isPlaying: boolean;
   noteColor?: string;
-  showNotes?: boolean;
   variant: ListingVariant;
 }) {
-  const bounceRef = useWaveformBounce<HTMLDivElement>({ intensity: bounceIntensity, isPlaying });
+  const bounceRef = useWaveformBounce<HTMLDivElement>({
+    intensity: bounceIntensity,
+    isPlaying,
+  });
   return (
     <div data-art-notes={variant}>
-      {showNotes ? (
-        <div aria-hidden="true" data-art-notes-center="">
-          <MusicNotes isPlaying={isPlaying} noteColor={noteColor} />
-        </div>
-      ) : null}
-      <div data-art-notes-bounce="" ref={bounceRef}>
+      <div aria-hidden="true" data-art-notes-center="">
+        <MusicNotes
+          isPlaying={isPlaying}
+          noteColor={noteColor}
+          variant={variant === 'compact' ? 'collageCompact' : 'collage'}
+        />
+      </div>
+      <div data-art-notes-bounce="" data-playing={isPlaying ? 'true' : undefined} ref={bounceRef}>
         {children}
       </div>
     </div>
@@ -192,7 +195,7 @@ export function TrackListing({
           <AlbumArtWithNotes
             bounceIntensity={COLLAGE_COMPACT_BOUNCE}
             isPlaying={track.isPlaying ?? false}
-            showNotes={false}
+            noteColor="var(--ink)"
             variant="compact"
           >
             {disableLinks ? (

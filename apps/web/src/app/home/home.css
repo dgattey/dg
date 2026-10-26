@@ -172,9 +172,7 @@
   z-index: -1;
   content: "";
   background: var(--cream);
-  box-shadow:
-    0 1.5px 0 rgb(0 0 0 / 0.24),
-    0 6px 12px light-dark(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.42));
+  box-shadow: var(--pshadow-lift);
 }
 /* Each rim corner is its paper's corner plus the rim, so the cream band stays even. */
 .home__spotify .print__sleeve::before {

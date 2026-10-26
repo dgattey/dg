@@ -61,7 +61,7 @@ export function PlaybackStatus({
         <span>{statusContent}</span>
       )}
       {isNowPlaying ? (
-        <span data-playback-status-icon="" ref={bounceRef}>
+        <span data-playback-status-icon="" data-playing="true" ref={bounceRef}>
           <Music size={iconSize} />
         </span>
       ) : null}

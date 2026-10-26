@@ -92,7 +92,7 @@
   left: 50%;
   z-index: 0;
   pointer-events: none;
-  transform: translate(-50%, -50%);
+  transform: translate3d(-50%, -50%, 0);
 }
 
 [data-art-notes-bounce] {
@@ -101,7 +101,9 @@
   width: 100%;
   height: 100%;
   overflow: visible;
+  transform-origin: center center;
   backface-visibility: hidden;
+  will-change: transform;
 }
 
 [data-compact-art-disabled] {
@@ -196,7 +198,9 @@
 [data-playback-status-icon] {
   display: inline-flex;
   flex-shrink: 0;
+  transform-origin: center center;
   backface-visibility: hidden;
+  will-change: transform;
 }
 
 [data-playback-progress-track] {
@@ -207,6 +211,7 @@
   pointer-events: none;
   background-color: color-mix(in srgb, var(--progress-color) 20%, transparent);
   border-radius: 999px;
+  transform: translateZ(0);
 }
 
 [data-playback-progress-bar] {
@@ -216,6 +221,8 @@
   border-radius: inherit;
   transform: scaleX(var(--progress-scale, 0));
   transform-origin: left;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 @keyframes albumGradientFadeIn {
@@ -252,47 +259,14 @@
   animation: albumGradientFadeIn var(--timing-slow) var(--easing-default);
 }
 
-@keyframes musicNoteFloatAndFade {
-  0% {
-    opacity: 0;
-    transform: translate3d(calc(-50% + var(--note-x0)), calc(-50% + var(--note-y0)), 0)
-      scale3d(var(--note-scale), var(--note-scale), 1) rotate(0deg);
-  }
-  8% {
-    opacity: var(--note-opacity-start);
-    transform: translate3d(
-        calc(-50% + var(--note-x0) + (var(--note-x) - var(--note-x0)) * 0.08),
-        calc(-50% + var(--note-y0) + (var(--note-y) - var(--note-y0)) * 0.08),
-        0
-      )
-      scale3d(var(--note-scale), var(--note-scale), 1) rotate(calc(var(--note-rotation) * 0.08));
-  }
-  50% {
-    opacity: var(--note-opacity-mid);
-  }
-  80% {
-    opacity: var(--note-opacity-end);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(calc(-50% + var(--note-x)), calc(-50% + var(--note-y)), 0)
-      scale3d(calc(var(--note-scale) * 0.7), calc(var(--note-scale) * 0.7), 1)
-      rotate(var(--note-rotation));
-  }
-}
-
 [data-ambient-notes] {
-  --note-opacity-start: 1;
-  --note-opacity-mid: 0.95;
-  --note-opacity-end: 0.6;
-  --note-shadow: drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.55))
-    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
   position: absolute;
   top: 0;
   left: 0;
   width: 0;
   height: 0;
   overflow: visible;
+  color: var(--note-color, currentColor);
   pointer-events: none;
   backface-visibility: hidden;
 }
@@ -301,11 +275,26 @@
   position: absolute;
   top: 0;
   left: 0;
-  color: var(--note-color, currentColor);
-  opacity: 0;
-  filter: var(--note-shadow);
+  opacity: 0.01;
   backface-visibility: hidden;
-  animation: musicNoteFloatAndFade var(--note-duration) ease-out forwards;
-  animation-delay: var(--note-delay);
   will-change: transform, opacity;
+}
+
+[data-music-note-shadow] {
+  position: absolute;
+  top: 1.5px;
+  left: 0;
+  display: block;
+  color: rgb(0 0 0 / 0.55);
+  pointer-events: none;
+}
+
+[data-ambient-notes="collageCompact"] [data-music-note-shadow] {
+  top: 1px;
+  color: light-dark(rgb(247 241 226 / 0.88), rgb(0 0 0 / 0.68));
+}
+
+[data-music-note-fg] {
+  position: relative;
+  display: block;
 }
