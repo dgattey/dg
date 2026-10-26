@@ -790,16 +790,17 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     border-top: 1px solid rgb(247 241 226 / 0.14);
   }
   .chrome__colophonNav {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     order: 1;
   }
   .chrome__colophonLink {
     display: flex;
+    flex: 1 0 auto;
     align-items: center;
     justify-content: center;
-    padding: 8px 10px;
+    padding: 8px 14px;
     color: var(--cream);
     text-align: center;
     white-space: nowrap;
