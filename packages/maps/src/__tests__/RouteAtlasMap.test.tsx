@@ -43,14 +43,15 @@ describe('RouteAtlasMap', () => {
     expect(html).toContain('aria-label="Zoom in"');
     expect(html).toContain('data-atlas-canvas=""');
     expect(html).toContain('data-atlas-ssr=""');
-    expect(html).toContain('viewBox="0 0 406 489.5"');
+    expect(html).toContain('viewBox="0 0 390 470"');
     expect(
       html.match(/<svg[^>]*data-atlas-ssr=""[\s\S]*?<\/svg>/)?.[0].match(/<path/g),
     ).toHaveLength(1);
     expect(html).toContain('data-tones="cobalt,vermilion"');
     expect(html).toContain('data:image/svg+xml,');
+    expect(html).toContain('data-atlas-tile-stage=""');
     expect(html).toMatch(
-      /--atlas-tile-transform:translate3d\(-?\d+\.\d{2}px, -?\d+\.\d{2}px, 0px\) scale\(\d+\.\d{6}\)/,
+      /--box-transform:translate3d\(-?\d+\.\d{4}%, -?\d+\.\d{4}%, 0px\) scale\(\d+\.\d{6}, \d+\.\d{6}\)/,
     );
   });
 

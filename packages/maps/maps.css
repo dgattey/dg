@@ -96,9 +96,9 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.58;
   fill: none;
-  stroke-width: 1.3px;
+  stroke-width: 1.5px;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -116,10 +116,15 @@
   background-color: #2a2a2a;
 }
 
+[data-atlas-tile-stage] {
+  position: absolute;
+  inset: 0;
+}
+
 [data-atlas-tile-box] {
   position: absolute;
   inset: 0;
-  transform: var(--atlas-tile-transform);
+  transform: var(--box-transform);
   transform-origin: 0 0;
 }
 
@@ -179,12 +184,6 @@ html[data-color-scheme="dark"] [data-map-scheme="dark"] {
   position: absolute;
   inset: 0;
   z-index: 1;
-}
-
-[data-map-tile-layer] > div {
-  width: 100% !important;
-  height: 100% !important;
-  background-color: transparent !important;
 }
 
 [data-route-map-scrim] {

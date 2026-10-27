@@ -1,62 +1,63 @@
-'use client';
+import type { CSSProperties, ReactElement } from 'react';
+import type { RouteFrame } from './routeFrame';
+import { project } from './routeGeometry';
+import { outdoorsTileUrl, type TileSource } from './tileSource';
 
-import type { TileComponentProps } from 'pigeon-maps';
-import { type CSSProperties, type RefObject, useEffect, useState } from 'react';
-
-/** Lazy, so a hidden scheme's tiles never load until that scheme shows. */
-export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
-  const tileVars = {
-    '--tile-h': `${tile.height}px`,
-    '--tile-left': `${tile.left}px`,
-    '--tile-top': `${tile.top}px`,
-    '--tile-w': `${tile.width}px`,
+export function frameTiles({
+  center,
+  dark,
+  height,
+  tileSource,
+  width,
+  zoom,
+}: RouteFrame & { dark: boolean; tileSource: TileSource }): ReactElement {
+  const tz = Math.round(zoom);
+  const ts = 2 ** (zoom - tz);
+  const { x: px, y: py } = project(center);
+  const cx = px * 2 ** tz;
+  const cy = py * 2 ** tz;
+  const minX = Math.max(Math.floor(cx - width / ts / 512), 0);
+  const maxX = Math.min(Math.floor(cx + width / ts / 512), 2 ** tz - 1);
+  const minY = Math.max(Math.floor(cy - height / ts / 512), 0);
+  const maxY = Math.min(Math.floor(cy + height / ts / 512), 2 ** tz - 1);
+  const tiles: Array<ReactElement> = [];
+  for (let x = minX; x <= maxX; x++) {
+    for (let y = minY; y <= maxY; y++) {
+      const col = x - minX;
+      const row = y - minY;
+      const url = (dpr?: number) => outdoorsTileUrl(tileSource, { dark, dpr, x, y, zoom: tz });
+      const tileVars = {
+        '--tile-h': '100%',
+        '--tile-left': `${col * 100}%`,
+        '--tile-top': `${row * 100}%`,
+        '--tile-w': '100%',
+      } as CSSProperties;
+      tiles.push(
+        <div data-active="true" data-map-tile="" key={`${col}-${row}`} style={tileVars}>
+          <img
+            alt=""
+            data-map-tile-img=""
+            decoding="async"
+            loading="lazy"
+            src={url()}
+            srcSet={tileSource.mode === 'offline' ? undefined : `${url(1)}, ${url(2)} 2x`}
+          />
+        </div>,
+      );
+    }
+  }
+  const lPct = ((0.5 + ((minX - cx) * 256 * ts) / width) * 100).toFixed(4);
+  const tPct = ((0.5 + ((minY - cy) * 256 * ts) / height) * 100).toFixed(4);
+  const sx = ((256 * ts) / width).toFixed(6);
+  const sy = ((256 * ts) / height).toFixed(6);
+  const boxVars = {
+    '--box-transform': `translate3d(${lPct}%, ${tPct}%, 0px) scale(${sx}, ${sy})`,
   } as CSSProperties;
   return (
-    <div data-active={tile.active ? 'true' : undefined} data-map-tile="" style={tileVars}>
-      <img
-        alt=""
-        data-map-tile-img=""
-        decoding="async"
-        loading="lazy"
-        onLoad={tileLoaded}
-        src={tile.url}
-        srcSet={tile.srcSet}
-      />
+    <div data-atlas-tile-stage="">
+      <div data-atlas-tile-box="" style={boxVars}>
+        {tiles}
+      </div>
     </div>
   );
-}
-
-/**
- * Measures an element's `borderBoxSize`, which ignores ancestor transforms
- * (rotated collage cards) while preserving fractional pixels unless `round` is set.
- */
-export function useHostSize(
-  ref: RefObject<HTMLElement | null>,
-  initialSize: { height: number; width: number },
-  options?: { disabled?: boolean; round?: boolean },
-) {
-  const [size, setSize] = useState(initialSize);
-  const disabled = options?.disabled ?? false;
-  const round = options?.round ?? false;
-
-  useEffect(() => {
-    const element = ref.current;
-    if (disabled || !element || typeof ResizeObserver === 'undefined') {
-      return;
-    }
-    const observer = new ResizeObserver(([entry]) => {
-      const box = entry?.borderBoxSize[0];
-      if (box && box.blockSize > 0 && box.inlineSize > 0) {
-        const height = round ? Math.round(box.blockSize) : box.blockSize;
-        const width = round ? Math.round(box.inlineSize) : box.inlineSize;
-        setSize((prev) =>
-          prev.height === height && prev.width === width ? prev : { height, width },
-        );
-      }
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [disabled, ref, round]);
-
-  return size;
 }
