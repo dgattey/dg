@@ -7,16 +7,17 @@
   text-decoration: none;
 }
 .strava__polaroidInner {
+  --inset: var(--mat);
   display: grid;
   gap: 4px;
-  padding: var(--mat) var(--mat) 14px;
+  padding: var(--inset) var(--inset) 14px;
 }
 .strava__print {
   display: block;
   aspect-ratio: 3 / 2;
   margin-bottom: 8px;
   overflow: clip;
-  border-radius: var(--print-radius);
+  border-radius: var(--nested-radius);
 }
 .strava__polaroidName {
   padding-inline: 4px;

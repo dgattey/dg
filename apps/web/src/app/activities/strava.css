@@ -79,24 +79,12 @@
   box-shadow: none;
 }
 .strava__atlasMat {
+  --inset: var(--mat-feature);
   position: relative;
-  padding: var(--mat-feature);
+  padding: var(--inset);
   overflow: visible;
-  border-radius: 0;
-}
-.strava__atlasMat::after {
-  --r: var(--print-radius);
-  --c: transparent calc(var(--r) - 0.5px), var(--pc, var(--cream)) var(--r);
-  position: absolute;
-  inset: var(--mat-feature);
-  z-index: 2;
-  pointer-events: none;
-  content: "";
-  background:
-    radial-gradient(circle at var(--r) var(--r), var(--c)) 0 0 / var(--r) var(--r) no-repeat,
-    radial-gradient(circle at 0 var(--r), var(--c)) 100% 0 / var(--r) var(--r) no-repeat,
-    radial-gradient(circle at var(--r) 0, var(--c)) 0 100% / var(--r) var(--r) no-repeat,
-    radial-gradient(circle at 0 0, var(--c)) 100% 100% / var(--r) var(--r) no-repeat;
+  border-bottom: 2px solid rgb(0 0 0 / 0.2);
+  box-shadow: none;
 }
 .strava__atlasMap {
   position: relative;
@@ -105,7 +93,9 @@
 .strava__atlasBlank {
   aspect-ratio: 780 / 940;
   overflow: clip;
-  border-radius: 0;
+}
+.strava__atlasBlank {
+  border-radius: var(--nested-radius);
 }
 .strava__atlasBlank,
 .strava__printBlank {
@@ -114,12 +104,13 @@
 .strava__routeCount {
   right: 36px;
   bottom: 36px;
+  z-index: 5;
 }
 .strava__regions {
   position: absolute;
   top: 14px;
   left: 14px;
-  z-index: 3;
+  z-index: 5;
 }
 
 .strava__totals {
