@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
+import { getTrackBpm } from '@dg/services/spotify/trackTempo';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
 import { cacheLife, cacheTag } from 'next/cache';
@@ -21,6 +22,23 @@ async function withMissingTokenFallback<T>(promise: Promise<T>): Promise<T | nul
   }
 }
 
+async function withTrackBpm(track: Track | null): Promise<Track | null> {
+  if (!track?.isrc) {
+    return track;
+  }
+  try {
+    const bpm = await getTrackBpm(track.isrc);
+    return bpm === null ? track : { ...track, bpm };
+  } catch (error) {
+    log.warn('Stored track tempo read failed; using the default bounce', { error });
+    return track;
+  }
+}
+
+async function readLatestTrack(): Promise<Track | null> {
+  return await withTrackBpm(await withMissingTokenFallback(fetchRecentlyPlayed()));
+}
+
 let cachedLatestSong: { expiresAt: number; track: Track | null } | null = null;
 let inFlightLatestSong: Promise<Track | null> | null = null;
 
@@ -35,7 +53,7 @@ export const getLatestSong = async (): Promise<Track | null> => {
   if (useMemoryCache && inFlightLatestSong) {
     return inFlightLatestSong;
   }
-  const promise = withMissingTokenFallback(fetchRecentlyPlayed()).then((track) => {
+  const promise = readLatestTrack().then((track) => {
     if (useMemoryCache) {
       cachedLatestSong = {
         expiresAt: Date.now() + LATEST_SONG_FRESH_MS,
@@ -60,5 +78,5 @@ export const getLastKnownSong = async () => {
   if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
     return null;
   }
-  return await withMissingTokenFallback(fetchRecentlyPlayed());
+  return await readLatestTrack();
 };

@@ -79,6 +79,8 @@ Spotify API integration for currently playing, history, and albums.
 | Export                       | Description                                           |
 | ---------------------------- | ----------------------------------------------------- |
 | `fetchRecentlyPlayed()`      | Recently played or currently playing track            |
+| `getTrackBpm(isrc)`          | Track tempo, stored in `MusicTrackTempo` after one Deezer lookup |
+| `fetchTrackBpm(isrc)`        | Deezer tempo lookup by ISRC (800ms timeout)           |
 | `fetchMusicHistoryPage()`    | Paginated listening history from the DB               |
 | `fetchPlaylistAlbums()`      | Favorite albums from a playlist                       |
 | `refreshFavoriteAlbumsSnapshot()` | Refresh the DB snapshot from the playlist         |

@@ -10,6 +10,7 @@ import { useWaveformBounce } from './useWaveformBounce';
 type ListingVariant = 'card' | 'compact';
 
 type PlaybackStatusProps = {
+  bpm?: Track['bpm'];
   isPlaying?: Track['isPlaying'];
   playedAt?: Track['playedAt'];
   color?: string;
@@ -22,6 +23,7 @@ type PlaybackStatusProps = {
  * Styling is driven by the parent TrackListing's variant.
  */
 export function PlaybackStatus({
+  bpm,
   isPlaying,
   playedAt,
   color,
@@ -32,6 +34,7 @@ export function PlaybackStatus({
   const isCompact = listingVariant === 'compact';
 
   const bounceRef = useWaveformBounce<HTMLSpanElement>({
+    bpm,
     intensity: 0.8,
     isPlaying: isNowPlaying,
   });
