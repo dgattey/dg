@@ -145,7 +145,41 @@
   z-index: 3;
   width: 100%;
   height: 100%;
-  overflow: visible;
+  overflow: hidden;
+}
+
+:is([data-pigeon-map], [data-route-map], [data-atlas-map])::after {
+  --tl: var(--nested-tl, var(--print-radius, 6px));
+  --tr: var(--nested-tr, var(--print-radius, 6px));
+  --br: var(--nested-br, var(--print-radius, 6px));
+  --bl: var(--nested-bl, var(--print-radius, 6px));
+  --mat-fill: var(--pc, var(--cream, #f7f1e2));
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(
+      circle at var(--tl) var(--tl),
+      transparent calc(var(--tl) - 0.5px),
+      var(--mat-fill) var(--tl)
+    )
+    0 0 / var(--tl) var(--tl) no-repeat,
+    radial-gradient(
+      circle at 0 var(--tr),
+      transparent calc(var(--tr) - 0.5px),
+      var(--mat-fill) var(--tr)
+    )
+    100% 0 / var(--tr) var(--tr) no-repeat,
+    radial-gradient(circle at 0 0, transparent calc(var(--br) - 0.5px), var(--mat-fill) var(--br))
+    100% 100% / var(--br) var(--br) no-repeat,
+    radial-gradient(
+      circle at var(--bl) 0,
+      transparent calc(var(--bl) - 0.5px),
+      var(--mat-fill) var(--bl)
+    )
+    0 100% / var(--bl) var(--bl) no-repeat;
 }
 
 [data-map-scheme] {
@@ -208,7 +242,7 @@ html[data-color-scheme="dark"] [data-map-scheme="dark"] {
   position: absolute;
   top: 12px;
   right: 12px;
-  z-index: 2;
+  z-index: 5;
   display: grid;
   gap: 5px;
 }

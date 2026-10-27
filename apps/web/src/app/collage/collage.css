@@ -208,9 +208,11 @@ html:has(.collageRoot) body {
   will-change: transform;
 }
 .paperInner {
-  --nested-radius: max(3px, calc(var(--edge-tl) - var(--inset)))
-    max(3px, calc(var(--edge-tr) - var(--inset))) max(3px, calc(var(--edge-br) - var(--inset)))
-    max(3px, calc(var(--edge-bl) - var(--inset)));
+  --nested-tl: max(var(--print-radius), calc(var(--edge-tl) - var(--inset)));
+  --nested-tr: max(var(--print-radius), calc(var(--edge-tr) - var(--inset)));
+  --nested-br: max(var(--print-radius), calc(var(--edge-br) - var(--inset)));
+  --nested-bl: max(var(--print-radius), calc(var(--edge-bl) - var(--inset)));
+  --nested-radius: var(--nested-tl) var(--nested-tr) var(--nested-br) var(--nested-bl);
   overflow: clip;
   color: var(--on);
   background: var(--pc);
