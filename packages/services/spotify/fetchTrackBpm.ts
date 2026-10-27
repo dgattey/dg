@@ -20,6 +20,10 @@ const ISRC_PATTERN = /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/i;
  */
 export const DEEZER_TIMEOUT_MS = 800;
 
+export function isIsrc(value: string): boolean {
+  return ISRC_PATTERN.test(value);
+}
+
 /**
  * Folds a raw tempo into `MIN_BPM..MAX_BPM` by doubling or halving.
  * Returns null for anything that is not a positive finite number, since
@@ -43,10 +47,10 @@ export function normalizeBpm(bpm: unknown): number | null {
  * Looks up a track's tempo on Deezer's keyless public API by ISRC, because
  * Spotify's audio-features endpoint is closed to apps created after Nov 2024.
  * Resolves null when Deezer has no tempo for the track, and throws on network,
- * HTTP, quota, or timeout failures so callers can cache those only briefly.
+ * HTTP, quota, or timeout failures so callers can retry those later.
  */
 export async function fetchTrackBpm(isrc: string): Promise<number | null> {
-  if (!ISRC_PATTERN.test(isrc)) {
+  if (!isIsrc(isrc)) {
     return null;
   }
   const response = await fetch(`${DEEZER_TRACK_ENDPOINT}isrc:${isrc.toUpperCase()}`, {

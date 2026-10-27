@@ -18,12 +18,12 @@ jest.mock('@dg/services/spotify/fetchRecentlyPlayed', () => ({
   fetchRecentlyPlayed: jest.fn(),
 }));
 
-jest.mock('@dg/services/spotify/fetchTrackBpm', () => ({
-  fetchTrackBpm: jest.fn(),
+jest.mock('@dg/services/spotify/trackTempo', () => ({
+  getTrackBpm: jest.fn(),
 }));
 
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
-import { fetchTrackBpm } from '@dg/services/spotify/fetchTrackBpm';
+import { getTrackBpm } from '@dg/services/spotify/trackTempo';
 import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { cacheLife } from 'next/cache';
 import { getLastKnownSong, getLatestSong } from '../spotify';
@@ -34,14 +34,14 @@ const trackWithIsrc = { ...track, isrc: 'USQX91300809' } as Track;
 describe('getLatestSong', () => {
   beforeEach(() => {
     jest.mocked(cacheLife).mockClear();
-    jest.mocked(fetchTrackBpm).mockReset();
+    jest.mocked(getTrackBpm).mockReset();
   });
 
   it('fetches the live track directly without Next use-cache stale windows', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(track);
     await expect(getLatestSong()).resolves.toBe(track);
     expect(cacheLife).not.toHaveBeenCalled();
-    expect(fetchTrackBpm).not.toHaveBeenCalled();
+    expect(getTrackBpm).not.toHaveBeenCalled();
   });
 
   it('returns null when tokens are missing', async () => {
@@ -49,39 +49,31 @@ describe('getLatestSong', () => {
     await expect(getLatestSong()).resolves.toBeNull();
   });
 
-  it('attaches the tempo looked up by ISRC behind a weeks-long cache', async () => {
+  it('attaches the stored or looked-up tempo without a Next cache layer', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(trackWithIsrc);
-    jest.mocked(fetchTrackBpm).mockResolvedValue(116.13);
+    jest.mocked(getTrackBpm).mockResolvedValue(116.13);
     await expect(getLatestSong()).resolves.toEqual({ ...trackWithIsrc, bpm: 116.13 });
-    expect(fetchTrackBpm).toHaveBeenCalledWith('USQX91300809');
-    expect(jest.mocked(cacheLife).mock.calls).toEqual([['weeks']]);
+    expect(getTrackBpm).toHaveBeenCalledWith('USQX91300809');
+    expect(cacheLife).not.toHaveBeenCalled();
   });
 
-  it('caches an unknown tempo for weeks too', async () => {
+  it('leaves the tempo unknown when there is none', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(trackWithIsrc);
-    jest.mocked(fetchTrackBpm).mockResolvedValue(null);
+    jest.mocked(getTrackBpm).mockResolvedValue(null);
     await expect(getLatestSong()).resolves.toBe(trackWithIsrc);
-    expect(jest.mocked(cacheLife).mock.calls).toEqual([['weeks']]);
   });
 
-  it.each([
-    ['times out', new DOMException('The operation timed out.', 'TimeoutError')],
-    ['fails', new Error('network')],
-  ])(
-    'returns the track at the default tempo and caches for about an hour when Deezer %s',
-    async (_label, error) => {
-      jest.mocked(fetchRecentlyPlayed).mockResolvedValue(trackWithIsrc);
-      jest.mocked(fetchTrackBpm).mockRejectedValue(error);
-      await expect(getLatestSong()).resolves.toBe(trackWithIsrc);
-      expect(jest.mocked(cacheLife).mock.calls).toEqual([['hours']]);
-    },
-  );
+  it('still returns the track when the stored tempo read fails', async () => {
+    jest.mocked(fetchRecentlyPlayed).mockResolvedValue(trackWithIsrc);
+    jest.mocked(getTrackBpm).mockRejectedValue(new Error('database unavailable'));
+    await expect(getLatestSong()).resolves.toBe(trackWithIsrc);
+  });
 });
 
 describe('getLastKnownSong', () => {
   beforeEach(() => {
     jest.mocked(cacheLife).mockClear();
-    jest.mocked(fetchTrackBpm).mockReset();
+    jest.mocked(getTrackBpm).mockReset();
   });
 
   it('caches the prerendered shell track with max lifetime', async () => {
@@ -97,7 +89,7 @@ describe('getLastKnownSong', () => {
 
   it('attaches the tempo to the prerendered shell track', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(trackWithIsrc);
-    jest.mocked(fetchTrackBpm).mockResolvedValue(98);
+    jest.mocked(getTrackBpm).mockResolvedValue(98);
     await expect(getLastKnownSong()).resolves.toEqual({ ...trackWithIsrc, bpm: 98 });
   });
 });

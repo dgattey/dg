@@ -2,7 +2,7 @@ import 'server-only';
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
-import { fetchTrackBpm } from '@dg/services/spotify/fetchTrackBpm';
+import { getTrackBpm } from '@dg/services/spotify/trackTempo';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
 import { cacheLife, cacheTag } from 'next/cache';
@@ -22,32 +22,17 @@ async function withMissingTokenFallback<T>(promise: Promise<T>): Promise<T | nul
   }
 }
 
-/**
- * A recording's tempo never changes, so a result, including an unknown tempo,
- * is cached for weeks and each ISRC costs one Deezer request across every
- * server instance. Failures and timeouts resolve to an unknown tempo cached
- * for about an hour, so a Deezer outage costs at most one slow request per
- * song per hour.
- */
-async function getTrackBpm(isrc: string): Promise<number | null> {
-  'use cache: remote';
-  try {
-    const bpm = await fetchTrackBpm(isrc);
-    cacheLife('weeks');
-    return bpm;
-  } catch (error) {
-    log.warn('Track tempo lookup failed; using the default bounce', { error, isrc });
-    cacheLife('hours');
-    return null;
-  }
-}
-
 async function withTrackBpm(track: Track | null): Promise<Track | null> {
   if (!track?.isrc) {
     return track;
   }
-  const bpm = await getTrackBpm(track.isrc);
-  return bpm === null ? track : { ...track, bpm };
+  try {
+    const bpm = await getTrackBpm(track.isrc);
+    return bpm === null ? track : { ...track, bpm };
+  } catch (error) {
+    log.warn('Stored track tempo read failed; using the default bounce', { error });
+    return track;
+  }
 }
 
 async function readLatestTrack(): Promise<Track | null> {
