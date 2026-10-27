@@ -2,6 +2,7 @@ import type { Point } from 'pigeon-maps';
 import {
   decodeRoutes,
   frameAround,
+  frameHeatmap,
   framePaths,
   homeBounds,
   routeBounds,
@@ -99,6 +100,20 @@ describe('route frames', () => {
     ]);
     expect(routeBounds(encodePolyline([[10, 20]]))).toBeNull();
     expect(routeBounds('_')).toBeNull();
+  });
+
+  it('buckets overlapping routes into Option D heatmap tiers with casing and sheath', () => {
+    const repeated = [1, 2, 3, 4, 5, 6].map((id) => route(id, [37.77, -122.42]));
+    const decoded = decodeRoutes([...repeated, route(7, [37.8, -122.27], 'cobalt')]);
+    const frame = frameAround(
+      [
+        [37.75, -122.45],
+        [37.82, -122.24],
+      ],
+      { height: 300, padding: 10, width: 426 },
+    );
+    const layers = frameHeatmap(frame, decoded);
+    expect(layers.map(({ tone }) => tone)).toEqual(['casing', 'sheath', 'tier-0', 'tier-3']);
   });
 
   it('fits a lone route into a silhouette square', () => {
