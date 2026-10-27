@@ -123,44 +123,43 @@ html:active-view-transition-type(page-close)::view-transition-new(root) {
 
 /*
  * Album well open/close. The cover already morphs under `.vt-album-art`, so this
- * layer only rolls the surface around it down out of its top edge, like a drawer,
- * in step with the cells below sliding the same distance. It stays opaque the
- * whole way: a fade would show the page backdrop through the well and then hide it.
- * The clip trims only the top edge, so the card's shadow and tilted corners are
- * already on screen when the live card takes over. Under art (z 150) so the morph
+ * layer only wipes the surface around it open from its top edge, in step with the
+ * cells below sliding the same distance. The well's contents never move: sliding
+ * them in would scroll the tracklist through the well while it opens. It stays
+ * opaque the whole way, since a fade would show the page backdrop through the well
+ * and then hide it. The negative insets keep the card's shadow and tilted corners
+ * on screen by the time the live card takes over. Under art (z 150) so the morph
  * still clears the well surface.
  */
 ::view-transition-group(album-well) {
   z-index: 140;
-  clip-path: inset(0 -48px -48px);
   animation-duration: var(--timing-medium);
   animation-timing-function: var(--easing-default);
 }
 
 ::view-transition-old(album-well) {
-  animation: var(--timing-medium) var(--easing-default) both vt-album-well-collapse;
+  animation: var(--timing-medium) var(--easing-default) both vt-album-well-conceal;
 }
 
 ::view-transition-new(album-well) {
-  animation: var(--timing-medium) var(--easing-default) both vt-album-well-expand;
+  animation: var(--timing-medium) var(--easing-default) both vt-album-well-reveal;
 }
 
-/* The extra few pixels tuck the card's shadow above the clip too. */
-@keyframes vt-album-well-expand {
+@keyframes vt-album-well-reveal {
   from {
-    transform: translateY(calc(-100% - 6px));
+    clip-path: inset(0 -48px 100%);
   }
   to {
-    transform: none;
+    clip-path: inset(0 -48px -48px);
   }
 }
 
-@keyframes vt-album-well-collapse {
+@keyframes vt-album-well-conceal {
   from {
-    transform: none;
+    clip-path: inset(0 -48px -48px);
   }
   to {
-    transform: translateY(calc(-100% - 6px));
+    clip-path: inset(0 -48px 100%);
   }
 }
 

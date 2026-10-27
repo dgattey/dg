@@ -24,9 +24,9 @@ type Props = {
 
 /**
  * Expanded album well. The grid only mounts it once the detail has loaded, so it
- * opens at its final height in one commit: the `album-well` view transition rolls
- * it down while the cells below slide the same distance, and nothing inside it
- * resizes afterwards.
+ * opens at its final height in one commit: the `album-well` view transition wipes
+ * it open, contents still, while the cells below slide the same distance, and
+ * nothing inside it resizes afterwards.
  */
 export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
   return (
