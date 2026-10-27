@@ -1,3 +1,9 @@
+/**
+ * @jest-environment jsdom
+ */
+
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { renderToString } from 'react-dom/server';
 import { VisibleRoutes } from '../../VisibleRoutes';
 import { RouteAtlasMap } from '../RouteAtlasMap';
@@ -77,5 +83,72 @@ describe('RouteAtlasMap', () => {
     expect(html).toMatch(
       /data-transform="translate\(-?\d+\.\d{2} -?\d+\.\d{2}\) scale\(\d+\.\d{6}\)"/,
     );
+  });
+});
+
+const tileZoom = (map: HTMLElement) =>
+  Number(/\/tiles\/[^/]+\/(\d+)\//.exec(map.querySelector('img')?.getAttribute('src') ?? '')?.[1]);
+
+describe('RouteAtlasMap zoom', () => {
+  beforeEach(() => {
+    HTMLImageElement.prototype.decode = () => Promise.resolve();
+  });
+
+  it('keeps the tile layer moving with the routes until the zoomed tiles replace it', async () => {
+    const user = userEvent.setup();
+    render(
+      <RouteAtlasMap
+        bounds={BOUNDS}
+        label="Route atlas"
+        routes={ROUTES}
+        tileSource={{ mode: 'offline' }}
+      />,
+    );
+    const map = screen.getByLabelText('Route atlas');
+    const layer = map.querySelector<HTMLElement>('[data-atlas-tiles]');
+    const startZoom = tileZoom(map);
+    const records: Array<MutationRecord> = [];
+    const observer = new MutationObserver((batch) => records.push(...batch));
+    observer.observe(map, {
+      attributeFilter: ['src', 'srcset', 'style'],
+      attributeOldValue: true,
+      childList: true,
+      subtree: true,
+    });
+
+    await user.click(screen.getByLabelText('Zoom in'));
+    await waitFor(() => expect(tileZoom(map)).toBe(startZoom + 1));
+    await waitFor(() => expect(layer?.style.transform).toBe(''));
+    observer.disconnect();
+
+    // Browsers keep painting an <img>'s previous picture until its new src loads,
+    // so an img switching tiles shows the wrong tile in the new slot.
+    const imgRecords = records.filter(
+      (r) => r.type === 'attributes' && r.attributeName !== 'style',
+    );
+    const valueAfter = (r: MutationRecord, i: number) => {
+      const later = imgRecords
+        .slice(i + 1)
+        .find((n) => n.target === r.target && n.attributeName === r.attributeName);
+      if (later) return later.oldValue;
+      return r.target instanceof Element ? r.target.getAttribute(r.attributeName ?? '') : null;
+    };
+    const retargets = imgRecords.filter(
+      (r, i) => r.oldValue !== null && r.oldValue !== valueAfter(r, i),
+    );
+    const retargeted = retargets.map(
+      (r) => `${r.oldValue} -> ${valueAfter(r, imgRecords.indexOf(r))}`,
+    );
+    expect(retargeted).toEqual([]);
+
+    const layerStyles = records.filter((r) => r.target === layer && r.attributeName === 'style');
+    const layerValueAfter = (r: MutationRecord) =>
+      layerStyles[layerStyles.indexOf(r) + 1]?.oldValue ?? layer?.getAttribute('style') ?? '';
+    const firstTileSwap = records.findIndex((r) => r.type === 'childList' || retargets.includes(r));
+    const firstUntransformed = records.findIndex(
+      (r) => layerStyles.includes(r) && !layerValueAfter(r).includes('transform'),
+    );
+    expect(firstTileSwap).toBeGreaterThan(-1);
+    expect(firstUntransformed).toBeGreaterThan(firstTileSwap);
   });
 });

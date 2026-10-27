@@ -518,6 +518,12 @@ importers:
       '@dg/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      '@testing-library/react':
+        specifier: 'catalog:'
+        version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@testing-library/user-event':
+        specifier: 'catalog:'
+        version: 14.6.8(@testing-library/dom@10.4.2)
       '@types/jest':
         specifier: 'catalog:'
         version: 30.0.0
@@ -536,6 +542,9 @@ importers:
       jest:
         specifier: 'catalog:'
         version: 30.5.2(@types/node@26.6.5)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.28.1)(supports-color@8.1.1))(supports-color@8.1.1)
+      jest-environment-jsdom:
+        specifier: 'catalog:'
+        version: 30.5.2(supports-color@8.1.1)
       react-dom:
         specifier: 'catalog:'
         version: 19.3.1(react@19.3.1)
