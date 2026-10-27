@@ -1,4 +1,4 @@
-import { fetchTrackBpm, MAX_BPM, MIN_BPM, normalizeBpm } from '../fetchTrackBpm';
+import { DEEZER_TIMEOUT_MS, fetchTrackBpm, MAX_BPM, MIN_BPM, normalizeBpm } from '../fetchTrackBpm';
 
 const fetchMock = jest.fn<Promise<Response>, [RequestInfo | URL, RequestInit?]>();
 
@@ -106,6 +106,23 @@ describe('fetchTrackBpm', () => {
     fetchMock.mockResolvedValue(jsonResponse({}, 503));
 
     await expect(fetchTrackBpm('GBUM72000433')).rejects.toThrow('status 503');
+  });
+
+  it('gives up once Deezer takes longer than the timeout', async () => {
+    fetchMock.mockImplementation(
+      (_input, init) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+        }),
+    );
+
+    const startedAt = performance.now();
+    await expect(fetchTrackBpm('GBUM72000433')).rejects.toMatchObject({ name: 'TimeoutError' });
+    const elapsedMs = performance.now() - startedAt;
+
+    expect(DEEZER_TIMEOUT_MS).toBe(800);
+    expect(elapsedMs).toBeGreaterThanOrEqual(DEEZER_TIMEOUT_MS - 50);
+    expect(elapsedMs).toBeLessThan(DEEZER_TIMEOUT_MS + 500);
   });
 
   it('throws when the network request fails', async () => {

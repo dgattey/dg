@@ -15,6 +15,12 @@ const DEEZER_NO_DATA_ERROR_CODE = 800;
 const ISRC_PATTERN = /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/i;
 
 /**
+ * Deezer usually answers in 100–300ms; past this the lookup gives up so a slow
+ * Deezer adds at most this much to a song's first Now Playing read.
+ */
+export const DEEZER_TIMEOUT_MS = 800;
+
+/**
  * Folds a raw tempo into `MIN_BPM..MAX_BPM` by doubling or halving.
  * Returns null for anything that is not a positive finite number, since
  * Deezer reports an unknown tempo as `0`.
@@ -37,7 +43,7 @@ export function normalizeBpm(bpm: unknown): number | null {
  * Looks up a track's tempo on Deezer's keyless public API by ISRC, because
  * Spotify's audio-features endpoint is closed to apps created after Nov 2024.
  * Resolves null when Deezer has no tempo for the track, and throws on network,
- * HTTP, or quota failures so callers never cache a transient miss.
+ * HTTP, quota, or timeout failures so callers can cache those only briefly.
  */
 export async function fetchTrackBpm(isrc: string): Promise<number | null> {
   if (!ISRC_PATTERN.test(isrc)) {
@@ -45,7 +51,7 @@ export async function fetchTrackBpm(isrc: string): Promise<number | null> {
   }
   const response = await fetch(`${DEEZER_TRACK_ENDPOINT}isrc:${isrc.toUpperCase()}`, {
     cache: 'no-store',
-    signal: AbortSignal.timeout(3000),
+    signal: AbortSignal.timeout(DEEZER_TIMEOUT_MS),
   });
   invariant(response.ok, `Deezer track lookup failed with status ${response.status}`);
   const data: unknown = await response.json();

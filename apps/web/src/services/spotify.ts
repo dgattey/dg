@@ -23,26 +23,31 @@ async function withMissingTokenFallback<T>(promise: Promise<T>): Promise<T | nul
 }
 
 /**
- * A recording's tempo never changes, so each ISRC costs one Deezer request
- * across every server instance. Failed lookups throw and stay uncached.
+ * A recording's tempo never changes, so a result, including an unknown tempo,
+ * is cached for weeks and each ISRC costs one Deezer request across every
+ * server instance. Failures and timeouts resolve to an unknown tempo cached
+ * for about an hour, so a Deezer outage costs at most one slow request per
+ * song per hour.
  */
 async function getTrackBpm(isrc: string): Promise<number | null> {
   'use cache: remote';
-  cacheLife('weeks');
-  return await fetchTrackBpm(isrc);
+  try {
+    const bpm = await fetchTrackBpm(isrc);
+    cacheLife('weeks');
+    return bpm;
+  } catch (error) {
+    log.warn('Track tempo lookup failed; using the default bounce', { error, isrc });
+    cacheLife('hours');
+    return null;
+  }
 }
 
 async function withTrackBpm(track: Track | null): Promise<Track | null> {
   if (!track?.isrc) {
     return track;
   }
-  try {
-    const bpm = await getTrackBpm(track.isrc);
-    return bpm === null ? track : { ...track, bpm };
-  } catch (error) {
-    log.warn('Track tempo lookup failed; using the default bounce', { error });
-    return track;
-  }
+  const bpm = await getTrackBpm(track.isrc);
+  return bpm === null ? track : { ...track, bpm };
 }
 
 async function readLatestTrack(): Promise<Track | null> {
