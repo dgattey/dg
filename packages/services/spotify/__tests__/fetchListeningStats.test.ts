@@ -371,7 +371,7 @@ describe('fetchListeningStats', () => {
     });
   });
 
-  it('filters stats by rolling week and month windows and adapts breakdowns to days and shifts', async () => {
+  it('filters stats by the rolling week and calendar month and adapts breakdowns to days and shifts', async () => {
     await seedCatalog();
     await db.SpotifyPlay.bulkCreate(
       plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
@@ -413,16 +413,56 @@ describe('fetchListeningStats', () => {
       },
       plays: 1,
       range: { kind: 'month' },
-      spanDays: 30,
+      spanDays: 1,
       timeline: {
         title: 'Plays per day, this month',
       },
       tracks: 1,
     });
-    expect(monthStats?.timeline.points).toHaveLength(30);
+    expect(monthStats?.timeline.points).toHaveLength(31);
     expect(monthStats?.timeline.points.map((point) => point.tick)).toEqual(
       monthStats?.timeline.points.map((point) => String(Number(point.key.slice(8, 10)))),
     );
+  });
+
+  it('scopes This month to the Pacific calendar month of today, not the last 30 days', async () => {
+    await db.SpotifyPlay.bulkCreate(
+      [
+        play('2026-09-28T19:00:00Z', 'ls-track-1'),
+        // 11:30 PM on 30 Sep in Los Angeles, though already 1 Oct in UTC.
+        play('2026-10-01T06:30:00Z', 'ls-track-1'),
+        play('2026-10-01T07:30:00Z', 'ls-track-2'),
+        play('2026-10-10T19:00:00Z', 'ls-track-2'),
+        play('2026-10-10T20:00:00Z', 'ls-track-3'),
+        play('2026-10-26T19:00:00Z', 'ls-track-3'),
+      ].map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
+    );
+
+    const monthStats = await fetchListeningStats({ kind: 'month' }, { today: '2026-10-26' });
+    const cells = monthStats?.matrix.rows.flatMap((row) => row.cells) ?? [];
+
+    expect(monthStats).toMatchObject({
+      activeDays: 3,
+      matrix: { peakCell: { key: '2026-10-10', label: 'Sat 10 Oct 2026', plays: 2 } },
+      newArtists: { label: 'New artist this month' },
+      plays: 4,
+      spanDays: 26,
+    });
+    expect(cells.filter((cell) => cell.blank).map((cell) => cell.key)).toEqual([
+      '2026-09-28',
+      '2026-09-29',
+      '2026-09-30',
+      '2026-11-01',
+    ]);
+    expect(cells.filter((cell) => cell.plays > 0).map((cell) => cell.key)).toEqual([
+      '2026-10-01',
+      '2026-10-10',
+      '2026-10-26',
+    ]);
+
+    await expect(
+      fetchListeningStats({ kind: 'month' }, { today: '2026-11-02' }),
+    ).resolves.toBeNull();
   });
 });
 

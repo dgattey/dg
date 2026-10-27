@@ -11,12 +11,11 @@ import {
   toStatsGenres,
   toStatsTracks,
 } from './listeningStatsCatalog';
+import { ALL_TIME_FILTER, rangePlayFilter } from './listeningStatsFilters';
 import { findNewArtists } from './listeningStatsNewArtists';
 import { statsNow } from './listeningStatsPhase';
 import { fetchTopPlaylistRows, toStatsPlaylists } from './listeningStatsPlaylists';
 import {
-  rollingDaysPlayFilter,
-  type SqlPlayFilter,
   selectAlbumSessions,
   selectArtistDepth,
   selectBucketTopTracks,
@@ -31,7 +30,6 @@ import {
   selectTopAlbumIds,
   selectTopGenres,
   selectTopTrackIds,
-  yearPlayFilter,
 } from './listeningStatsQueries';
 import type { SpotifyLink } from './spotifyLinks';
 import { resolveTrackDisplays } from './trackDisplays';
@@ -73,6 +71,8 @@ export type StatsTimelinePoint = {
 };
 export type StatsTimeline = { points: Array<StatsTimelinePoint>; title: string };
 export type StatsMatrixCell = {
+  /** A spacer that pads a calendar row outside the range, with no plays of its own. */
+  blank?: true;
   key: string;
   label: string;
   phase: StatsPhase;
@@ -179,32 +179,22 @@ function sumYearsFromMonths(
   return [...byYear.entries()].sort(([a], [b]) => a - b).map(([year, plays]) => ({ plays, year }));
 }
 
-function resolvePlayFilter(range: StatsRange, latest: Date): SqlPlayFilter | undefined {
-  switch (range.kind) {
-    case 'all':
-      return undefined;
-    case 'year':
-      return yearPlayFilter(range.year);
-    case 'week':
-    case 'month':
-      return rollingDaysPlayFilter(latest, range.kind === 'week' ? 7 : 30);
-    default: {
-      const unhandled: never = range;
-      return unhandled;
-    }
-  }
-}
-
 export async function fetchListeningStats(
   range: StatsRange = { kind: 'all' },
-  options?: { knownYears?: Array<{ plays: number; year: number }> },
+  options?: {
+    knownYears?: Array<{ plays: number; year: number }>;
+    /** Pacific `YYYY-MM-DD` whose calendar month `month` covers; defaults to the latest play's day. */
+    today?: string;
+  },
 ): Promise<ListeningStats | null> {
   if (process.env.NODE_ENV !== 'test' && !process.env.DATABASE_URL) return null;
   try {
     const latestPlayedAt = await selectLatestPlayedAt();
     if (!latestPlayedAt) return null;
-    const filter = resolvePlayFilter(range, latestPlayedAt);
     const now = statsNow(latestPlayedAt);
+    const today = options?.today ?? now.day;
+    const month = today.slice(0, 7);
+    const filter = rangePlayFilter(range, latestPlayedAt, month);
     const championUnit =
       range.kind === 'all'
         ? 'year'
@@ -289,6 +279,7 @@ export async function fetchListeningStats(
       bucketTopTracks,
       dailyPlays,
       dayHourPlays,
+      month,
       monthlyPlays,
       now,
       range,
@@ -311,7 +302,7 @@ export async function fetchListeningStats(
       ...[...tracks.values()].flatMap((track) => track.artists.map((artist) => artist.id)),
       ...genres.flatMap((genre) => genre.artists.map((artist) => artist.id)),
     ]);
-    const newArtists = await findNewArtists(shownArtistIds, range, latestPlayedAt, now);
+    const newArtists = await findNewArtists(shownArtistIds, range, filter ?? ALL_TIME_FILTER, now);
 
     return {
       activeDays: summary.activeDays,
@@ -336,7 +327,12 @@ export async function fetchListeningStats(
       sessionPlays: sessions[0]?.totalSessionPlays ?? 0,
       sessions: sessions[0]?.totalSessions ?? 0,
       shelf: { albums: summary.shelfAlbums, plays: summary.shelfPlays },
-      spanDays: range.kind === 'week' ? 7 : range.kind === 'month' ? 30 : (summary.spanDays ?? 1),
+      spanDays:
+        range.kind === 'week'
+          ? 7
+          : range.kind === 'month'
+            ? Number(today.slice(8, 10))
+            : (summary.spanDays ?? 1),
       timeline,
       topPlaylists,
       tracks: summary.tracks,

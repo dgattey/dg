@@ -235,6 +235,64 @@ describe('ListeningStatsSections', () => {
     expect(container.querySelectorAll('.stats__column--current')).toHaveLength(1);
   });
 
+  it('draws This month as its calendar weeks, with blank spacers outside the month', () => {
+    const playsByDay = new Map([
+      ['2026-03-01', 4],
+      ['2026-03-03', 9],
+      ['2026-03-09', 2],
+    ]);
+    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const mondays = ['2026-02-23', '2026-03-02', '2026-03-09', '2026-03-16', '2026-03-23'];
+    const rows = [...mondays, '2026-03-30'].map((monday) => ({
+      cells: weekdays.map((weekday, i) => {
+        const day = new Date(Date.parse(`${monday}T12:00:00Z`) + i * 86_400_000)
+          .toISOString()
+          .slice(0, 10);
+        const phase = day < '2026-03-09' ? 'past' : day === '2026-03-09' ? 'current' : 'future';
+        return day.startsWith('2026-03')
+          ? {
+              key: day,
+              label: `${weekday} ${Number(day.slice(8))} Mar 2026`,
+              phase,
+              plays: playsByDay.get(day) ?? 0,
+            }
+          : { blank: true, key: day, label: '', phase, plays: 0 };
+      }),
+      key: monday,
+      label: monday === '2026-02-23' ? '1 Mar' : `${Number(monday.slice(8))} Mar`,
+    })) satisfies ListeningStats['matrix']['rows'];
+    const monthStats: ListeningStats = {
+      ...stats,
+      activeDays: 3,
+      matrix: {
+        columns: weekdays.map((day) => ({ full: day, key: day, short: day.charAt(0) })),
+        peakCell: { key: '2026-03-03', label: 'Tue 3 Mar 2026', plays: 9 },
+        rows,
+        title: 'Every day, this month',
+      },
+      range: { kind: 'month' },
+      spanDays: 9,
+    };
+    const { container } = render(<ListeningStatsSections stats={monthStats} />);
+    const card = container.querySelector<HTMLElement>('.stats__monthly');
+    if (!card) {
+      throw new Error('Expected the activity matrix card');
+    }
+
+    const blanks = card.querySelectorAll('.stats__monthCell--blank');
+    expect(blanks).toHaveLength(11);
+    expect([...blanks].every((cell) => cell.tagName === 'SPAN')).toBe(true);
+    expect(card.querySelectorAll('.stats__monthCell--future')).toHaveLength(22);
+    expect(
+      [...card.querySelectorAll('.stats__monthRowLabel')].map((label) => label.textContent),
+    ).toEqual(['1 Mar', '2 Mar', '9 Mar', '16 Mar', '23 Mar', '30 Mar']);
+    expect(card.querySelector('.stats__cardStamp')).toHaveTextContent('Active days3');
+    expect(card.querySelector('.stats__monthReadout')).toHaveTextContent(
+      'Peak Tue 3 Mar 2026: 9 plays',
+    );
+    expect(screen.getByText('3 of 9 days')).toBeInTheDocument();
+  });
+
   it('labels only the busiest hour on the clock by default and updates on hover', async () => {
     const user = userEvent.setup();
     const { container } = render(<ListeningStatsSections stats={stats} />);

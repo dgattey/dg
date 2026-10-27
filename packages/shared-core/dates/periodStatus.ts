@@ -29,6 +29,12 @@ function calendarDay(now: number, timeZone: string): CalendarDay {
   return { day: parts.day ?? 1, month: parts.month ?? 1, year: parts.year ?? 1970 };
 }
 
+/** The `YYYY-MM-DD` calendar day `now` falls on in `timeZone`. */
+export function calendarDayKey(now: number, timeZone = 'UTC'): string {
+  const { day, month, year } = calendarDay(now, timeZone);
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
 const compare = (a: number, b: number): PeriodStatus =>
   a < b ? 'past' : a > b ? 'future' : 'current';
 

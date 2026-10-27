@@ -41,6 +41,11 @@ function addDaysIso(dayIso: string, deltaDays: number): string {
   return new Date(ms).toISOString().slice(0, 10);
 }
 
+function lastDayOfMonth(month: string): string {
+  const [year = 1970, monthOfYear = 1] = month.split('-').map(Number);
+  return new Date(Date.UTC(year, monthOfYear, 0, 12)).toISOString().slice(0, 10);
+}
+
 function isoWeekday(dayIso: string): number {
   const utcDay = new Date(`${dayIso}T12:00:00Z`).getUTCDay();
   return utcDay === 0 ? 7 : utcDay;
@@ -93,6 +98,7 @@ export function buildRangeBreakdowns({
   bucketTopTracks,
   dailyPlays,
   dayHourPlays,
+  month,
   monthlyPlays,
   now,
   range,
@@ -102,6 +108,8 @@ export function buildRangeBreakdowns({
   bucketTopTracks: ReadonlyArray<{ bucket: string; plays: number; trackId: string }>;
   dailyPlays: ReadonlyArray<{ day: string; plays: number }>;
   dayHourPlays: ReadonlyArray<{ day: string; hour: number; plays: number }>;
+  /** The Pacific calendar month (`YYYY-MM`) the `month` range covers. */
+  month: string;
   monthlyPlays: ReadonlyArray<{ month: number; plays: number; year: number }>;
   now: StatsNow;
   range: StatsRange;
@@ -224,27 +232,36 @@ export function buildRangeBreakdowns({
   const playsByDay = new Map(dailyPlays.map((row) => [row.day, row.plays]));
 
   if (range.kind === 'month') {
-    const days = Array.from({ length: 30 }, (_, idx) => addDaysIso(anchorDay, idx - 29));
-    const firstDay = days[0] ?? anchorDay;
-    const firstMonday = addDaysIso(firstDay, -(isoWeekday(firstDay) - 1));
-    const lastMonday = addDaysIso(anchorDay, -(isoWeekday(anchorDay) - 1));
+    const firstDay = `${month}-01`;
+    const lastDay = lastDayOfMonth(month);
+    const days: Array<string> = [];
+    for (let cursor = firstDay; cursor <= lastDay; cursor = addDaysIso(cursor, 1)) {
+      days.push(cursor);
+    }
     const weekMondays: Array<string> = [];
-    for (let cursor = firstMonday; cursor <= lastMonday; cursor = addDaysIso(cursor, 7)) {
+    for (
+      let cursor = addDaysIso(firstDay, 1 - isoWeekday(firstDay));
+      cursor <= lastDay;
+      cursor = addDaysIso(cursor, 7)
+    ) {
       weekMondays.push(cursor);
     }
-    const inWindow = new Set(days);
     const matrixRows: Array<StatsMatrixRow> = weekMondays.map((mondayIso) => ({
       cells: WEEKDAY_ABBR.map((_, dowIdx) => {
         const cellDay = addDaysIso(mondayIso, dowIdx);
+        const phase = phaseOf(cellDay, now);
+        if (cellDay < firstDay || cellDay > lastDay) {
+          return { blank: true, key: cellDay, label: '', phase, plays: 0 };
+        }
         return {
           key: cellDay,
           label: fullDateLabel(cellDay),
-          phase: phaseOf(cellDay, now),
-          plays: inWindow.has(cellDay) ? (playsByDay.get(cellDay) ?? 0) : 0,
+          phase,
+          plays: playsByDay.get(cellDay) ?? 0,
         };
       }),
       key: mondayIso,
-      label: shortDateBadge(mondayIso),
+      label: shortDateBadge(mondayIso < firstDay ? firstDay : mondayIso),
     }));
     return {
       champions: {

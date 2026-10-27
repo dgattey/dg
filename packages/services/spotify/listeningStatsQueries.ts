@@ -3,6 +3,12 @@ import 'server-only';
 import { dbClient, QueryTypes } from '@dg/db';
 import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import * as v from 'valibot';
+import {
+  ALL_TIME_FILTER,
+  andClause,
+  type SqlPlayFilter,
+  whereClause,
+} from './listeningStatsFilters';
 
 /** Days, hours, and weeks are bucketed where the listening happened. */
 const LOCAL_PLAYED_AT = `("playedAt" AT TIME ZONE '${SITE_TIME_ZONE}')`;
@@ -18,43 +24,6 @@ const TOP_GENRES_LIMIT = 8;
 
 const int = v.number();
 const artistRef = v.object({ id: v.string(), name: v.string(), url: v.nullable(v.string()) });
-
-export type SqlPlayFilter = {
-  /** SQL predicate over `{alias}."playedAt"` using only index-friendly timestamp bounds. */
-  predicate: (alias?: string) => string;
-};
-
-export const ALL_TIME_FILTER: SqlPlayFilter = { predicate: () => '' };
-const columnRef = (alias?: string): string => (alias ? `${alias}."playedAt"` : '"playedAt"');
-export const whereClause = (filter: SqlPlayFilter, alias?: string): string => {
-  const cond = filter.predicate(alias);
-  return cond ? `WHERE ${cond}` : '';
-};
-const andClause = (filter: SqlPlayFilter, alias?: string): string => {
-  const cond = filter.predicate(alias);
-  return cond ? `AND ${cond}` : '';
-};
-
-export function yearPlayFilter(year: number): SqlPlayFilter {
-  const safeYear = Math.trunc(year);
-  const startExpr = `('${safeYear}-01-01 00:00:00'::timestamp AT TIME ZONE '${SITE_TIME_ZONE}')`;
-  const endExpr = `('${safeYear + 1}-01-01 00:00:00'::timestamp AT TIME ZONE '${SITE_TIME_ZONE}')`;
-  return {
-    predicate: (alias) =>
-      `${columnRef(alias)} >= ${startExpr} AND ${columnRef(alias)} < ${endExpr}`,
-  };
-}
-
-export function rollingDaysPlayFilter(anchor: Date, days: number): SqlPlayFilter {
-  const safeDays = Math.max(1, Math.trunc(days));
-  const iso = anchor.toISOString();
-  const startExpr = `((('${iso}'::timestamptz AT TIME ZONE '${SITE_TIME_ZONE}')::date - ${safeDays - 1})::timestamp AT TIME ZONE '${SITE_TIME_ZONE}')`;
-  const endExpr = `'${iso}'::timestamptz`;
-  return {
-    predicate: (alias) =>
-      `${columnRef(alias)} >= ${startExpr} AND ${columnRef(alias)} <= ${endExpr}`,
-  };
-}
 
 export async function select<Schema extends v.GenericSchema>(
   sql: string,
