@@ -71,7 +71,6 @@
 .music__cardInner {
   display: block;
   padding: 14px 14px 18px;
-  overflow: clip;
 }
 .music__albumLink {
   --album-fan-spread: 1;

@@ -32,6 +32,11 @@ function offsetStyle(treatment: CollageCardTreatment): CardOffsetStyle {
   };
 }
 
+/**
+ * Album paper is unclipped: the fanned stack already sits inside its padding,
+ * and a rounded clip between the tilted paper and the tilted art crashes
+ * Firefox whenever a cover inside takes a view-transition name (the album morph).
+ */
 export function CollageAlbumPaper({
   children,
   selected = false,
@@ -45,7 +50,7 @@ export function CollageAlbumPaper({
     <PaperCard
       className={selected ? `music__card music__selected` : 'music__card'}
       edge="quad-a"
-      innerClassName="music__cardInner"
+      innerClassName="music__cardInner paperInnerUnclipped"
       style={offsetStyle(treatment)}
       tiltDeg={treatment.tiltDeg}
       tone={treatment.tone}
