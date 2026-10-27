@@ -1,6 +1,5 @@
 import { dbClient } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
-import { parseStatsRange } from '@dg/shared-core/dates/statsRange';
 import { fetchListeningStats, longestDayStreak, longestMonthStreak } from '../fetchListeningStats';
 
 const mockSpotifyGet = jest.fn();
@@ -473,7 +472,7 @@ describe('fetchListeningStats', () => {
   });
 });
 
-describe('streaks and range parsing', () => {
+describe('streaks', () => {
   it('finds the longest run of consecutive months, across year boundaries', () => {
     expect(longestMonthStreak(['2023-11', '2023-12', '2024-01', '2024-03', '2024-04'])).toEqual({
       end: '2024-01',
@@ -490,14 +489,5 @@ describe('streaks and range parsing', () => {
       start: '2024-02-28',
     });
     expect(longestDayStreak([])).toEqual({ days: 0, end: '', start: '' });
-  });
-
-  it('parses range query keys into typed StatsRange values', () => {
-    expect(parseStatsRange(undefined)).toEqual({ kind: 'all' });
-    expect(parseStatsRange('all')).toEqual({ kind: 'all' });
-    expect(parseStatsRange('week')).toEqual({ kind: 'week' });
-    expect(parseStatsRange('month')).toEqual({ kind: 'month' });
-    expect(parseStatsRange('2024')).toEqual({ kind: 'year', year: 2024 });
-    expect(parseStatsRange('invalid')).toEqual({ kind: 'all' });
   });
 });

@@ -203,7 +203,6 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
     Math.max(...stats.topArtists.map(pick));
   const highlight = (value: number, max: number) =>
     cx('stats__cell', value === max && 'stats__cell--max');
-  const { loyalty } = stats;
   const topActive = most((a) => a.active);
   return (
     <PaperCard
@@ -217,7 +216,7 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
               Loyal for
             </span>
             <span className="stats__cardStampValue" data-typography="badge">
-              {formatLoyaltyCount(topActive, loyalty.unit)}
+              {formatLoyaltyCount(topActive, stats.loyalty.unit)}
             </span>
           </Stub>
         ) : undefined
@@ -225,7 +224,7 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
       tiltDeg={-0.7}
     >
       <CardHead
-        aside={`Active ${formatLoyaltyShare(loyalty.active, loyalty)}`}
+        aside={`Active ${formatLoyaltyShare(stats.loyalty.active, stats.loyalty)}`}
         title="Depth and loyalty"
       />
       <table className="stats__table" data-typography="prose">
@@ -247,7 +246,7 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
               Per track
             </th>
             <th className="stats__cell stats__loyaltyHead" data-typography="meta" scope="col">
-              {loyalty.unit === 'day' ? 'Days' : 'Months'}
+              {stats.loyalty.unit === 'day' ? 'Days' : 'Months'}
             </th>
           </tr>
         </thead>
@@ -282,7 +281,7 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
                 <span
                   aria-hidden="true"
                   className="stats__meter"
-                  style={bar(artist.active, loyalty.possible)}
+                  style={bar(artist.active, stats.loyalty.possible)}
                 />
                 <span className={highlight(artist.active, topActive)} data-typography="row-title">
                   {formatCount(artist.active)}
