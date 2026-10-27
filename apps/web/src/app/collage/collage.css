@@ -394,7 +394,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
   pointer-events: none;
 }
 
-@supports (animation-timeline: view()) and (not (-moz-appearance: none)) {
+@supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .cutOut.cutDepthMedium,
     .cutOut.cutDepthFast {
