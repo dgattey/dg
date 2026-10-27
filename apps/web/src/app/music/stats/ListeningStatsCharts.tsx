@@ -13,6 +13,12 @@ import {
   formatPercent,
   formatRangeSuffix,
 } from './listeningStatsFormat';
+import {
+  formatPopularity,
+  PopularityLine,
+  PopularityNote,
+  popularityByYearKey,
+} from './PopularityLine';
 import { bar, CardHead } from './StatsCardParts';
 import { ArtistLinks } from './StatsLinks';
 import { Stub } from './StatsShapes';
@@ -31,6 +37,12 @@ export function TimelineBarsCard({
   const peak = points.find((point) => point.plays === max && point.plays > 0) ?? points[0];
   const isDense = points.length > 16;
   const activePoint = hoveredKey ? points.find((point) => point.key === hoveredKey) : undefined;
+  const popularity = popularityByYearKey(stats.popularity);
+  const activePopularity = activePoint ? popularity.get(activePoint.key) : undefined;
+  const describe = (point: (typeof points)[number]) => {
+    const pointPopularity = popularity.get(point.key);
+    return `${formatCount(point.plays)} plays${pointPopularity ? `, ${formatPopularity(pointPopularity)}` : ''}`;
+  };
 
   return (
     <PaperCard
@@ -55,6 +67,7 @@ export function TimelineBarsCard({
               {formatCount(activePoint.plays)} plays,{' '}
               {formatHours((activePoint.plays * stats.minutesPerPlay) / 60)} ·{' '}
               {formatPercent(activePoint.plays, totalPlays)}
+              {activePopularity ? ` · ${formatPopularity(activePopularity)}` : null}
             </strong>
           ) : peak ? (
             <strong className="stats__peak">
@@ -86,6 +99,7 @@ export function TimelineBarsCard({
                 aria-label={`${point.label}: not here yet`}
                 className="stats__column stats__column--future"
                 key={point.key}
+                style={{ gridColumn: idx + 1 }}
               >
                 <span className="stats__columnValue" data-typography="meta" />
                 <span aria-hidden="true" className="stats__columnBar" />
@@ -97,7 +111,7 @@ export function TimelineBarsCard({
           }
           return (
             <li
-              aria-label={`${point.label}: ${formatCount(point.plays)} plays`}
+              aria-label={`${point.label}: ${describe(point)}`}
               className={cx(
                 'stats__column',
                 isPeak && 'stats__column--peak',
@@ -120,6 +134,7 @@ export function TimelineBarsCard({
                 setHoveredKey(point.key);
               }}
               onMouseLeave={() => setHoveredKey(null)}
+              style={{ gridColumn: idx + 1 }}
             >
               <span className="stats__columnValue" data-typography="meta">
                 {showValue ? formatCompact(point.plays) : null}
@@ -129,11 +144,17 @@ export function TimelineBarsCard({
                 <span className="chrome__srOnly">{point.label}</span>
                 <span aria-hidden="true">{showTick ? point.tick : ''}</span>
               </span>
-              <span className="chrome__srOnly">: {formatCount(point.plays)} plays</span>
+              <span className="chrome__srOnly">: {describe(point)}</span>
             </li>
           );
         })}
+        {popularity.size > 0 ? (
+          <PopularityLine activeKey={hoveredKey} byKey={popularity} points={points} />
+        ) : null}
       </ol>
+      {stats.popularity && popularity.size > 0 ? (
+        <PopularityNote byKey={popularity} points={points} popularity={stats.popularity} />
+      ) : null}
     </PaperCard>
   );
 }

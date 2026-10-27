@@ -283,23 +283,25 @@
   color: var(--ochre);
 }
 .stats__columns {
+  --column-gap: 10px;
   display: grid;
+  grid-template-rows: auto 196px auto;
   grid-template-columns: repeat(var(--count), minmax(0, 1fr));
-  column-gap: 10px;
-  align-items: end;
+  gap: 6px var(--column-gap);
+  align-content: end;
   height: 262px;
   padding: 0;
   margin: 24px 0 0;
   list-style: none;
 }
 .stats__columns--dense {
-  column-gap: 4px;
+  --column-gap: 4px;
 }
 .stats__column {
   display: grid;
-  grid-template-rows: auto 196px auto;
+  grid-template-rows: subgrid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
+  grid-row: 1 / -1;
   justify-items: center;
   cursor: pointer;
   border-radius: 6px;
@@ -363,6 +365,69 @@
 .stats__column--active .stats__columnValue,
 .stats__column--active .stats__columnTick {
   color: var(--ochre);
+}
+
+/* Popularity line over the year timeline's bar row */
+.stats__popularity {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-row: 2;
+  grid-column: 1 / -1;
+  pointer-events: none;
+}
+.stats__popularityCell {
+  position: relative;
+}
+.stats__popularitySegment {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: calc(100% + var(--column-gap));
+  height: 100%;
+  overflow: visible;
+}
+.stats__popularitySegment line {
+  stroke: var(--vermilion);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+}
+.stats__popularitySegment--current line {
+  stroke-dasharray: 5px 5px;
+}
+.stats__popularityDot {
+  position: absolute;
+  bottom: calc(var(--popularity) * 100%);
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  background: var(--vermilion);
+  border: 2px solid var(--on);
+  border-radius: 50%;
+  translate: -50% 50%;
+  transition: scale 200ms ease;
+}
+.stats__popularityDot--current {
+  background: var(--on);
+  border-color: var(--vermilion);
+}
+.stats__popularityDot--active {
+  scale: 1.5;
+}
+.stats__popularityNote {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 14px 0 0;
+  color: var(--soft);
+}
+.stats__popularityKey {
+  flex: none;
+  width: 18px;
+  height: 0;
+  border-top: 2.5px solid var(--vermilion);
+  translate: 0 -0.3em;
 }
 
 /* Genres card (real Spotify genres) */
@@ -819,7 +884,7 @@
     padding: var(--collage-card-pad-mobile);
   }
   .stats__columns {
-    column-gap: 4px;
+    --column-gap: 4px;
   }
   .stats__column:nth-child(even) .stats__columnTick {
     visibility: hidden;

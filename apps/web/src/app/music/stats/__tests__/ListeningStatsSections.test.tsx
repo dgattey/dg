@@ -88,6 +88,42 @@ describe('ListeningStatsSections', () => {
     expect(container.querySelectorAll('.stats__column--current')).toHaveLength(1);
   });
 
+  it('draws popularity over the year bars, dashing years that read current popularity', () => {
+    const { container } = render(<ListeningStatsSections stats={stats} />);
+
+    expect(screen.getByLabelText('2011: 400 plays, 41% popularity (current)')).toBeInTheDocument();
+    expect(screen.getByLabelText('2012: 600 plays, 63% popularity')).toBeInTheDocument();
+    expect(container.querySelectorAll('.stats__popularityDot')).toHaveLength(2);
+    expect(container.querySelectorAll('.stats__popularitySegment--current')).toHaveLength(1);
+    expect(
+      screen.getByText(
+        /average Spotify popularity \(0–100%\) of the songs played each year, weighted by plays\. Dashed years \(’11\) use each song’s current popularity, tracked since Jun 2012/,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Scores cover/)).not.toBeInTheDocument();
+  });
+
+  it('says how many plays the line covers and leaves it out without scores', () => {
+    const partial = {
+      ...stats,
+      popularity: {
+        firstCapturedOn: '2012-06-01',
+        source: 'spotify' as const,
+        years: [{ atPlayShare: 1, popularity: 50, scoredShare: 0.5, year: 2012 }],
+      },
+    };
+    const { unmount } = render(<ListeningStatsSections stats={partial} />);
+
+    expect(screen.getByText(/Scores cover 30% of plays so far\./)).toBeInTheDocument();
+    expect(screen.queryByText(/Dashed years/)).not.toBeInTheDocument();
+    unmount();
+
+    const { container } = render(<ListeningStatsSections stats={{ ...stats, popularity: null }} />);
+
+    expect(container.querySelector('.stats__popularity')).toBeNull();
+    expect(screen.queryByText(/Spotify popularity/)).not.toBeInTheDocument();
+  });
+
   it('draws This month as its calendar weeks, with blank spacers outside the month', () => {
     const playsByDay = new Map([
       ['2026-03-01', 4],
@@ -323,9 +359,11 @@ describe('ListeningStatsSections', () => {
     expect(screen.queryByText('One track, one day')).not.toBeInTheDocument();
     expect(screen.queryByText(/Hover or tap/i)).not.toBeInTheDocument();
 
-    const year2011 = screen.getByLabelText('2011: 400 plays');
+    const year2011 = screen.getByLabelText('2011: 400 plays, 41% popularity (current)');
     await user.hover(year2011);
-    expect(screen.getByText(/2011: 400 plays/)).toBeInTheDocument();
+    expect(container.querySelector('.stats__years .stats__peak')).toHaveTextContent(
+      '2011: 400 plays, 26h · 40.0% · 41% popularity (current)',
+    );
 
     const july2011 = screen.getByLabelText('Jul 2011: 180 plays');
     await user.hover(july2011);

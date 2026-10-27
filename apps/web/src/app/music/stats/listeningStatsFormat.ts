@@ -1,5 +1,5 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
-import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
+import { formatYearTick, SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import type { StatsRange } from '@dg/shared-core/dates/statsRange';
 import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 
@@ -55,6 +55,24 @@ export function formatPacificDay(timestamp: string): string {
 /** `2011-07` → `Jul 2011`. */
 export function formatMonth(month: string): string {
   return monthFormat.format(new Date(`${month}-15T12:00:00Z`));
+}
+
+/** `[2011, 2012, 2013, 2016]` → `’11–’13, ’16`. */
+export function formatYearSpans(years: ReadonlyArray<number>): string {
+  const spans: Array<[number, number]> = [];
+  for (const year of [...years].sort((a, b) => a - b)) {
+    const last = spans.at(-1);
+    if (last && year === last[1] + 1) {
+      last[1] = year;
+    } else {
+      spans.push([year, year]);
+    }
+  }
+  return spans
+    .map(([start, end]) =>
+      start === end ? formatYearTick(start) : `${formatYearTick(start)}–${formatYearTick(end)}`,
+    )
+    .join(', ');
 }
 
 /** A timestamp as the Pacific month it fell in, `Jul 2011`. */

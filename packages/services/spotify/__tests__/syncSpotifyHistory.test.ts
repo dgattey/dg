@@ -18,6 +18,13 @@ jest.mock('../spotifyClient', () => ({
   getSpotifyClient: () => ({ get: mockSpotifyGet }),
 }));
 
+const mockCaptureTrackPopularity = jest.fn();
+
+jest.mock('../trackPopularity', () => ({
+  backfillTrackPopularity: jest.fn(async () => ({ deezer: 0, spotify: 0, stoppedEarly: false })),
+  captureTrackPopularity: (...args: Array<unknown>) => mockCaptureTrackPopularity(...args),
+}));
+
 const PREFIX = 'sync';
 
 const buildTrackApi = (overrides: Partial<Record<string, unknown>> = {}) => ({
@@ -57,6 +64,7 @@ const db = setupTestDatabase();
 
 beforeEach(async () => {
   jest.clearAllMocks();
+  mockCaptureTrackPopularity.mockResolvedValue({ deezer: 0, spotify: 0, stoppedEarly: false });
   await db.SpotifyPlay.destroy({ where: {} });
 });
 
@@ -95,6 +103,7 @@ describe('syncSpotifyPlaysSince', () => {
     });
     expect(insertedRow?.albumId).toBe(`${PREFIX}-album-id`);
     expect(insertedRow?.playedAt.toISOString()).toBe('2025-01-02T00:00:00.000Z');
+    expect(mockCaptureTrackPopularity).toHaveBeenCalledWith([`${PREFIX}-track-id`]);
   });
 
   it('syncs plays since the latest timestamp', async () => {

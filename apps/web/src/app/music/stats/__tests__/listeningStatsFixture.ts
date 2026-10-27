@@ -96,6 +96,14 @@ export const stats: ListeningStats = {
   newArtists: { ids: ['fireboy'], label: 'New artist this year' },
   onRepeat: [{ plays: 36, track: track('jet-pack'), week: '2017-05-29' }],
   plays: 1_000,
+  popularity: {
+    firstCapturedOn: '2012-06-01',
+    source: 'spotify',
+    years: [
+      { atPlayShare: 0, popularity: 41.2, scoredShare: 0.9, year: 2011 },
+      { atPlayShare: 0.8, popularity: 63, scoredShare: 1, year: 2012 },
+    ],
+  },
   range: { kind: 'all' },
   sessionPlays: 240,
   sessions: 30,
