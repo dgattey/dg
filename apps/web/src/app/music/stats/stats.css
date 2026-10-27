@@ -537,6 +537,9 @@
   background: transparent;
   border: 1.5px dotted color-mix(in oklab, var(--on) 38%, transparent);
 }
+.stats__monthCell--blank {
+  visibility: hidden;
+}
 .stats__monthCell--current {
   outline: 2px dashed var(--on);
   outline-offset: 1px;

@@ -127,6 +127,15 @@ export function ActivityMatrixCard({
                 const tier = matrixTier(cell.plays, maxPlays);
                 const isPeak = peakCell?.key === cell.key && cell.plays > 0;
                 const isHovered = hoveredCell?.key === cell.key;
+                if (cell.blank) {
+                  return (
+                    <span
+                      aria-hidden="true"
+                      className="stats__monthCell stats__monthCell--blank"
+                      key={cell.key}
+                    />
+                  );
+                }
                 if (cell.phase === 'future' || cell.plays <= 0) {
                   return (
                     <span

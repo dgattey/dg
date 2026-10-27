@@ -1,4 +1,10 @@
-import { formatUtcShortDate, formatYearTick, periodStatus, SITE_TIME_ZONE } from '../periodStatus';
+import {
+  calendarDayKey,
+  formatUtcShortDate,
+  formatYearTick,
+  periodStatus,
+  SITE_TIME_ZONE,
+} from '../periodStatus';
 import { parseStatsRange, parseStatsRangeKey, statsRangeKey } from '../statsRange';
 
 // Sat Oct 24 2026, 06:00 UTC, which is still Fri Oct 23 in Los Angeles.
@@ -32,6 +38,14 @@ describe('periodStatus', () => {
 
   it('treats keys that are not calendar buckets as past', () => {
     expect(periodStatus('morning', NOW)).toBe('past');
+  });
+});
+
+describe('calendarDayKey', () => {
+  it('names the local calendar day, rolling over at local midnight', () => {
+    expect(calendarDayKey(NOW)).toBe('2026-10-24');
+    expect(calendarDayKey(NOW, SITE_TIME_ZONE)).toBe('2026-10-23');
+    expect(calendarDayKey(Date.parse('2026-11-01T07:30:00Z'), SITE_TIME_ZONE)).toBe('2026-11-01');
   });
 });
 
