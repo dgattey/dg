@@ -131,7 +131,7 @@ export function simplifyLine<T>(
   return points.filter((_, index) => keep[index] === 1);
 }
 
-function project([latitude, longitude]: Point): ProjectedPoint {
+export function project([latitude, longitude]: Point): ProjectedPoint {
   const clampedLatitude = Math.max(
     -MAX_MERCATOR_LATITUDE,
     Math.min(MAX_MERCATOR_LATITUDE, latitude),
@@ -144,7 +144,7 @@ function project([latitude, longitude]: Point): ProjectedPoint {
   };
 }
 
-function unproject({ x, y }: ProjectedPoint): Point {
+export function unproject({ x, y }: ProjectedPoint): Point {
   const longitude = x * 360 - 180;
   const latitudeRadians = Math.atan(Math.sinh(Math.PI * (1 - 2 * y)));
   return [(latitudeRadians * 180) / Math.PI, longitude];

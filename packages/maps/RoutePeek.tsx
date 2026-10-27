@@ -4,7 +4,7 @@ import { getTileSource } from './src/getTileSource';
 import { RouteMap } from './src/RouteMap';
 import { decodeRoutes, frameAround, framePaths, homeBounds, type MapRoute } from './src/routeFrame';
 
-const FRAME = { height: 288, padding: 16, width: 378 };
+const FRAME = { height: 300, padding: 16, width: 426 };
 
 /**
  * A card-sized glimpse of every route around where most of them start. Paths

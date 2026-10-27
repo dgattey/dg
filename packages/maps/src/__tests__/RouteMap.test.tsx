@@ -1,10 +1,6 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import { renderToString } from 'react-dom/server';
 import { RouteMap } from '../RouteMap';
 import type { RouteFrame } from '../routeFrame';
-
-const mapsCss = readFileSync(path.join(__dirname, '../../maps.css'), 'utf8');
 
 const frame: RouteFrame = { center: [37.77, -122.42], height: 320, width: 420, zoom: 11 };
 
@@ -37,20 +33,14 @@ describe('RouteMap', () => {
     }
   });
 
-  it('locks pigeon-maps container size to 100% so rotated cards never trigger a ResizeObserver zoom loop', () => {
+  it('positions tiles in card-relative percentages so rotated cards and all breakpoints render without ResizeObserver reflow', () => {
     const html = serverMarkup();
 
-    expect(html).toContain('<div data-map-tile-layer=""><div style="width:100%;height:100%;');
-    expect(html).not.toContain('<div data-map-tile-layer=""><div style="width:420px;height:320px;');
-
-    const tileLayerDivBlock =
-      mapsCss.match(/\[data-map-tile-layer\]\s*>\s*div\s*\{([^}]*)\}/)?.[1] ?? '';
-    expect(tileLayerDivBlock).toContain('width: 100% !important;');
-    expect(tileLayerDivBlock).toContain('height: 100% !important;');
-    expect(tileLayerDivBlock).toContain('background-color: transparent !important;');
-
-    const atlasTilesDivBlock =
-      mapsCss.match(/\[data-atlas-tiles\]\s*>\s*div\s*\{([^}]*)\}/)?.[1] ?? '';
-    expect(atlasTilesDivBlock).toContain('background-color: transparent !important;');
+    expect(html).toContain('data-atlas-tile-stage=""');
+    expect(html).toMatch(
+      /--box-transform:translate3d\(-?\d+\.\d{4}%, -?\d+\.\d{4}%, 0px\) scale\(\d+\.\d{6}, \d+\.\d{6}\)/,
+    );
+    expect(html).toContain('--tile-w:100%');
+    expect(html).toContain('--tile-h:100%');
   });
 });

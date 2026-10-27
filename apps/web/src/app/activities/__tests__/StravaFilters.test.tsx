@@ -58,13 +58,14 @@ const renderFilters = (
     </StravaFilters>,
   );
   const inkedTones = () =>
-    [...container.querySelectorAll('path[data-tone]')].map((path) =>
-      path.getAttribute('data-tone'),
-    );
-  const inkedPaths = () =>
-    [...container.querySelectorAll('[data-atlas-overlay] > g')].map((group) =>
-      group.getAttribute('transform'),
-    );
+    container
+      .querySelector('[data-atlas-canvas]')
+      ?.getAttribute('data-tones')
+      ?.split(',')
+      .filter(Boolean) ?? [];
+  const inkedPaths = () => [
+    container.querySelector('[data-atlas-canvas]')?.getAttribute('data-transform'),
+  ];
   return { inkedPaths, inkedTones };
 };
 
