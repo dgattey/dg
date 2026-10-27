@@ -144,10 +144,14 @@
 .home__workGrid > [data-slot="c1"] {
   margin-top: 96px;
 }
-/* Shares the big map's row and drop, so the two cards' middles line up. */
+/*
+ * Shares the big map's row and drop, so the two cards' middles line up. It takes
+ * the column beside the big map but leaves a gutter of blue against it.
+ */
 .home__workGrid > [data-slot="ws"] {
   align-self: center;
   margin-top: var(--atlas-drop);
+  margin-left: var(--gap);
 }
 .home__codaGrid {
   grid-template-areas: ". . . li li li li . . . . .";
@@ -551,7 +555,7 @@
   /* Settles beside the Strava card's middle instead of leaving a gap below it. */
   .home__workGrid > [data-slot="ws"] {
     align-self: center;
-    margin-top: 0;
+    margin: 0;
   }
   .home__spotifySlot {
     margin-top: calc(-1 * var(--sp-top) - 168px);
