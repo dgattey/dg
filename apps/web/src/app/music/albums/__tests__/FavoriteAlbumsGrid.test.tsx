@@ -16,7 +16,6 @@ const detailFor = (id: string, name: string, trackTitle: string): AlbumDetail =>
   imageUrl: `https://i.scdn.co/image/${id}`,
   label: null,
   name,
-  popularity: 50,
   releaseDate: '2020-01-01',
   totalTracks: 1,
   tracks: [

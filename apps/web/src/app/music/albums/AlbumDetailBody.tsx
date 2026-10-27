@@ -1,7 +1,7 @@
 import type { AlbumDetail, AlbumDetailArtist } from '@dg/services/spotify/albumDetailTypes';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Link } from '@dg/ui/dependent/Link';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 function formatDuration(totalMs: number): string {
   const totalSeconds = Math.round(totalMs / 1000);
@@ -65,23 +65,9 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
             </span>
           </Tooltip>
         </h3>
-        <div className="music__wellFacts">
-          <p data-typography="meta">{albumFacts(album).join(' · ')}</p>
-          {album.popularity == null ? null : (
-            <div
-              aria-label={`Popularity ${album.popularity} out of 100`}
-              className="music__wellPopularity"
-              role="img"
-            >
-              <div className="music__wellPopularityTrack">
-                <div
-                  className="music__wellPopularityFill"
-                  style={{ '--popularity': `${album.popularity}%` } as CSSProperties}
-                />
-              </div>
-            </div>
-          )}
-        </div>
+        <p className="music__wellFacts" data-typography="meta">
+          {albumFacts(album).join(' · ')}
+        </p>
       </div>
       <ol className="music__wellTracks" data-typography="prose">
         {album.tracks.map((track) => (

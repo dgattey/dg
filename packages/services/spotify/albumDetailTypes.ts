@@ -24,7 +24,6 @@ export type AlbumDetail = {
   url: string;
   releaseDate: string | null;
   label: string | null;
-  popularity: number | null;
   totalTracks: number;
   durationMs: number;
   artists: Array<AlbumDetailArtist>;

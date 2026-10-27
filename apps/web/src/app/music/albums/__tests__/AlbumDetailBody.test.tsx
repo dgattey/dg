@@ -16,7 +16,6 @@ const album: AlbumDetail = {
   imageUrl: 'https://i.scdn.co/image/album-1',
   label: 'Example Records',
   name: 'Example Album',
-  popularity: 55,
   releaseDate: '2019-04-12',
   totalTracks: 2,
   tracks: [
@@ -111,13 +110,6 @@ describe('AlbumDetailBody', () => {
     expect(screen.getByText(/2019/)).toBeInTheDocument();
     expect(screen.getByText(/2 tracks/)).toBeInTheDocument();
     expect(screen.queryByText(/Example Records/)).not.toBeInTheDocument();
-  });
-
-  it('shows popularity as an accessible meter', () => {
-    render(<AlbumDetailBody album={album} />);
-
-    const meter = screen.getByRole('img', { name: 'Popularity 55 out of 100' });
-    expect(meter).toBeInTheDocument();
   });
 
   it('keeps the skeleton on the loaded column structure', () => {

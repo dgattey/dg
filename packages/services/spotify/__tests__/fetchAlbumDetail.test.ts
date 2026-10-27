@@ -29,7 +29,6 @@ const spotifyAlbumResponse = {
   images: [{ height: 640, url: 'https://image.test/album.jpg', width: 640 }],
   label: 'Test Label',
   name: 'Test Album',
-  popularity: 42,
   release_date: '2020-05-01',
   total_tracks: 2,
   tracks: {
@@ -85,7 +84,6 @@ describe('fetchAlbumDetail', () => {
       imageUrl: 'https://image.test/album.jpg',
       label: 'Test Label',
       name: 'Test Album',
-      popularity: 42,
       releaseDate: '2020-05-01',
       totalTracks: 2,
       url: `https://open.spotify.com/album/${ALBUM_ID}`,
