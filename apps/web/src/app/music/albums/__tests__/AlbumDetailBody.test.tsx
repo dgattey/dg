@@ -16,6 +16,7 @@ const album: AlbumDetail = {
   imageUrl: 'https://i.scdn.co/image/album-1',
   label: 'Example Records',
   name: 'Example Album',
+  popularity: 55,
   releaseDate: '2019-04-12',
   totalTracks: 2,
   tracks: [

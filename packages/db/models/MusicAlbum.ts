@@ -26,6 +26,9 @@ export class MusicAlbum extends Model {
   declare label: string | null;
 
   @Column({ allowNull: true, type: DataType.INTEGER })
+  declare popularity: number | null;
+
+  @Column({ allowNull: true, type: DataType.INTEGER })
   declare totalTracks: number | null;
 
   @BelongsToMany(() => MusicArtist, 'MusicAlbumArtist', 'albumId', 'artistId')
