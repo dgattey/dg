@@ -45,8 +45,35 @@ const setUrl = (query = '') => {
   window.history.replaceState(null, '', query ? `/music/albums?${query}` : '/music/albums');
 };
 
+const scrollIntoView = jest.fn();
+
+const later = <T,>(settle: () => T) =>
+  new Promise<T>((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        resolve(settle());
+      } catch (error) {
+        reject(error);
+      }
+    }, 0);
+  });
+
+/** Jest only retries a suspended render when it suspends and settles in the same `act`. */
+const whileAlbumsLoad = (action: () => unknown) =>
+  act(async () => {
+    await action();
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  });
+
 beforeEach(() => {
-  jest.mocked(loadAlbumDetail).mockImplementation(async (albumId) => DETAIL_BY_ID[albumId] ?? null);
+  jest
+    .mocked(loadAlbumDetail)
+    .mockImplementation((albumId) => later(() => DETAIL_BY_ID[albumId] ?? null));
+  Object.defineProperty(Element.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: scrollIntoView,
+  });
+  scrollIntoView.mockClear();
   setUrl();
 });
 
@@ -103,6 +130,7 @@ describe('FavoriteAlbumsGrid', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     Reflect.deleteProperty(Element.prototype, 'animate');
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
   });
 
   it('renders both sort buttons and album cards immediately', () => {
@@ -123,7 +151,7 @@ describe('FavoriteAlbumsGrid', () => {
 
     expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
     const link = screen.getByRole('link', { name: /Zebra/ });
-    expect(link).toHaveAttribute('href', '/music/albums?album=album-zebra');
+    expect(link).toHaveAttribute('href', '/music/albums?album=album-zebra#album-album-zebra');
     expect(link).not.toHaveAttribute('target', '_blank');
     const coversPerCell = [...container.querySelectorAll('a')].map(
       (link) => link.querySelectorAll('img').length,
@@ -179,11 +207,11 @@ describe('FavoriteAlbumsGrid', () => {
     const user = userEvent.setup();
     setUrl('album=album-zebra');
 
-    render(<FavoriteAlbumsGrid albums={albums} />);
+    await whileAlbumsLoad(() => render(<FavoriteAlbumsGrid albums={albums} />));
 
     expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
     expect(
-      await screen.findByRole('link', { name: 'Open zebra tracklist on Spotify' }),
+      screen.getByRole('link', { name: 'Open zebra tracklist on Spotify' }),
     ).toBeInTheDocument();
     const close = screen.getByRole('link', { name: 'Close Zebra' });
     expect(close).toHaveAttribute('href', '/music/albums');
@@ -195,7 +223,7 @@ describe('FavoriteAlbumsGrid', () => {
     expect(window.location.pathname + window.location.search).toBe('/music/albums');
   });
 
-  it('opens with a skeleton immediately on click, updates the URL, and shows loaded detail', async () => {
+  it('keeps the open well until the next album loads, then swaps it in one step', async () => {
     const user = userEvent.setup();
     setUrl('album=album-zebra');
 
@@ -206,50 +234,121 @@ describe('FavoriteAlbumsGrid', () => {
           resolveMango = resolve;
         });
       }
-      return Promise.resolve(DETAIL_BY_ID[albumId] ?? null);
+      return later(() => DETAIL_BY_ID[albumId] ?? null);
     });
 
-    const view = render(<FavoriteAlbumsGrid albums={albums} />);
+    await whileAlbumsLoad(() => render(<FavoriteAlbumsGrid albums={albums} />));
     expect(
-      await screen.findByRole('link', { name: 'Open zebra tracklist on Spotify' }),
+      screen.getByRole('link', { name: 'Open zebra tracklist on Spotify' }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('link', { name: /Mango/ }));
+    await whileAlbumsLoad(async () => {
+      await user.click(screen.getByRole('link', { name: /Mango/ }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
-    expect(window.location.pathname + window.location.search).toBe(
-      '/music/albums?album=album-mango',
-    );
-    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
-    expect(
-      screen.queryByRole('link', { name: 'Open zebra tracklist on Spotify' }),
-    ).not.toBeInTheDocument();
-    expect(view.container.querySelectorAll('[data-skeleton]').length).toBeGreaterThan(0);
+      expect(window.location.pathname + window.location.search).toBe(
+        '/music/albums?album=album-mango',
+      );
+      expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
+      expect(screen.queryByRole('region', { name: 'Mango details' })).not.toBeInTheDocument();
 
-    act(() => {
       resolveMango?.(DETAIL_BY_ID['album-mango'] ?? null);
     });
 
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
     expect(
-      await screen.findByRole('link', { name: 'Open mango tracklist on Spotify' }),
+      screen.getByRole('link', { name: 'Open mango tracklist on Spotify' }),
     ).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Zebra details' })).not.toBeInTheDocument();
+  });
+
+  it('starts loading an album as soon as the pointer goes down on it', async () => {
+    const user = userEvent.setup();
+    render(<FavoriteAlbumsGrid albums={albums} />);
+
+    await user.pointer({
+      keys: '[MouseLeft>]',
+      target: screen.getByRole('link', { name: /Apple/ }),
+    });
+
+    expect(loadAlbumDetail).toHaveBeenCalledWith('album-apple');
+    expect(screen.queryByRole('region', { name: 'Apple details' })).not.toBeInTheDocument();
+  });
+
+  it('lands on the open well when the page arrives with an album selected', async () => {
+    setUrl('album=album-mango');
+
+    await whileAlbumsLoad(() => render(<FavoriteAlbumsGrid albums={albums} />));
+
+    const region = screen.getByRole('region', { name: 'Mango details' });
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: 'instant', block: 'start' });
+    expect(scrollIntoView.mock.contexts[0]).toContainElement(region);
+  });
+
+  it('does not scroll when a visitor opens an album in place', async () => {
+    const user = userEvent.setup();
+    render(<FavoriteAlbumsGrid albums={albums} />);
+
+    await whileAlbumsLoad(() => user.click(screen.getByRole('link', { name: /Zebra/ })));
+
+    expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
+    expect(scrollIntoView).not.toHaveBeenCalled();
+  });
+
+  it('gives every album cell the id its links target', () => {
+    const { container } = render(<FavoriteAlbumsGrid albums={albums} />);
+
+    expect(container.querySelector('#album-album-zebra')).toContainElement(
+      screen.getByRole('link', { name: /Zebra/ }),
+    );
+  });
+
+  it('retries an album whose detail failed once the visitor asks for it again', async () => {
+    const user = userEvent.setup();
+    jest.mocked(loadAlbumDetail).mockClear();
+    const kiwi = { ...albums[0], id: 'album-kiwi', name: 'Kiwi' } as PlaylistAlbum;
+    jest
+      .mocked(loadAlbumDetail)
+      .mockImplementationOnce(() =>
+        later(() => {
+          throw new Error('Spotify is down');
+        }),
+      )
+      .mockImplementationOnce(() => later(() => detailFor('album-kiwi', 'Kiwi', 'kiwi tracklist')));
+
+    render(<FavoriteAlbumsGrid albums={[kiwi, ...albums.slice(1)]} />);
+
+    await whileAlbumsLoad(() => user.click(screen.getByRole('link', { name: /Kiwi/ })));
+    expect(
+      screen.getByText('Album details are temporarily unavailable. Please try again soon.'),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('link', { name: 'Close Kiwi' }));
+    await whileAlbumsLoad(() => user.click(screen.getByRole('link', { name: /Kiwi/ })));
+
+    expect(
+      screen.getByRole('link', { name: 'Open kiwi tracklist on Spotify' }),
+    ).toBeInTheDocument();
+    expect(jest.mocked(loadAlbumDetail).mock.calls).toEqual([['album-kiwi'], ['album-kiwi']]);
   });
 
   it('syncs the open well when popstate navigates history', async () => {
     const user = userEvent.setup();
     setUrl('album=album-zebra');
 
-    render(<FavoriteAlbumsGrid albums={albums} />);
-    await user.click(screen.getByRole('link', { name: /Mango/ }));
+    await whileAlbumsLoad(() => render(<FavoriteAlbumsGrid albums={albums} />));
+    await whileAlbumsLoad(() => user.click(screen.getByRole('link', { name: /Mango/ })));
     expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
 
-    act(() => {
+    await whileAlbumsLoad(() => {
       setUrl('album=album-apple');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
 
     expect(screen.getByRole('region', { name: 'Apple details' })).toBeInTheDocument();
     expect(
-      await screen.findByRole('link', { name: 'Open apple tracklist on Spotify' }),
+      screen.getByRole('link', { name: 'Open apple tracklist on Spotify' }),
     ).toBeInTheDocument();
 
     act(() => {

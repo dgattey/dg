@@ -6,7 +6,7 @@ import type { TypographyVariant } from '@dg/ui/core/Typography';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { Fragment, type ReactNode } from 'react';
 import { cx } from '../../collage/paperVars';
-import { NewArtistBadge } from '../NewArtistBadge';
+import { type ArtistRowSubject, NewArtistBadge } from '../NewArtistBadge';
 
 export function SpotifyAnchor({
   children,
@@ -66,17 +66,22 @@ export function AlbumLink({
   );
 }
 
-/** Comma-separated artist links, each tagged `New!` when first played in this window. */
+/**
+ * Comma-separated artist links. In an artist or album row, each is tagged `New!` when
+ * first played in this window.
+ */
 export function ArtistLinks({
   artists,
   className = 'stats__meta',
   newArtists,
+  subject,
   variant = 'meta',
 }: {
   artists: ReadonlyArray<SpotifyLink>;
   /** The type style; artist lists read as meta under a title unless they are the title. */
   className?: string;
   newArtists: ListeningStats['newArtists'];
+  subject: ArtistRowSubject;
   variant?: TypographyVariant;
 }) {
   return (
@@ -87,7 +92,7 @@ export function ArtistLinks({
             {i > 0 ? ', ' : null}
             <SpotifyAnchor href={artist.url}>{artist.name}</SpotifyAnchor>
             {newArtists.ids.includes(artist.id) ? (
-              <NewArtistBadge label={newArtists.label} />
+              <NewArtistBadge label={newArtists.label} subject={subject} />
             ) : null}
           </Fragment>
         ))}

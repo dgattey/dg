@@ -203,7 +203,7 @@ describe('ListeningStatsSections', () => {
     render(<ListeningStatsSections stats={stats} />);
 
     for (const link of screen.getAllByRole('link', { name: 'Album apart' })) {
-      expect(link).toHaveAttribute('href', '/music/albums?album=apart');
+      expect(link).toHaveAttribute('href', '/music/albums?album=apart#album-apart');
     }
     for (const link of screen.getAllByRole('link', { name: 'Album rush' })) {
       expect(link).toHaveAttribute('href', 'https://open.spotify.com/album/rush');
@@ -221,10 +221,26 @@ describe('ListeningStatsSections', () => {
     );
   });
 
-  it('tags artists first played in this window as new', () => {
-    render(<ListeningStatsSections stats={stats} />);
+  it('tags new artists only in artist and album rows, never under a song or genre', () => {
+    render(
+      <ListeningStatsSections
+        stats={{
+          ...stats,
+          newArtists: {
+            ids: ['artist-burna', 'by-apart', 'by-jet-pack', 'fireboy', 'tame'],
+            label: 'New artist this year',
+          },
+        }}
+      />,
+    );
 
-    expect(screen.getAllByRole('img', { name: 'New artist this year' })).toHaveLength(1);
+    const taggedArtists = screen
+      .getAllByRole('img', { name: 'New artist this year' })
+      .map((badge) => badge.closest('.stats__artists')?.querySelector('a')?.textContent);
+
+    expect(new Set(taggedArtists)).toEqual(new Set(['Artist by-apart', 'Burna Boy']));
+    expect(screen.getAllByRole('link', { name: 'Tame Impala' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Artist by-jet-pack' }).length).toBeGreaterThan(0);
   });
 
   it('leaves periods that have not happened yet as inert placeholders', () => {

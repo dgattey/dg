@@ -1,29 +1,19 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
-import { ALBUM_PARAM, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
-import { Typography } from '@dg/ui/core/Typography';
+import { ALBUM_PARAM, albumAnchorId, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { albumTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
-import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
-import type { CSSProperties, MouseEvent } from 'react';
+import { EASING_DEFAULT, TIMING_MEDIUM, TIMING_SLOW } from '@dg/ui/helpers/timing';
+import type { CSSProperties, MouseEvent, PointerEvent } from 'react';
 import {
   addTransitionType,
-  Fragment,
   startTransition,
   useEffect,
   useLayoutEffect,
   useRef,
   useState,
 } from 'react';
-import { loadAlbumDetail } from '../../../services/albumDetail.actions';
-import {
-  type CollageCardTreatment,
-  collageCardTreatment,
-} from '../../collage/collageCardTreatment';
-import { AlbumDetailBody } from './AlbumDetailBody';
-import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
-import { AlbumWell } from './AlbumWell';
+import { collageCardTreatment } from '../../collage/collageCardTreatment';
 import {
   type AlbumSortKey,
   COLLAGE_ALBUM_GRID_COLUMNS,
@@ -31,6 +21,7 @@ import {
   DEFAULT_ALBUM_SORT,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
+import { type AlbumCard, albumDetailFor, SelectedAlbumWell } from './SelectedAlbumWell';
 
 const COLLAGE_FIRST_SCREEN_CELLS = COLLAGE_ALBUM_GRID_COLUMNS.xs * 2;
 
@@ -41,28 +32,16 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
   released: (a, b) => b.releaseDate.localeCompare(a.releaseDate),
 };
 
-/**
- * Albums claim odd visual slots (`2i + 1`), leaving even slots for the well at
- * the end of the selected album's row across each breakpoint.
- */
-function wellPlacementStyle(selectedIndex: number, albumCount: number): CSSProperties {
-  const slotFor = (columns: number) =>
-    2 * Math.min(albumCount, (Math.floor(selectedIndex / columns) + 1) * columns);
-  const columns = COLLAGE_ALBUM_GRID_COLUMNS;
-
-  return {
-    '--well-order-lg': slotFor(columns.lg),
-    '--well-order-md': slotFor(columns.md),
-    '--well-order-sm': slotFor(columns.sm),
-    '--well-order-xs': slotFor(columns.xs),
-  } as CSSProperties;
-}
-
 function readUrlAlbumId(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
   return new URLSearchParams(window.location.search).get(ALBUM_PARAM);
+}
+
+function pageOffset(element: HTMLElement) {
+  const rect = element.getBoundingClientRect();
+  return { left: rect.left + window.scrollX, top: rect.top + window.scrollY };
 }
 
 function isPlainNavigationClick(event: MouseEvent<HTMLElement>) {
@@ -76,7 +55,7 @@ function isPlainNavigationClick(event: MouseEvent<HTMLElement>) {
   );
 }
 
-function albumsRouteAnchor(event: MouseEvent<HTMLElement>) {
+function albumsRouteAnchor(event: { target: EventTarget | null }) {
   const anchor = event.target instanceof Element ? event.target.closest('a') : null;
   if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) {
     return null;
@@ -88,75 +67,13 @@ function albumsRouteAnchor(event: MouseEvent<HTMLElement>) {
     : null;
 }
 
-type AlbumCard = {
-  album: PlaylistAlbum;
-  treatment: CollageCardTreatment;
+/** Where every cell sat before a change, kept until the commit that shows that change. */
+type PendingSlide = {
+  duration: number;
+  offsets: Map<string, { left: number; top: number }>;
+  selectedAlbumId: string | null;
+  sortKey: AlbumSortKey;
 };
-
-type AlbumDetailState =
-  | { albumId: string; status: 'loading' }
-  | { albumId: string; detail: AlbumDetail | null | undefined; status: 'loaded' };
-
-function ClientSelectedAlbumDetail({ albumId }: { albumId: string }) {
-  const [state, setState] = useState<AlbumDetailState>({ albumId, status: 'loading' });
-
-  useEffect(() => {
-    let cancelled = false;
-    setState({ albumId, status: 'loading' });
-    void loadAlbumDetail(albumId)
-      .then((detail) => {
-        if (!cancelled) {
-          setState({ albumId, detail, status: 'loaded' });
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setState({ albumId, detail: undefined, status: 'loaded' });
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [albumId]);
-
-  if (state.albumId !== albumId || state.status === 'loading') {
-    return <AlbumDetailBodySkeleton />;
-  }
-
-  if (!state.detail) {
-    return (
-      <Typography color="var(--dg-palette-text-secondary)">
-        Album details are temporarily unavailable. Please try again soon.
-      </Typography>
-    );
-  }
-
-  return <AlbumDetailBody album={state.detail} />;
-}
-
-function SelectedAlbumWell({
-  albumCount,
-  selectedCard,
-  selectedIndex,
-}: {
-  albumCount: number;
-  selectedCard: AlbumCard | undefined;
-  selectedIndex: number;
-}) {
-  if (!selectedCard) {
-    return null;
-  }
-
-  return (
-    <div className="music__wellSlot" style={wellPlacementStyle(selectedIndex, albumCount)}>
-      <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
-        <Fragment key={selectedCard.album.id}>
-          <ClientSelectedAlbumDetail albumId={selectedCard.album.id} />
-        </Fragment>
-      </AlbumWell>
-    </div>
-  );
-}
 
 type Props = {
   albums: Array<PlaylistAlbum>;
@@ -166,18 +83,44 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<AlbumSortKey>(DEFAULT_ALBUM_SORT);
   const itemRefs = useRef(new Map<string, HTMLElement>());
-  const previousRects = useRef<Map<string, DOMRect> | null>(null);
+  const wellRef = useRef<HTMLDivElement>(null);
+  const pendingSlide = useRef<PendingSlide | null>(null);
+  const landOnWell = useRef(false);
 
   useEffect(() => {
     const syncFromUrl = () => {
-      setSelectedAlbumId(readUrlAlbumId());
+      startTransition(() => {
+        setSelectedAlbumId(readUrlAlbumId());
+      });
     };
+    landOnWell.current = readUrlAlbumId() !== null;
     syncFromUrl();
     window.addEventListener('popstate', syncFromUrl);
     return () => {
       window.removeEventListener('popstate', syncFromUrl);
     };
   }, []);
+
+  useEffect(() => {
+    if (selectedAlbumId && landOnWell.current && wellRef.current) {
+      landOnWell.current = false;
+      wellRef.current.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }, [selectedAlbumId]);
+
+  const slideCellsInto = (next: Omit<PendingSlide, 'offsets'>) => {
+    pendingSlide.current = {
+      ...next,
+      offsets: new Map([...itemRefs.current].map(([id, element]) => [id, pageOffset(element)])),
+    };
+  };
+
+  const onAlbumPointerDownCapture = (event: PointerEvent<HTMLElement>) => {
+    const nextAlbumId = albumsRouteAnchor(event)?.searchParams.get(ALBUM_PARAM);
+    if (nextAlbumId) {
+      void albumDetailFor(nextAlbumId, { retryFailed: true });
+    }
+  };
 
   const onAlbumNavigationCapture = (event: MouseEvent<HTMLElement>) => {
     if (!isPlainNavigationClick(event)) {
@@ -192,9 +135,13 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
       return;
     }
     event.preventDefault();
+    if (nextAlbumId) {
+      void albumDetailFor(nextAlbumId, { retryFailed: true });
+    }
     const types = albumTransitionTypes(nextAlbumId ? 'open' : 'close');
-    const href = `${destination.pathname}${destination.search}`;
-    window.history.pushState(null, '', href);
+    window.history.pushState(null, '', `${destination.pathname}${destination.search}`);
+    // Matches the `album-well` view transition, so the cells below move with the well.
+    slideCellsInto({ duration: TIMING_MEDIUM, selectedAlbumId: nextAlbumId, sortKey });
     startTransition(() => {
       for (const type of types) {
         addTransitionType(type);
@@ -207,32 +154,34 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
     if (next === sortKey) {
       return;
     }
-    previousRects.current = new Map(
-      [...itemRefs.current].map(([id, element]) => [id, element.getBoundingClientRect()]),
-    );
+    slideCellsInto({ duration: TIMING_SLOW, selectedAlbumId, sortKey: next });
     setSortKey(next);
   };
 
   useLayoutEffect(() => {
-    const previous = previousRects.current;
-    previousRects.current = null;
-    if (!previous || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+    const previous = pendingSlide.current;
+    if (!previous || previous.selectedAlbumId !== selectedAlbumId || previous.sortKey !== sortKey) {
       return;
     }
-    const maxVisibleTop = (window.innerHeight || 900) + 240;
+    pendingSlide.current = null;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    const maxTravel = (window.innerHeight || 900) + 240;
+    const viewportBottom = window.scrollY + maxTravel;
     const moves: Array<{ deltaX: number; deltaY: number; element: HTMLElement }> = [];
     for (const [id, element] of itemRefs.current) {
-      const before = previous.get(id);
+      const before = previous.offsets.get(id);
       if (!before || typeof element.animate !== 'function') {
         continue;
       }
-      const after = element.getBoundingClientRect();
-      if (before.top > maxVisibleTop && after.top > maxVisibleTop) {
+      const after = pageOffset(element);
+      if (before.top > viewportBottom && after.top > viewportBottom) {
         continue;
       }
       const deltaX = before.left - after.left;
       const rawDeltaY = before.top - after.top;
-      const deltaY = Math.max(-maxVisibleTop, Math.min(maxVisibleTop, rawDeltaY));
+      const deltaY = Math.max(-maxTravel, Math.min(maxTravel, rawDeltaY));
       if (deltaX === 0 && deltaY === 0) {
         continue;
       }
@@ -241,7 +190,7 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
     for (const { deltaX, deltaY, element } of moves) {
       element.animate(
         [{ transform: `translate(${deltaX}px, ${deltaY}px)` }, { transform: 'translate(0, 0)' }],
-        { duration: TIMING_SLOW, easing: EASING_DEFAULT },
+        { duration: previous.duration, easing: EASING_DEFAULT },
       );
     }
   });
@@ -262,12 +211,14 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
       key="album-well"
       selectedCard={sortedAlbumCards[selectedIndex]}
       selectedIndex={selectedIndex}
+      wellRef={wellRef}
     />
   );
 
   const renderAlbum = ({ album, treatment }: AlbumCard, index: number) => (
     <div
       className="music__albumSlot"
+      id={albumAnchorId(album.id)}
       key={album.id}
       ref={(element: HTMLElement | null) => {
         if (element) {
@@ -300,7 +251,11 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   return (
     <>
       <CollageSortControls onSortChange={handleSortChange} sortKey={sortKey} />
-      <div className="music__albumGrid" onClickCapture={onAlbumNavigationCapture}>
+      <div
+        className="music__albumGrid"
+        onClickCapture={onAlbumNavigationCapture}
+        onPointerDownCapture={onAlbumPointerDownCapture}
+      >
         {cells}
       </div>
     </>

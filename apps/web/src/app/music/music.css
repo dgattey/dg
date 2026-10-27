@@ -96,6 +96,7 @@
 }
 .music__albumSlot {
   order: var(--slot-order);
+  scroll-margin-top: calc(var(--site-header-height, 5.5rem) + 16px);
 }
 .music__albumSlot > *,
 .music__albumSlot a {
@@ -278,6 +279,7 @@
 .music__wellSlot {
   grid-column: 1 / -1;
   order: var(--well-order-xs);
+  scroll-margin-top: var(--site-header-height, 5.5rem);
 }
 @media (min-width: 576px) {
   .music__wellSlot {
@@ -332,8 +334,10 @@
 .music__wellShell a {
   color: inherit;
 }
+/* Sticky inside the shell's grid, so the art rides beside the tracklist and stops at its end. */
 .music__wellArtLink {
-  position: relative;
+  position: sticky;
+  top: calc(var(--site-header-height, 5.5rem) + 24px);
   display: block;
   grid-area: art;
   align-self: start;
@@ -428,31 +432,6 @@
 .music__wellTrackDuration {
   white-space: nowrap;
 }
-.music__wellTrackSkeleton {
-  grid-template-columns: 1.5rem minmax(0, 1fr);
-}
-.music__wellOuter {
-  height: auto;
-  overflow: visible;
-}
-.music__wellOuter--locked {
-  height: var(--well-locked-h, auto);
-  overflow: clip;
-  transition: height var(--timing-medium) var(--easing-default);
-}
-.music__wellShell:has([data-role="album-detail-placeholder"]) {
-  min-height: var(--well-reserve-h, 0px);
-}
-@media (prefers-reduced-motion: reduce) {
-  .music__wellOuter--locked {
-    height: auto;
-    overflow: visible;
-    transition: none;
-  }
-}
-.music__wellPlaceholder {
-  display: contents;
-}
 .music__wellTrackBody {
   display: grid;
   row-gap: 2px;
@@ -539,6 +518,8 @@
     padding: 22px 20px 26px;
   }
   .music__wellArtLink {
+    position: relative;
+    top: auto;
     justify-self: center;
     max-width: 220px;
     margin-bottom: 22px;

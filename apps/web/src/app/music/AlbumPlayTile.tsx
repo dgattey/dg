@@ -79,7 +79,9 @@ export function AlbumPlayTile({
           </strong>
           <span className="music__artist">
             {artistNames}
-            {newArtist ? <NewArtistBadge label={newArtist} /> : null}
+            {newArtist ? (
+              <NewArtistBadge label={newArtist} subject={isRun ? 'album' : 'song'} />
+            ) : null}
           </span>
         </span>
       </Link>
