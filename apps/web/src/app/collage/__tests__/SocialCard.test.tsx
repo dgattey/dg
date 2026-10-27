@@ -29,7 +29,6 @@ describe('SocialCard', () => {
       <SocialCard
         activeDaysPercent="74%"
         activeDaysSub="218 of 295d"
-        activeMonths={10}
         grainUrl={GRAIN}
         listeningHours="541h"
         playsCompact="8,526"
@@ -42,7 +41,7 @@ describe('SocialCard', () => {
             plays: '412',
           },
         ]}
-        topArtists={[{ months: 10, name: 'ROSALÍA', plays: '612' }]}
+        topArtists={[{ name: 'ROSALÍA', plays: '612' }]}
         tracksAndArtistsSub="2,418 tracks · 912 artists"
         variant="music-stats"
         year={2026}

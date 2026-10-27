@@ -12,6 +12,7 @@ import {
   toStatsTracks,
 } from './listeningStatsCatalog';
 import { ALL_TIME_FILTER, rangePlayFilter } from './listeningStatsFilters';
+import { buildLoyalty, loyaltyUnit, monthIndex, type StatsLoyalty } from './listeningStatsLoyalty';
 import { findNewArtists } from './listeningStatsNewArtists';
 import { statsNow } from './listeningStatsPhase';
 import { fetchTopPlaylistRows, toStatsPlaylists } from './listeningStatsPlaylists';
@@ -45,7 +46,8 @@ export type StatsAlbumRef = SpotifyLink & { imageUrl: string; isFavorite: boolea
 export type StatsAlbum = StatsAlbumRef & { artists: Array<SpotifyLink> };
 export type StatsTrack = SpotifyLink & { album: StatsAlbumRef; artists: Array<SpotifyLink> };
 export type StatsTopTrack = StatsTrack & { plays: number };
-export type StatsTopArtist = SpotifyLink & { months: number; plays: number; tracks: number };
+/** `active` counts the artist's days or months with a play, in the range's `loyalty` unit. */
+export type StatsTopArtist = SpotifyLink & { active: number; plays: number; tracks: number };
 export type StatsPlaylist = SpotifyLink & {
   imageUrl: string;
   playedTracks: number;
@@ -101,7 +103,6 @@ export type StatsChampions = { aside: string; entries: Array<StatsChampionEntry>
 
 export type ListeningStats = {
   activeDays: number;
-  activeMonths: number;
   artists: number;
   champions: StatsChampions;
   dayStreak: { days: number; end: string; start: string };
@@ -110,6 +111,7 @@ export type ListeningStats = {
   genres: Array<StatsGenre>;
   hours: Array<number>;
   lastPlayedAt: string;
+  loyalty: StatsLoyalty;
   matrix: StatsMatrix;
   minutesPerPlay: number;
   monthStreak: { end: string; months: number; start: string };
@@ -147,10 +149,7 @@ function longestRun(items: ReadonlyArray<string>, toIndex: (item: string) => num
 }
 
 export function longestMonthStreak(months: ReadonlyArray<string>): ListeningStats['monthStreak'] {
-  const { end, length, start } = longestRun(months, (month) => {
-    const [year = 0, monthOfYear = 1] = month.split('-').map(Number);
-    return year * 12 + monthOfYear - 1;
-  });
+  const { end, length, start } = longestRun(months, monthIndex);
   return { end, months: length, start };
 }
 
@@ -235,7 +234,7 @@ export async function fetchListeningStats(
       selectBucketTopTracks(championUnit, filter),
       selectAlbumSessions(filter),
       selectRepeats(repeatUnit, ON_REPEAT_TRACKS, filter),
-      selectArtistDepth(filter),
+      selectArtistDepth(loyaltyUnit(range), filter),
       fetchTopPlaylistRows(filter),
     ]);
 
@@ -250,6 +249,12 @@ export async function fetchListeningStats(
       range.kind === 'all'
         ? monthlyPlays.map((row) => `${row.year}-${String(row.month).padStart(2, '0')}`)
         : [...new Set(dailyPlays.map((row) => row.day.slice(0, 7)))];
+    const spanDays =
+      range.kind === 'week'
+        ? 7
+        : range.kind === 'month'
+          ? Number(today.slice(8, 10))
+          : (summary.spanDays ?? 1);
 
     const shownAlbums = topAlbumIds.slice(0, TOP_ALBUMS);
     const shownTracks = topTrackIds.slice(0, TOP_TRACKS);
@@ -306,7 +311,6 @@ export async function fetchListeningStats(
 
     return {
       activeDays: summary.activeDays,
-      activeMonths: activeMonthKeys.length,
       artists: summary.artists,
       champions,
       dayStreak:
@@ -318,6 +322,7 @@ export async function fetchListeningStats(
       genres,
       hours: fillBuckets(hours, 24, 0),
       lastPlayedAt: summary.lastPlayedAt.toISOString(),
+      loyalty: buildLoyalty({ activeMonthKeys, range, spanDays, summary, today }),
       matrix,
       minutesPerPlay,
       monthStreak: longestMonthStreak(activeMonthKeys),
@@ -327,12 +332,7 @@ export async function fetchListeningStats(
       sessionPlays: sessions[0]?.totalSessionPlays ?? 0,
       sessions: sessions[0]?.totalSessions ?? 0,
       shelf: { albums: summary.shelfAlbums, plays: summary.shelfPlays },
-      spanDays:
-        range.kind === 'week'
-          ? 7
-          : range.kind === 'month'
-            ? Number(today.slice(8, 10))
-            : (summary.spanDays ?? 1),
+      spanDays,
       timeline,
       topPlaylists,
       tracks: summary.tracks,

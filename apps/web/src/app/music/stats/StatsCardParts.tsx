@@ -8,7 +8,12 @@ import type { CSSProperties, ReactNode } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
-import { formatDay, formatPercent } from './listeningStatsFormat';
+import {
+  formatDay,
+  formatLoyaltyCount,
+  formatLoyaltyShare,
+  formatPercent,
+} from './listeningStatsFormat';
 import { AlbumLink, ArtistLinks, SpotifyAnchor } from './StatsLinks';
 import { Scallop, Stub } from './StatsShapes';
 
@@ -198,26 +203,28 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
     Math.max(...stats.topArtists.map(pick));
   const highlight = (value: number, max: number) =>
     cx('stats__cell', value === max && 'stats__cell--max');
-  const topMonths = most((a) => a.months);
+  const topActive = most((a) => a.active);
   return (
     <PaperCard
       className="stats__card stats__depth"
       edge="quad-d"
       innerClassName="stats__pad"
       tag={
-        <Stub className="stats__cardStamp" kind="stamp" size="sm" tiltDeg={-4.2} tone="viridian">
-          <span className="stats__cardStampKicker" data-typography="stamp">
-            Loyal for
-          </span>
-          <span className="stats__cardStampValue" data-typography="badge">
-            {topMonths} mo
-          </span>
-        </Stub>
+        topActive > 1 ? (
+          <Stub className="stats__cardStamp" kind="stamp" size="sm" tiltDeg={-4.2} tone="viridian">
+            <span className="stats__cardStampKicker" data-typography="stamp">
+              Loyal for
+            </span>
+            <span className="stats__cardStampValue" data-typography="badge">
+              {formatLoyaltyCount(topActive, stats.loyalty.unit)}
+            </span>
+          </Stub>
+        ) : undefined
       }
       tiltDeg={-0.7}
     >
       <CardHead
-        aside={`${formatCount(stats.activeMonths)} active months`}
+        aside={`Active ${formatLoyaltyShare(stats.loyalty.active, stats.loyalty)}`}
         title="Depth and loyalty"
       />
       <table className="stats__table" data-typography="prose">
@@ -238,8 +245,8 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
             <th className="stats__cell" data-typography="meta" scope="col">
               Per track
             </th>
-            <th className="stats__cell stats__monthsHead" data-typography="meta" scope="col">
-              Months
+            <th className="stats__cell stats__loyaltyHead" data-typography="meta" scope="col">
+              {stats.loyalty.unit === 'day' ? 'Days' : 'Months'}
             </th>
           </tr>
         </thead>
@@ -270,14 +277,14 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
               >
                 {perTrack(artist).toFixed(1)}
               </td>
-              <td className="stats__months">
+              <td className="stats__loyalty">
                 <span
                   aria-hidden="true"
                   className="stats__meter"
-                  style={bar(artist.months, stats.activeMonths)}
+                  style={bar(artist.active, stats.loyalty.possible)}
                 />
-                <span className={highlight(artist.months, topMonths)} data-typography="row-title">
-                  {artist.months}
+                <span className={highlight(artist.active, topActive)} data-typography="row-title">
+                  {formatCount(artist.active)}
                 </span>
               </td>
             </tr>

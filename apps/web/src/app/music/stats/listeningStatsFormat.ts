@@ -62,6 +62,16 @@ export function formatPacificMonth(timestamp: string): string {
   return pacificMonthFormat.format(new Date(timestamp));
 }
 
+/** `1, 'day'` → `1 day`, `14, 'month'` → `14 months`. */
+export function formatLoyaltyCount(count: number, unit: ListeningStats['loyalty']['unit']): string {
+  return `${formatCount(count)} ${count === 1 ? unit : `${unit}s`}`;
+}
+
+/** `5 of 7 days`, `10 of 12 months`. */
+export function formatLoyaltyShare(active: number, loyalty: ListeningStats['loyalty']): string {
+  return `${formatCount(active)} of ${formatLoyaltyCount(loyalty.possible, loyalty.unit)}`;
+}
+
 export function formatRangeSuffix(range: StatsRange): string {
   switch (range.kind) {
     case 'all':

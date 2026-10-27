@@ -9,6 +9,7 @@ import {
   type SqlPlayFilter,
   whereClause,
 } from './listeningStatsFilters';
+import type { StatsLoyaltyUnit } from './listeningStatsLoyalty';
 
 /** Days, hours, and weeks are bucketed where the listening happened. */
 const LOCAL_PLAYED_AT = `("playedAt" AT TIME ZONE '${SITE_TIME_ZONE}')`;
@@ -243,7 +244,8 @@ export function selectRepeats(
   );
 }
 
-export function selectArtistDepth(filter: SqlPlayFilter = ALL_TIME_FILTER) {
+/** `active` counts the distinct Pacific days or months each top artist had a play. */
+export function selectArtistDepth(unit: StatsLoyaltyUnit, filter: SqlPlayFilter = ALL_TIME_FILTER) {
   return select(
     `WITH top_artists AS (
        SELECT artist AS "artistId", count(*)::int AS plays
@@ -253,12 +255,12 @@ export function selectArtistDepth(filter: SqlPlayFilter = ALL_TIME_FILTER) {
      )
      SELECT ta."artistId", ta.plays,
        count(DISTINCT p."trackId")::int AS tracks,
-       count(DISTINCT date_trunc('month', (p."playedAt" AT TIME ZONE '${SITE_TIME_ZONE}'))::date)::int AS months
+       count(DISTINCT date_trunc('${unit}', (p."playedAt" AT TIME ZONE '${SITE_TIME_ZONE}'))::date)::int AS active
      FROM top_artists ta
      JOIN "SpotifyPlay" p ON p."artistIds" @> ARRAY[ta."artistId"]::varchar(64)[] ${andClause(filter, 'p')}
      GROUP BY ta."artistId", ta.plays
      ORDER BY ta.plays DESC, ta."artistId"`,
-    v.object({ artistId: v.string(), months: int, plays: int, tracks: int }),
+    v.object({ active: int, artistId: v.string(), plays: int, tracks: int }),
   );
 }
 

@@ -18,7 +18,6 @@ import { SocialCardScallop } from './SocialCardScallop';
 export type MusicStatsCardVariant = {
   activeDaysPercent: string;
   activeDaysSub: string;
-  activeMonths: number;
   listeningHours: string;
   playsCompact: string;
   playsFull: string;
@@ -29,7 +28,6 @@ export type MusicStatsCardVariant = {
     plays: string;
   }>;
   topArtists: ReadonlyArray<{
-    months: number;
     name: string;
     plays: string;
   }>;

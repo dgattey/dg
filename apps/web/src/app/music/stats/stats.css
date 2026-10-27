@@ -773,10 +773,10 @@
   color: var(--soft);
 }
 .stats__table .stats__cell,
-.stats__table .stats__monthsHead {
+.stats__table .stats__loyaltyHead {
   text-align: right;
 }
-.stats__months {
+.stats__loyalty {
   display: grid;
   grid-template-columns: minmax(64px, 1fr) 32px;
   column-gap: 8px;
@@ -864,7 +864,7 @@
   .stats__table td:nth-child(5) {
     display: none;
   }
-  .stats__months {
+  .stats__loyalty {
     grid-template-columns: minmax(40px, 1fr) 28px;
     min-width: 88px;
   }

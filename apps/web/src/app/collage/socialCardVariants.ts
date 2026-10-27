@@ -90,7 +90,6 @@ export function buildMusicStatsCardVariant(
     return {
       activeDaysPercent: '0%',
       activeDaysSub: '0 of 0d',
-      activeMonths: 0,
       listeningHours: '0h',
       playsCompact: '0',
       playsFull: '0',
@@ -108,7 +107,6 @@ export function buildMusicStatsCardVariant(
   return {
     activeDaysPercent: formatPercent(stats.activeDays, stats.spanDays, 0),
     activeDaysSub: `${formatCount(stats.activeDays)} of ${formatCount(stats.spanDays)}d`,
-    activeMonths: stats.activeMonths,
     listeningHours: `${formatCount(hours)}h`,
     playsCompact,
     playsFull: formatCount(stats.plays),
@@ -118,8 +116,7 @@ export function buildMusicStatsCardVariant(
       name: album.name,
       plays: formatCount(plays),
     })),
-    topArtists: stats.topArtists.slice(0, 3).map(({ months, name, plays }) => ({
-      months,
+    topArtists: stats.topArtists.slice(0, 3).map(({ name, plays }) => ({
       name,
       plays: formatCount(plays),
     })),

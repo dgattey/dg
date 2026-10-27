@@ -172,7 +172,6 @@ describe('createSocialImage', () => {
     const burna = { id: 'burna', name: 'Burna Boy', url: 'https://open.spotify.com/artist/burna' };
     jest.mocked(fetchListeningStats).mockResolvedValue({
       activeDays: 137,
-      activeMonths: 10,
       artists: 2215,
       champions: { aside: '#1 song each month in 2026', entries: [], title: 'Soundtrack by month' },
       dayStreak: { days: 14, end: '2026-02-14', start: '2026-02-01' },
@@ -181,6 +180,7 @@ describe('createSocialImage', () => {
       genres: [{ artists: [burna], genre: 'afrobeats', plays: 457, tracks: 161 }],
       hours: Array.from({ length: 24 }, () => 0),
       lastPlayedAt: '2026-10-22T00:00:00.000Z',
+      loyalty: { active: 10, possible: 10, unit: 'month' },
       matrix: { columns: [], rows: [], title: 'Every week of 2026' },
       minutesPerPlay: 3.95,
       monthStreak: { end: '2026-10', months: 10, start: '2026-01' },
@@ -206,7 +206,7 @@ describe('createSocialImage', () => {
           plays: 344,
         },
       ],
-      topArtists: [{ ...burna, months: 7, plays: 457, tracks: 161 }],
+      topArtists: [{ ...burna, active: 7, plays: 457, tracks: 161 }],
       topPlaylists: [],
       topTracks: [],
       tracks: 4818,
