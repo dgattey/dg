@@ -103,11 +103,4 @@ describe('AlbumDetailBody', () => {
     expect(screen.getByText(/2 tracks/)).toBeInTheDocument();
     expect(screen.queryByText(/Example Records/)).not.toBeInTheDocument();
   });
-
-  it('shows popularity as an accessible meter', () => {
-    render(<AlbumDetailBody album={album} />);
-
-    const meter = screen.getByRole('img', { name: 'Popularity 55 out of 100' });
-    expect(meter).toBeInTheDocument();
-  });
 });

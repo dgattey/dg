@@ -10,6 +10,7 @@ import { serializeError } from '@dg/shared-core/logging/maskSecrets';
 import { parseResponse } from '../clients/parseResponse';
 import { getSpotifyClient } from './spotifyClient';
 import type { TrackMetadata } from './trackMetadataShared';
+import { backfillTrackPopularity, captureTrackPopularity } from './trackPopularity';
 
 /**
  * Maximum tracks Spotify returns from recently-played endpoint.
@@ -100,6 +101,16 @@ async function fetchRecentPlays(afterTimestamp?: number): Promise<Array<SpotifyP
   }));
 }
 
+/**
+ * Scores the synced tracks as of today, then a slice of never-scored tracks,
+ * skipping the backfill when Spotify already refused this run's calls.
+ */
+async function captureSyncedPopularity(trackIds: ReadonlyArray<string>): Promise<void> {
+  const captured = await captureTrackPopularity(trackIds);
+  const backfilled = captured.stoppedEarly ? null : await backfillTrackPopularity();
+  log.info('Spotify track popularity captured', { backfilled, captured });
+}
+
 export async function getLatestPlayedAt(): Promise<Date | null> {
   const latest = await db.SpotifyPlay.findOne({
     attributes: ['playedAt'],
@@ -130,6 +141,7 @@ export async function syncSpotifyPlaysSince(options?: SyncPlaysOptions): Promise
 
   if (plays.length === 0) {
     log.info('No new Spotify plays to sync');
+    await captureSyncedPopularity([]);
     return { gapDetected: false, inserted: 0, total: 0 };
   }
 
@@ -141,6 +153,7 @@ export async function syncSpotifyPlaysSince(options?: SyncPlaysOptions): Promise
   }
 
   const inserted = await insertSpotifyPlayBatch(plays);
+  await captureSyncedPopularity(plays.map((play) => play.trackId));
   log.info('Spotify plays synced', {
     gapDetected,
     inserted,

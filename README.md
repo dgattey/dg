@@ -125,6 +125,7 @@ Core tables include:
 - Spotify only exposes the 50 most recent plays. Sync runs every 15 minutes via GitHub Actions calling `/api/spotify/sync`.
 - An empty DB is seeded by the first cron sync from that recent-plays window; later runs fetch only plays after the latest stored timestamp.
 - Historical gaps older than 50 plays can be backfilled from a Spotify Extended Streaming History `.zip` or `.json` export via `turbo spotify:import -- <path.zip | dir | file.json ...> [--dry-run] [--from=YYYY-MM-DD] [--to=YYYY-MM-DD]`.
+- Track popularity is snapshotted per Pacific day whenever plays sync or import (Spotify's 0–100 score, Deezer rank only when Spotify has none). Plays from before snapshots began read a track's earliest snapshot, labeled as current popularity on `/music/stats`. `turbo spotify:popularity` scores every never-scored track at once; syncs otherwise fill them in a slice at a time.
 - Track metadata for history uses individual `GET /tracks/{id}` requests.
 - The homepage "latest song" card uses `fetchRecentlyPlayed`, which returns now-playing or last-played data for UI.
 

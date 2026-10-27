@@ -16,6 +16,7 @@ import { buildLoyalty, loyaltyUnit, monthIndex, type StatsLoyalty } from './list
 import { findNewArtists } from './listeningStatsNewArtists';
 import { statsNow } from './listeningStatsPhase';
 import { fetchTopPlaylistRows, toStatsPlaylists } from './listeningStatsPlaylists';
+import { type StatsPopularity, selectYearlyPopularity } from './listeningStatsPopularity';
 import {
   selectAlbumSessions,
   selectArtistDepth,
@@ -118,6 +119,8 @@ export type ListeningStats = {
   newArtists: { ids: Array<string>; label: string };
   onRepeat: Array<{ plays: number; track: StatsTrack; week: string }>;
   plays: number;
+  /** Popularity of what was played each year, on the all-time range only. */
+  popularity: StatsPopularity | null;
   range: StatsRange;
   sessionPlays: number;
   sessions: number;
@@ -158,14 +161,6 @@ export function longestDayStreak(days: ReadonlyArray<string>): ListeningStats['d
     Math.round(Date.parse(`${day}T00:00:00Z`) / 86_400_000),
   );
   return { days: length, end, start };
-}
-
-function fillBuckets(rows: Array<{ bucket: number; plays: number }>, size: number, first: number) {
-  const buckets = Array.from({ length: size }, () => 0);
-  for (const row of rows) {
-    buckets[row.bucket - first] = row.plays;
-  }
-  return buckets;
 }
 
 function sumYearsFromMonths(
@@ -219,6 +214,7 @@ export async function fetchListeningStats(
       onRepeat,
       depth,
       playlistRows,
+      popularity,
     ] = await Promise.all([
       selectSummary(filter),
       options?.knownYears || range.kind === 'all'
@@ -236,6 +232,7 @@ export async function fetchListeningStats(
       selectRepeats(repeatUnit, ON_REPEAT_TRACKS, filter),
       selectArtistDepth(loyaltyUnit(range), filter),
       fetchTopPlaylistRows(filter),
+      range.kind === 'all' ? selectYearlyPopularity() : Promise.resolve(null),
     ]);
 
     if (!summary?.firstPlayedAt || !summary.lastPlayedAt || summary.plays === 0) return null;
@@ -320,7 +317,10 @@ export async function fetchListeningStats(
       ...slices,
       firstPlayedAt: summary.firstPlayedAt.toISOString(),
       genres,
-      hours: fillBuckets(hours, 24, 0),
+      hours: Array.from(
+        { length: 24 },
+        (_, hour) => hours.find((row) => row.bucket === hour)?.plays ?? 0,
+      ),
       lastPlayedAt: summary.lastPlayedAt.toISOString(),
       loyalty: buildLoyalty({ activeMonthKeys, range, spanDays, summary, today }),
       matrix,
@@ -328,6 +328,7 @@ export async function fetchListeningStats(
       monthStreak: longestMonthStreak(activeMonthKeys),
       newArtists,
       plays: summary.plays,
+      popularity,
       range,
       sessionPlays: sessions[0]?.totalSessionPlays ?? 0,
       sessions: sessions[0]?.totalSessions ?? 0,

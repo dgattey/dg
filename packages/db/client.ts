@@ -9,6 +9,7 @@ import { MusicArtist } from './models/MusicArtist';
 import { MusicPlaylist } from './models/MusicPlaylist';
 import { MusicTrack } from './models/MusicTrack';
 import { MusicTrackArtist } from './models/MusicTrackArtist';
+import { MusicTrackPopularity } from './models/MusicTrackPopularity';
 import { MusicTrackTempo } from './models/MusicTrackTempo';
 import { OauthState } from './models/OauthState';
 import { Release } from './models/Release';
@@ -26,6 +27,7 @@ export const db = {
   MusicPlaylist,
   MusicTrack,
   MusicTrackArtist,
+  MusicTrackPopularity,
   MusicTrackTempo,
   OauthState,
   Release,

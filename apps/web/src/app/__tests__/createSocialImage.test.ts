@@ -187,6 +187,7 @@ describe('createSocialImage', () => {
       newArtists: { ids: [], label: 'New artist this year' },
       onRepeat: [],
       plays: 8476,
+      popularity: null,
       range: { kind: 'year', year },
       sessionPlays: 2400,
       sessions: 190,

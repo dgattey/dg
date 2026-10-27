@@ -44,12 +44,11 @@ export function normalizeBpm(bpm: unknown): number | null {
 }
 
 /**
- * Looks up a track's tempo on Deezer's keyless public API by ISRC, because
- * Spotify's audio-features endpoint is closed to apps created after Nov 2024.
- * Resolves null when Deezer has no tempo for the track, and throws on network,
- * HTTP, quota, or timeout failures so callers can retry those later.
+ * Deezer's public track record for an ISRC from its keyless API. Resolves null
+ * when Deezer has no such track, and throws on network, HTTP, quota, or timeout
+ * failures so callers can retry those later.
  */
-export async function fetchTrackBpm(isrc: string): Promise<number | null> {
+export async function fetchDeezerTrack(isrc: string): Promise<Record<string, unknown> | null> {
   if (!isIsrc(isrc)) {
     return null;
   }
@@ -67,5 +66,15 @@ export async function fetchTrackBpm(isrc: string): Promise<number | null> {
     );
     return null;
   }
-  return normalizeBpm(data.bpm);
+  return data;
+}
+
+/**
+ * Looks up a track's tempo on Deezer by ISRC, because Spotify's audio-features
+ * endpoint is closed to apps created after Nov 2024. Resolves null when Deezer
+ * has no tempo for the track, and throws like `fetchDeezerTrack` on failures.
+ */
+export async function fetchTrackBpm(isrc: string): Promise<number | null> {
+  const track = await fetchDeezerTrack(isrc);
+  return track ? normalizeBpm(track.bpm) : null;
 }

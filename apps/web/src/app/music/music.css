@@ -387,29 +387,7 @@
   text-overflow: ellipsis;
 }
 .music__wellFacts {
-  display: grid;
-  row-gap: 10px;
-  align-items: start;
   color: inherit;
-}
-.music__wellPopularity {
-  position: relative;
-  display: block;
-  width: 240px;
-  max-width: 100%;
-  height: 10px;
-}
-.music__wellPopularityTrack {
-  width: 100%;
-  height: 10px;
-  overflow: hidden;
-  background-color: color-mix(in oklab, var(--on) 24%, var(--pc));
-  border-radius: var(--quad-c);
-}
-.music__wellPopularityFill {
-  width: var(--popularity, 0%);
-  height: 100%;
-  background-color: var(--on);
 }
 .music__wellTracks {
   column-count: 2;

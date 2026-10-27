@@ -21,6 +21,13 @@ jest.mock('../spotifyClient', () => ({
   getSpotifyClient: () => ({ get: mockSpotifyGet }),
 }));
 
+const mockCaptureTrackPopularity = jest.fn();
+
+jest.mock('../trackPopularity', () => ({
+  backfillTrackPopularity: jest.fn(async () => ({ deezer: 0, spotify: 0, stoppedEarly: false })),
+  captureTrackPopularity: (...args: Array<unknown>) => mockCaptureTrackPopularity(...args),
+}));
+
 const TRACK_1 = '000000000000000import1';
 const TRACK_2 = '000000000000000import2';
 const TRACK_3 = '000000000000000import3';
@@ -227,6 +234,7 @@ describe('extractZipJsonFiles', () => {
 describe('importSpotifyHistory', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCaptureTrackPopularity.mockResolvedValue({ deezer: 0, spotify: 0, stoppedEarly: false });
   });
 
   it('imports new plays, resolves metadata, and is idempotent on re-import', async () => {
@@ -251,6 +259,7 @@ describe('importSpotifyHistory', () => {
       skippedShortPlays: 0,
       totalEntries: 2,
     });
+    expect(mockCaptureTrackPopularity).toHaveBeenCalledWith([TRACK_1]);
 
     const second = await importSpotifyHistory(fileText);
     expect(second.imported).toBe(0);
