@@ -99,7 +99,7 @@ export function TimelineBarsCard({
                 aria-label={`${point.label}: not here yet`}
                 className="stats__column stats__column--future"
                 key={point.key}
-                style={{ gridColumn: idx + 1 }}
+                style={{ '--column': idx + 1 } as CSSProperties}
               >
                 <span className="stats__columnValue" data-typography="meta" />
                 <span aria-hidden="true" className="stats__columnBar" />
@@ -134,7 +134,7 @@ export function TimelineBarsCard({
                 setHoveredKey(point.key);
               }}
               onMouseLeave={() => setHoveredKey(null)}
-              style={{ gridColumn: idx + 1 }}
+              style={{ '--column': idx + 1 } as CSSProperties}
             >
               <span className="stats__columnValue" data-typography="meta">
                 {showValue ? formatCompact(point.plays) : null}

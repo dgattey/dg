@@ -163,14 +163,6 @@ export function longestDayStreak(days: ReadonlyArray<string>): ListeningStats['d
   return { days: length, end, start };
 }
 
-function fillBuckets(rows: Array<{ bucket: number; plays: number }>, size: number, first: number) {
-  const buckets = Array.from({ length: size }, () => 0);
-  for (const row of rows) {
-    buckets[row.bucket - first] = row.plays;
-  }
-  return buckets;
-}
-
 function sumYearsFromMonths(
   monthlyPlays: ReadonlyArray<{ month: number; plays: number; year: number }>,
 ): Array<{ plays: number; year: number }> {
@@ -325,7 +317,10 @@ export async function fetchListeningStats(
       ...slices,
       firstPlayedAt: summary.firstPlayedAt.toISOString(),
       genres,
-      hours: fillBuckets(hours, 24, 0),
+      hours: Array.from(
+        { length: 24 },
+        (_, hour) => hours.find((row) => row.bucket === hour)?.plays ?? 0,
+      ),
       lastPlayedAt: summary.lastPlayedAt.toISOString(),
       loyalty: buildLoyalty({ activeMonthKeys, range, spanDays, summary, today }),
       matrix,

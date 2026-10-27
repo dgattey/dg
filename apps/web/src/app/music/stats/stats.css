@@ -302,6 +302,7 @@
   grid-template-rows: subgrid;
   grid-template-columns: minmax(0, 1fr);
   grid-row: 1 / -1;
+  grid-column: var(--column);
   justify-items: center;
   cursor: pointer;
   border-radius: 6px;
