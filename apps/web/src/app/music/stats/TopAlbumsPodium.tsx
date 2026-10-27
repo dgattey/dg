@@ -92,7 +92,11 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
           <AlbumLink album={first.album} className="stats__heroTitle" variant="title-md">
             {first.album.name}
           </AlbumLink>
-          <ArtistLinks artists={first.album.artists} newArtists={stats.newArtists} />
+          <ArtistLinks
+            artists={first.album.artists}
+            newArtists={stats.newArtists}
+            subject="album"
+          />
           <span className="stats__heroPlays" data-typography="title-md">
             {formatCount(first.plays)}{' '}
             <span className="stats__meta" data-typography="meta">
@@ -129,7 +133,11 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
                   <AlbumLink album={album} className="stats__label" variant="label">
                     {album.name}
                   </AlbumLink>
-                  <ArtistLinks artists={album.artists} newArtists={stats.newArtists} />
+                  <ArtistLinks
+                    artists={album.artists}
+                    newArtists={stats.newArtists}
+                    subject="album"
+                  />
                   <span className="stats__count" data-typography="title-md">
                     {formatCount(plays)}
                   </span>

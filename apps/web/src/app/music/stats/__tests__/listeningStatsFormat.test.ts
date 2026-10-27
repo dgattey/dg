@@ -8,6 +8,8 @@ import {
   formatHourRange,
   formatHours,
   formatHourTick,
+  formatLoyaltyCount,
+  formatLoyaltyShare,
   formatMonth,
   formatPercent,
   formatPlaysHeading,
@@ -16,6 +18,23 @@ import {
   peakHours,
   playsInDayPart,
 } from '../listeningStatsFormat';
+
+describe('formatLoyaltyCount and formatLoyaltyShare', () => {
+  it('pluralizes days and months by count', () => {
+    expect(formatLoyaltyCount(1, 'day')).toBe('1 day');
+    expect(formatLoyaltyCount(6, 'day')).toBe('6 days');
+    expect(formatLoyaltyCount(1, 'month')).toBe('1 month');
+    expect(formatLoyaltyCount(1_204, 'month')).toBe('1,204 months');
+  });
+
+  it('reads a share against the range possible days or months', () => {
+    expect(formatLoyaltyShare(5, { active: 6, possible: 7, unit: 'day' })).toBe('5 of 7 days');
+    expect(formatLoyaltyShare(1, { active: 1, possible: 1, unit: 'day' })).toBe('1 of 1 day');
+    expect(formatLoyaltyShare(10, { active: 10, possible: 12, unit: 'month' })).toBe(
+      '10 of 12 months',
+    );
+  });
+});
 
 describe('formatCompact and formatHours', () => {
   it('keeps small counts and shortens thousands to one decimal', () => {

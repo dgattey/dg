@@ -240,7 +240,7 @@ export function GenresCard({ stats }: { stats: ListeningStats }) {
                     {item.genre}
                   </span>
                 </Tooltip>
-                <ArtistLinks artists={item.artists} newArtists={stats.newArtists} />
+                <ArtistLinks artists={item.artists} newArtists={stats.newArtists} subject="genre" />
               </span>
               <span
                 aria-hidden="true"

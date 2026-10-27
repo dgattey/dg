@@ -60,7 +60,7 @@ export function TopSongsCard({ stats }: { stats: ListeningStats }) {
                   {track.name}
                 </SpotifyAnchor>
               </Tooltip>
-              <ArtistLinks artists={track.artists} newArtists={stats.newArtists} />
+              <ArtistLinks artists={track.artists} newArtists={stats.newArtists} subject="song" />
             </span>
             <span aria-hidden="true" className="stats__meter" style={bar(track.plays, top)} />
             <span className="stats__topCountGroup">
@@ -111,6 +111,7 @@ export function TopArtistsCard({ stats }: { stats: ListeningStats }) {
                 artists={[artist]}
                 className="stats__label"
                 newArtists={stats.newArtists}
+                subject="artist"
                 variant="label"
               />
               <span className="stats__meta" data-typography="meta">

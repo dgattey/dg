@@ -2,7 +2,7 @@
 
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { MouseEvent, ReactNode } from 'react';
+import type { FocusEvent, MouseEvent, PointerEvent, ReactNode } from 'react';
 import type { TypographyVariant } from '../Typography';
 import { rememberPageOrigin } from './pageScrollMemory';
 import { pageTransitionTypes } from './pageTransitions';
@@ -14,6 +14,9 @@ type PageTransitionLinkProps = {
   'data-typography-xs'?: TypographyVariant;
   href: string;
   onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
+  /** With `onPointerEnter`, lets the destination start loading its own data before the press. */
+  onFocus?: (event: FocusEvent<HTMLAnchorElement>) => void;
+  onPointerEnter?: (event: PointerEvent<HTMLAnchorElement>) => void;
   title: string;
   variant?: TypographyVariant;
 };

@@ -6,7 +6,8 @@ import type { TypographyVariant } from '@dg/ui/core/Typography';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { Fragment, type ReactNode } from 'react';
 import { cx } from '../../collage/paperVars';
-import { NewArtistBadge } from '../NewArtistBadge';
+import { albumDetailFor } from '../albums/albumDetailCache';
+import { type ArtistRowSubject, NewArtistBadge } from '../NewArtistBadge';
 
 export function SpotifyAnchor({
   children,
@@ -36,7 +37,10 @@ export function SpotifyAnchor({
   );
 }
 
-/** A favorite album opens in place on the favorite albums page; any other opens on Spotify. */
+/**
+ * A favorite album opens in place on the favorite albums page; any other opens on Spotify.
+ * Hover or focus starts loading the favorite's details, so its well opens without waiting.
+ */
 export function AlbumLink({
   album,
   children,
@@ -50,10 +54,15 @@ export function AlbumLink({
   label?: string;
   variant?: TypographyVariant;
 }) {
+  const prefetchAlbum = () => {
+    void albumDetailFor(album.id);
+  };
   return album.isFavorite ? (
     <PageTransitionLink
       className={cx('stats__itemLink', className)}
       href={albumRoute(album.id)}
+      onFocus={prefetchAlbum}
+      onPointerEnter={prefetchAlbum}
       title={label ?? album.name}
       variant={variant}
     >
@@ -66,17 +75,22 @@ export function AlbumLink({
   );
 }
 
-/** Comma-separated artist links, each tagged `New!` when first played in this window. */
+/**
+ * Comma-separated artist links. In an artist or album row, each is tagged `New!` when
+ * first played in this window.
+ */
 export function ArtistLinks({
   artists,
   className = 'stats__meta',
   newArtists,
+  subject,
   variant = 'meta',
 }: {
   artists: ReadonlyArray<SpotifyLink>;
   /** The type style; artist lists read as meta under a title unless they are the title. */
   className?: string;
   newArtists: ListeningStats['newArtists'];
+  subject: ArtistRowSubject;
   variant?: TypographyVariant;
 }) {
   return (
@@ -87,7 +101,7 @@ export function ArtistLinks({
             {i > 0 ? ', ' : null}
             <SpotifyAnchor href={artist.url}>{artist.name}</SpotifyAnchor>
             {newArtists.ids.includes(artist.id) ? (
-              <NewArtistBadge label={newArtists.label} />
+              <NewArtistBadge label={newArtists.label} subject={subject} />
             ) : null}
           </Fragment>
         ))}

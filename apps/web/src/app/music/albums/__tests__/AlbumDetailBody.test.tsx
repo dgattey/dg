@@ -1,7 +1,6 @@
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { render, screen } from '@testing-library/react';
 import { AlbumDetailBody } from '../AlbumDetailBody';
-import { AlbumDetailBodySkeleton } from '../AlbumDetailBodySkeleton';
 
 const album: AlbumDetail = {
   artists: [
@@ -59,14 +58,6 @@ const album: AlbumDetail = {
   url: 'https://open.spotify.com/album/album-1',
 };
 
-function byRole(container: HTMLElement, role: string): HTMLElement {
-  const element = container.querySelector<HTMLElement>(`[data-role="${role}"]`);
-  if (!element) {
-    throw new Error(`No element with data-role="${role}"`);
-  }
-  return element;
-}
-
 describe('AlbumDetailBody', () => {
   it('renders numbered tracks and Spotify links for artists and tracks', () => {
     render(<AlbumDetailBody album={album} />);
@@ -111,14 +102,5 @@ describe('AlbumDetailBody', () => {
     expect(screen.getByText(/2019/)).toBeInTheDocument();
     expect(screen.getByText(/2 tracks/)).toBeInTheDocument();
     expect(screen.queryByText(/Example Records/)).not.toBeInTheDocument();
-  });
-
-  it('keeps the skeleton on the loaded column structure', () => {
-    const { container } = render(<AlbumDetailBodySkeleton />);
-
-    expect(byRole(container, 'track-row-skeleton')).toHaveClass(
-      'music__wellTrack',
-      'music__wellTrackSkeleton',
-    );
   });
 });

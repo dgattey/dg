@@ -1,6 +1,6 @@
 'use client';
 
-import type { StravaBike, StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
+import type { StravaBike } from '@dg/content-models/strava/StravaHistory';
 import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import { RouteAtlasMap } from '@dg/maps/src/RouteAtlasMap';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
@@ -37,14 +37,7 @@ const LONGEST_ROWS = 8;
  */
 export function HeadlineTotals() {
   const { outings, sport, spanLabel } = useFilteredOutings();
-  const totalsRef = useRef<{
-    outings: typeof outings;
-    totals: ReturnType<typeof totalsOf>;
-  } | null>(null);
-  if (!totalsRef.current || totalsRef.current.outings !== outings) {
-    totalsRef.current = { outings, totals: totalsOf(outings) };
-  }
-  const totals = totalsRef.current.totals;
+  const totals = totalsOf(outings);
   const scope = `${sport === 'all' ? 'All sports' : SPORT_DETAILS[sport].filter} · ${spanLabel}`;
   const distance =
     totals.distanceMeters > 0
@@ -171,57 +164,27 @@ export function StravaBands({
 }) {
   const { outings, span, sport, spanLabel, sportOutings } = useFilteredOutings();
   const distanceSport = sport === 'all' ? 'ride' : sport;
-  const statsRef = useRef<{
-    climbs: ReturnType<typeof biggestClimbs>;
-    distanceSport: typeof distanceSport;
-    longest: StravaLogEntry | undefined;
-    longestForSport: ReturnType<typeof longestOutings>;
-    months: ReturnType<typeof monthlyClimbing>;
-    outings: typeof outings;
-    recent: ReadonlyArray<StravaLogEntry>;
-    sportOutings: typeof sportOutings;
-    years: ReturnType<typeof yearlyTotals>;
-  } | null>(null);
-  if (
-    !statsRef.current ||
-    statsRef.current.outings !== outings ||
-    statsRef.current.sportOutings !== sportOutings ||
-    statsRef.current.distanceSport !== distanceSport
-  ) {
-    const [longest] = longestOutings(
-      outings.filter((outing) => outing.polyline),
-      1,
-    );
-    statsRef.current = {
-      climbs: biggestClimbs(outings, LISTED_OUTINGS),
-      distanceSport,
-      longest,
-      longestForSport: longestOutings(
-        outings.filter((outing) => outing.sport === distanceSport),
-        LONGEST_ROWS,
-      ),
-      months: monthlyClimbing(outings),
-      outings,
-      recent: outings.slice(0, LISTED_OUTINGS),
-      sportOutings,
-      years: yearlyTotals(sportOutings),
-    };
-  }
-  const { climbs, longest, longestForSport, months, recent, years } = statsRef.current;
+  const [longest] = longestOutings(
+    outings.filter((outing) => outing.polyline),
+    1,
+  );
   return (
     <>
       <div className="strava__band">
         <ClimbingFlower
-          months={months}
+          months={monthlyClimbing(outings)}
           span={spanLabel}
           year={typeof span === 'number' ? span : null}
         />
-        <RecentOutings outings={recent} />
+        <RecentOutings outings={outings.slice(0, LISTED_OUTINGS)} />
       </div>
       <div className="strava__band">
         <LongestOutings
           heading={`Longest ${SPORT_DETAILS[distanceSport].filter.toLowerCase()}`}
-          outings={longestForSport}
+          outings={longestOutings(
+            outings.filter((outing) => outing.sport === distanceSport),
+            LONGEST_ROWS,
+          )}
         />
         {longest ? (
           <RoutePolaroid
@@ -238,8 +201,8 @@ export function StravaBands({
         ) : null}
       </div>
       <div className="strava__band">
-        <YearlyMiles years={years} />
-        <BiggestClimbs outings={climbs} />
+        <YearlyMiles years={yearlyTotals(sportOutings)} />
+        <BiggestClimbs outings={biggestClimbs(outings, LISTED_OUTINGS)} />
         <BikeOdometers bikes={bikes} />
       </div>
     </>

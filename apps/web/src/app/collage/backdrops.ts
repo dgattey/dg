@@ -132,22 +132,6 @@ export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
   },
 ]);
 
-/** Fills the margins beside the open album's well. */
-export const ALBUM_DETAIL_BACKDROP = defineBackdrop('fill', 1, [
-  {
-    cutOuts: [
-      ['album-detail-seaweed', 'seaweed2', 'ochre', 240, -10, -3, 40, 'desktop', 0],
-      ['album-detail-swallow', 'swallow', 'rose', 170, -10, 89, 18, 'desktop', 1, { mirrored: true }],
-      ['album-detail-coral', 'coral', 'vermilion', 200, 14, 90, 62, 'desktop', 1],
-      ['album-detail-star', 'star4', 'cream', 40, 12, 93, 86, 'desktop', 1],
-    ],
-    sheets: [
-      ['album-detail-stripes', 'torn', 'stripes', ['rose', 'vermilion'], -4, -6, 14, 300, -3, 'desktop'],
-      ['album-detail-disc', 'disc', 'solid', 'rose', 88, -6, 190, 0, 'desktop'],
-    ],
-  },
-]);
-
 /** A listening log: ledger paper, records stacked as discs, water and sky cut-outs. */
 export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
   {

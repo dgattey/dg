@@ -30,8 +30,13 @@ export const ALBUM_PARAM = 'album' as const;
  * change the route. A route change makes Next refetch the albums layout, which
  * re-suspends its boundary, replays the grid skeleton, and destroys the art the
  * transition was supposed to morph. Same route, new query, nothing torn down.
+ * The fragment names the album's grid cell, so the link lands on it without script.
  */
-export const albumRoute = (id: string) => `${favoriteAlbumsRoute}?${ALBUM_PARAM}=${id}`;
+export const albumRoute = (id: string) =>
+  `${favoriteAlbumsRoute}?${ALBUM_PARAM}=${id}#${albumAnchorId(id)}`;
+
+/** The element id of a favorite album's cell on the favorite albums page. */
+export const albumAnchorId = (id: string) => `album-${id}`;
 
 /** Listening stats for `week`, `month`, or a year, the ranges its toolbar offers. */
 export const musicStatsRangeRoute = (range: 'week' | 'month' | number) =>

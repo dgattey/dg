@@ -11,6 +11,7 @@ import {
   formatDay,
   formatDayPartHours,
   formatHourRange,
+  formatLoyaltyShare,
   formatMonth,
   formatPacificDay,
   formatPercent,
@@ -113,7 +114,7 @@ export async function getListeningStatsMarkdown(): Promise<string> {
         stats.topArtists
           .map(
             (artist, i) =>
-              `${i + 1}. [${artist.name}](${artist.url}): ${formatCount(artist.plays)} plays across ${artist.tracks} tracks, in ${artist.months} of ${stats.activeMonths} active months`,
+              `${i + 1}. [${artist.name}](${artist.url}): ${formatCount(artist.plays)} plays across ${artist.tracks} tracks, active ${formatLoyaltyShare(artist.active, stats.loyalty)}`,
           )
           .join('\n'),
       );

@@ -1,13 +1,7 @@
 import { renderToString } from 'react-dom/server';
 import { VisibleRoutes } from '../../VisibleRoutes';
-import {
-  applyRelativeTransform,
-  buildWorkerRoutes,
-  computeTransformBasis,
-  unprojectMercatorRef,
-} from '../AtlasRoutesCanvas';
 import { RouteAtlasMap } from '../RouteAtlasMap';
-import { decodeRoutes, type GeoBounds, type MapRoute, mercatorRefPoint } from '../routeFrame';
+import type { GeoBounds, MapRoute } from '../routeFrame';
 import { encodePolyline } from '../routeGeometry';
 
 const BOUNDS: GeoBounds = [
@@ -35,7 +29,7 @@ const ROUTES: ReadonlyArray<MapRoute> = [
 ];
 
 describe('RouteAtlasMap', () => {
-  it('renders offline placeholder tiles, Mercator route paths, canvas overlay, and zoom controls when tileSource is offline', () => {
+  it('renders offline placeholder tiles, single combined SSR route path, canvas layer, and zoom controls', () => {
     const html = renderToString(
       <RouteAtlasMap
         bounds={BOUNDS}
@@ -48,12 +42,20 @@ describe('RouteAtlasMap', () => {
     expect(html).toContain('aria-label="Route atlas"');
     expect(html).toContain('aria-label="Zoom in"');
     expect(html).toContain('data-atlas-canvas=""');
-    expect(html).toContain('data-tone="cobalt"');
-    expect(html).toContain('data-tone="vermilion"');
+    expect(html).toContain('data-atlas-ssr=""');
+    expect(html).toContain('viewBox="0 0 390 470"');
+    expect(
+      html.match(/<svg[^>]*data-atlas-ssr=""[\s\S]*?<\/svg>/)?.[0].match(/<path/g),
+    ).toHaveLength(1);
+    expect(html).toContain('data-tones="cobalt,vermilion"');
     expect(html).toContain('data:image/svg+xml,');
+    expect(html).toContain('data-atlas-tile-stage=""');
+    expect(html).toMatch(
+      /--box-transform:translate3d\(-?\d+\.\d{4}%, -?\d+\.\d{4}%, 0px\) scale\(\d+\.\d{6}, \d+\.\d{6}\)/,
+    );
   });
 
-  it('renders Stadia tiles, filtered route paths, and zoom controls when online', () => {
+  it('renders Stadia tiles, filtered route tones, and zoom controls when online', () => {
     const html = renderToString(
       <VisibleRoutes value={new Set([1])}>
         <RouteAtlasMap
@@ -70,32 +72,10 @@ describe('RouteAtlasMap', () => {
     expect(html).toContain('aria-label="Zoom out"');
     expect(html).toContain('aria-label="Reset view"');
     expect(html).toContain('tiles/outdoors/');
-    expect(html).toContain('class="pigeon-overlays"');
-    expect(html).toContain('pointer-events:none');
-    expect(html).toContain('data-tone="cobalt"');
-    expect(html).not.toContain('data-tone="vermilion"');
-    expect(html).toContain('vector-effect="non-scaling-stroke"');
-    expect(html).toMatch(/scale\(\d+\.\d{6}\)/);
-    expect(html).toMatch(/d="M\d{5,}/);
-  });
-
-  it('projects, unprojects, and computes relative GPU gesture transform matrices', () => {
-    const sf: [number, number] = [37.7749, -122.4194];
-    const ref = mercatorRefPoint(sf);
-    const roundTripped = unprojectMercatorRef(ref);
-    expect(roundTripped[0]).toBeCloseTo(sf[0], 4);
-    expect(roundTripped[1]).toBeCloseTo(sf[1], 4);
-
-    const base = computeTransformBasis(sf, 11, 800, 600);
-    const zoomed = computeTransformBasis(sf, 12, 800, 600);
-    const target = { style: { transform: 'initial' } } as unknown as HTMLElement;
-    applyRelativeTransform(target, base, base);
-    expect(target.style.transform).toBe('');
-    applyRelativeTransform(target, zoomed, base);
-    expect(target.style.transform).toContain('scale(2.00000)');
-
-    const workerRoutes = buildWorkerRoutes(decodeRoutes(ROUTES));
-    expect(workerRoutes).toHaveLength(2);
-    expect(workerRoutes[0]?.legs[0]?.length).toBeGreaterThan(1);
+    expect(html).toContain('data-tones="cobalt"');
+    expect(html).not.toContain('vermilion');
+    expect(html).toMatch(
+      /data-transform="translate\(-?\d+\.\d{2} -?\d+\.\d{2}\) scale\(\d+\.\d{6}\)"/,
+    );
   });
 });
