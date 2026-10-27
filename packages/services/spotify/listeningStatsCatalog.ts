@@ -277,7 +277,7 @@ export function mapCatalogSlices({
   }>;
   shownAlbums: ReadonlyArray<{ albumId: string; plays: number }>;
   shownTracks: ReadonlyArray<{ plays: number; trackId: string }>;
-  topDepthRows: ReadonlyArray<{ artistId: string; months: number; plays: number; tracks: number }>;
+  topDepthRows: ReadonlyArray<{ active: number; artistId: string; plays: number; tracks: number }>;
   tracks: ReadonlyMap<string, StatsTrack>;
 }): Pick<ListeningStats, 'frontToBack' | 'onRepeat' | 'topAlbums' | 'topArtists' | 'topTracks'> {
   return {
@@ -300,12 +300,12 @@ export function mapCatalogSlices({
       })
       .filter(isNotNullish),
     topArtists: topDepthRows
-      .map(({ artistId, months, plays, tracks: artistTracks }) => {
+      .map(({ active, artistId, plays, tracks: artistTracks }) => {
         const artist = artistMap.get(artistId);
         return artist
           ? {
+              active,
               id: artistId,
-              months,
               name: artist.name,
               plays,
               tracks: artistTracks,

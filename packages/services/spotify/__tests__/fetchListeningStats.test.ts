@@ -171,7 +171,6 @@ describe('fetchListeningStats', () => {
 
     expect(stats).toMatchObject({
       activeDays: 8,
-      activeMonths: 5,
       artists: 2,
       dayStreak: { days: 4, end: '2024-03-08', start: '2024-03-05' },
       firstPlayedAt: '2023-11-12T20:00:00.000Z',
@@ -204,6 +203,7 @@ describe('fetchListeningStats', () => {
         },
       ],
       lastPlayedAt: '2024-05-01T20:00:00.000Z',
+      loyalty: { active: 5, possible: 7, unit: 'month' },
       minutesPerPlay: 3,
       monthStreak: { end: '2024-03', months: 3, start: '2024-01' },
       newArtists: { ids: [GUEST], label: 'New artist this year' },
@@ -257,16 +257,16 @@ describe('fetchListeningStats', () => {
     ]);
     expect(stats?.topArtists).toEqual([
       {
+        active: 5,
         id: ARTIST,
-        months: 5,
         name: 'ODESZA',
         plays: 14,
         tracks: 7,
         url: 'https://open.spotify.com/artist/cached',
       },
       {
+        active: 1,
         id: GUEST,
-        months: 1,
         name: 'Burna Boy',
         plays: 4,
         tracks: 1,
@@ -330,11 +330,11 @@ describe('fetchListeningStats', () => {
     const stats2024 = await fetchListeningStats({ kind: 'year', year: 2024 });
     expect(stats2024).toMatchObject({
       activeDays: 7,
-      activeMonths: 4,
       champions: {
         aside: '#1 song each month in 2024',
         title: 'Soundtrack by month',
       },
+      loyalty: { active: 4, possible: 5, unit: 'month' },
       matrix: {
         title: 'Every week of 2024',
       },
@@ -359,7 +359,7 @@ describe('fetchListeningStats', () => {
     const stats2023 = await fetchListeningStats({ kind: 'year', year: 2023 });
     expect(stats2023).toMatchObject({
       activeDays: 1,
-      activeMonths: 1,
+      loyalty: { active: 1, possible: 12, unit: 'month' },
       newArtists: { ids: [ARTIST], label: 'New artist in 2023' },
       plays: 1,
       range: { kind: 'year', year: 2023 },
@@ -384,6 +384,7 @@ describe('fetchListeningStats', () => {
         aside: '#1 song each day',
         title: 'Soundtrack by day',
       },
+      loyalty: { active: 1, possible: 7, unit: 'day' },
       matrix: {
         title: 'Every day & shift',
       },
@@ -408,6 +409,7 @@ describe('fetchListeningStats', () => {
         aside: '#1 song each week',
         title: 'Soundtrack by week',
       },
+      loyalty: { active: 1, possible: 1, unit: 'day' },
       matrix: {
         title: 'Every day, this month',
       },
@@ -426,6 +428,7 @@ describe('fetchListeningStats', () => {
   });
 
   it('scopes This month to the Pacific calendar month of today, not the last 30 days', async () => {
+    await seedCatalog();
     await db.SpotifyPlay.bulkCreate(
       [
         play('2026-09-28T19:00:00Z', 'ls-track-1'),
@@ -434,6 +437,8 @@ describe('fetchListeningStats', () => {
         play('2026-10-01T07:30:00Z', 'ls-track-2'),
         play('2026-10-10T19:00:00Z', 'ls-track-2'),
         play('2026-10-10T20:00:00Z', 'ls-track-3'),
+        // 11:30 PM on 10 Oct in Los Angeles, though already 11 Oct in UTC.
+        play('2026-10-11T06:30:00Z', 'ls-track-4'),
         play('2026-10-26T19:00:00Z', 'ls-track-3'),
       ].map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
     );
@@ -443,10 +448,12 @@ describe('fetchListeningStats', () => {
 
     expect(monthStats).toMatchObject({
       activeDays: 3,
-      matrix: { peakCell: { key: '2026-10-10', label: 'Sat 10 Oct 2026', plays: 2 } },
+      loyalty: { active: 3, possible: 26, unit: 'day' },
+      matrix: { peakCell: { key: '2026-10-10', label: 'Sat 10 Oct 2026', plays: 3 } },
       newArtists: { label: 'New artist this month' },
-      plays: 4,
+      plays: 5,
       spanDays: 26,
+      topArtists: [{ active: 3, id: ARTIST, plays: 5 }],
     });
     expect(cells.filter((cell) => cell.blank).map((cell) => cell.key)).toEqual([
       '2026-09-28',
