@@ -19,6 +19,7 @@ type RouteMapProps = {
  */
 export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProps) {
   const casingStroke = `light-dark(${ROUTE_MAP_TOKENS.light.casingStroke}, ${ROUTE_MAP_TOKENS.dark.casingStroke})`;
+  const customPaths = paths.some((p) => p.stroke !== undefined);
 
   return (
     <div aria-hidden="true" data-route-map="">
@@ -33,24 +34,39 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
       <svg
         aria-hidden="true"
         data-route-map-svg=""
-        preserveAspectRatio="xMidYMid slice"
+        preserveAspectRatio="none"
         viewBox={`0 0 ${frame.width} ${frame.height}`}
       >
-        {[true, false].map((casing) =>
-          paths.map(({ d, tone }) => (
-            <path
-              d={d}
-              data-tone={casing ? undefined : tone}
-              fill="none"
-              key={casing ? `casing-${tone}` : tone}
-              stroke={casing ? casingStroke : `var(--${tone})`}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={casing ? strokeWidth + 2.5 : strokeWidth}
-              vectorEffect="non-scaling-stroke"
-            />
-          )),
-        )}
+        {customPaths
+          ? paths.map(({ d, opacity, stroke, tone, width }) => (
+              <path
+                d={d}
+                data-tone={tone}
+                fill="none"
+                key={tone}
+                stroke={stroke}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeOpacity={opacity}
+                strokeWidth={width ?? strokeWidth}
+                vectorEffect="non-scaling-stroke"
+              />
+            ))
+          : [true, false].map((casing) =>
+              paths.map(({ d, tone }) => (
+                <path
+                  d={d}
+                  data-tone={casing ? undefined : tone}
+                  fill="none"
+                  key={casing ? `casing-${tone}` : tone}
+                  stroke={casing ? casingStroke : `var(--${tone})`}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={casing ? strokeWidth + 2.5 : strokeWidth}
+                  vectorEffect="non-scaling-stroke"
+                />
+              )),
+            )}
       </svg>
     </div>
   );

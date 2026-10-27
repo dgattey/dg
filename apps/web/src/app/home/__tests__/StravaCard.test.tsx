@@ -103,24 +103,12 @@ const renderCard = (value: StravaHistory | null) =>
     </ServerTimeProvider>,
   );
 
-/** Card maps measure themselves; jsdom has no layout, so the frame's own size stands. */
-class StillResizeObserver {
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-}
-
 beforeEach(() => {
   jest.useFakeTimers({ now: NOW });
-  Object.defineProperty(globalThis, 'ResizeObserver', {
-    configurable: true,
-    value: StillResizeObserver,
-  });
 });
 
 afterEach(() => {
   jest.useRealTimers();
-  Reflect.deleteProperty(globalThis, 'ResizeObserver');
 });
 
 describe('StravaCard', () => {
@@ -136,7 +124,7 @@ describe('StravaCard', () => {
     expect(screen.getByRole('heading', { name: 'Big map' })).toBeInTheDocument();
     const atlas = screen.getByRole('link', { name: 'Big map' });
     expect(atlas).toHaveAttribute('href', '/activities');
-    expect(inkedTones(atlas)).toEqual(['cobalt', 'vermilion']);
+    expect(inkedTones(atlas)).toEqual(['casing', 'tier-0']);
     expect(within(atlas).getByText('3 routes')).toBeInTheDocument();
     expect(within(atlas).getByText('0.7× around Earth')).toBeInTheDocument();
     expect(within(atlas).getByText('Explore big map →')).toBeInTheDocument();

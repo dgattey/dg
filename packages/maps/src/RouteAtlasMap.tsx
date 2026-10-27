@@ -146,8 +146,7 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
 
   const dispatchRender = (target: RefViewport, onReady?: () => void) => {
     const canvas = canvasRef.current;
-    const { ch, cw } = st;
-    if (!st.worker || !canvas || cw <= 0 || ch <= 0) return onReady?.();
+    if (!st.worker || !canvas) return onReady?.();
     if (st.sentRoutes !== routes) {
       st.sentRoutes = routes;
       const packed = decodeRoutes(routes).map(({ id, points }) => ({
@@ -157,9 +156,9 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
       st.worker.postMessage({ routes: packed, type: 'routes' });
     }
     const basis = basisOf(target);
-    const key = `${visible ? [...visible].join(',') : '*'}|${dark ? 1 : 0}|${cw}x${ch}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
+    const key = `${visible ? [...visible].join(',') : '*'}|${dark ? 1 : 0}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
     if (st.lastKey === key) {
-      applyTransform(canvas, basisOf(st.live), st.basis, cw, ch);
+      applyTransform(canvas, basisOf(st.live), st.basis, st.cw, st.ch);
       return onReady?.();
     }
     st.lastKey = key;
@@ -168,8 +167,8 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
     st.onReady = onReady ?? null;
     const msg = Object.assign(
       { bScale: basis.scale, bTx: basis.tx, bTy: basis.ty, dark, zf },
-      { dpr: Math.min(2, window.devicePixelRatio || 1), height: ch, id: st.reqId, width: cw },
-      { scale: basis.scale * (cw / W), tx: basis.tx * (cw / W), ty: basis.ty * (ch / H) },
+      { dpr: Math.min(2, window.devicePixelRatio || 1), height: H, id: st.reqId, width: W },
+      { scale: basis.scale, tx: basis.tx, ty: basis.ty },
       { type: 'render', visibleIds: visible ? [...visible] : null },
     );
     st.worker.postMessage(msg);
@@ -234,7 +233,7 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
         canvas.getContext('bitmaprenderer')?.transferFromImageBitmap(bitmap);
         ssrRef.current?.remove();
         s.basis = { scale, tx, ty };
-        applyTransform(canvas, basisOf(s.live), s.basis, bw, bh);
+        applyTransform(canvas, basisOf(s.live), s.basis, s.cw, s.ch);
         cb?.();
       };
       worker.onerror = () => {
@@ -318,7 +317,13 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
         })}
       </div>
       {ssrPathRef.current ? (
-        <svg aria-hidden="true" data-atlas-ssr="" ref={ssrRef} viewBox="0 0 390 470">
+        <svg
+          aria-hidden="true"
+          data-atlas-ssr=""
+          preserveAspectRatio="none"
+          ref={ssrRef}
+          viewBox="0 0 390 470"
+        >
           <path d={ssrPathRef.current} stroke="var(--cobalt)" vectorEffect="non-scaling-stroke" />
         </svg>
       ) : null}
