@@ -3,7 +3,6 @@ import type {
   StatsPopularity,
   StatsPopularityYear,
 } from '@dg/services/spotify/listeningStatsPopularity';
-import type { CSSProperties } from 'react';
 import { cx } from '../../collage/paperVars';
 import { formatMonth, formatPercent, formatYearSpans } from './listeningStatsFormat';
 
@@ -81,14 +80,18 @@ export function PopularityLine({
               </svg>
             ) : null}
             {here ? (
-              <span
-                className={cx(
-                  'stats__popularityDot',
-                  here.usesCurrent && 'stats__popularityDot--current',
-                  activeKey === point.key && 'stats__popularityDot--active',
-                )}
-                style={{ '--popularity': here.popularity / 100 } as CSSProperties}
-              />
+              <svg aria-hidden="true" className="stats__popularityPoint">
+                <circle
+                  className={cx(
+                    'stats__popularityDot',
+                    here.usesCurrent && 'stats__popularityDot--current',
+                    activeKey === point.key && 'stats__popularityDot--active',
+                  )}
+                  cx="50%"
+                  cy={`${100 - here.popularity}%`}
+                  r={5.5}
+                />
+              </svg>
             ) : null}
           </span>
         );
