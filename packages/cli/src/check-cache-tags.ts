@@ -177,7 +177,12 @@ function checkNoInlineStyles(
   content: string,
   sourceLines: ReadonlyArray<string>,
 ): Array<StructureViolation> {
-  if (relPath.startsWith('packages/cli/') || /SocialCard\w*\.tsx$/.test(relPath)) {
+  // ImageResponse renders JSX without stylesheets, so its elements need inline styles.
+  if (
+    relPath.startsWith('packages/cli/') ||
+    /SocialCard\w*\.tsx$/.test(relPath) ||
+    content.includes("from 'next/og'")
+  ) {
     return [];
   }
   const violations: Array<StructureViolation> = [];

@@ -158,6 +158,11 @@ describe('check-structure', () => {
       'export const X = () => <div style={{ "--bar": "50%" }} />;\n',
     );
     assert.equal(cssVarInlineStyleAllowed.length, 0);
+    const imageResponseInlineStyleAllowed = checkFileStructure(
+      'apps/web/src/app/tiles/route.tsx',
+      "import { ImageResponse } from 'next/og';\nexport const X = () => new ImageResponse(<div style={{ display: 'flex' }} />);\n",
+    );
+    assert.equal(imageResponseInlineStyleAllowed.length, 0);
 
     const orphanCss = checkOrphanCssFiles(
       ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
