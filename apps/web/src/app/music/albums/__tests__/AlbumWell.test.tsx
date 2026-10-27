@@ -1,13 +1,6 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import { act, render, screen } from '@testing-library/react';
-import { AlbumDetailBodySkeleton } from '../AlbumDetailBodySkeleton';
+import { render, screen } from '@testing-library/react';
 import { AlbumWell } from '../AlbumWell';
-
-function wellReserveHeight() {
-  return (
-    document.querySelector<HTMLElement>('section')?.style.getPropertyValue('--well-reserve-h') ?? ''
-  );
-}
 
 const album: PlaylistAlbum = {
   addedAt: '2024-01-02T03:04:05Z',
@@ -35,196 +28,24 @@ describe('AlbumWell', () => {
     );
   });
 
-  it('renders streamed detail inside the well', () => {
+  it('renders the loaded detail inside the well', () => {
     render(
       <AlbumWell album={album}>
-        <p>streamed tracklist</p>
+        <p>loaded tracklist</p>
       </AlbumWell>,
     );
 
-    expect(screen.getByText('streamed tracklist')).toBeInTheDocument();
+    expect(screen.getByText('loaded tracklist')).toBeInTheDocument();
   });
 
-  it('tweens shell height when streamed content grows, then releases to auto', () => {
-    let observerCallback: ResizeObserverCallback | undefined;
-    const OriginalResizeObserver = global.ResizeObserver;
-
-    global.ResizeObserver = class {
-      constructor(callback: ResizeObserverCallback) {
-        observerCallback = callback;
-      }
-      observe = jest.fn();
-      unobserve = jest.fn();
-      disconnect = jest.fn();
-    } as unknown as typeof ResizeObserver;
-
-    let rafCallback: FrameRequestCallback | undefined;
-    const rafSpy = jest
-      .spyOn(window, 'requestAnimationFrame')
-      .mockImplementation((callback: FrameRequestCallback) => {
-        rafCallback = callback;
-        return 1;
-      });
-
+  it('adds no stickers of its own, so opening never pops new ones in', () => {
     const { container } = render(
       <AlbumWell album={album}>
-        <div>skeleton</div>
+        <p>loaded tracklist</p>
       </AlbumWell>,
     );
 
-    const shell = container.firstElementChild as HTMLElement;
-    const measure = shell.firstElementChild as HTMLElement;
-    let scrollHeight = 80;
-
-    Object.defineProperty(measure, 'scrollHeight', {
-      configurable: true,
-      get: () => scrollHeight,
-    });
-
-    act(() => {
-      observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
-    });
-
-    scrollHeight = 240;
-    act(() => {
-      observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
-    });
-
-    expect(shell).toHaveClass('music__wellOuter--locked');
-    expect(shell.style.getPropertyValue('--well-locked-h')).toBe('80px');
-
-    act(() => {
-      rafCallback?.(0);
-    });
-
-    expect(shell.style.getPropertyValue('--well-locked-h')).toBe('240px');
-
-    act(() => {
-      const end = new Event('transitionend', { bubbles: true });
-      Object.defineProperty(end, 'propertyName', { value: 'height' });
-      Object.defineProperty(end, 'target', { value: shell });
-      Object.defineProperty(end, 'currentTarget', { value: shell });
-      shell.dispatchEvent(end);
-    });
-
-    expect(shell).not.toHaveClass('music__wellOuter--locked');
-    expect(shell.style.getPropertyValue('--well-locked-h')).toBe('');
-
-    rafSpy.mockRestore();
-    global.ResizeObserver = OriginalResizeObserver;
-  });
-
-  it('floors the well at the outgoing height while a placeholder stands in', () => {
-    let observerCallback: ResizeObserverCallback | undefined;
-    const OriginalResizeObserver = global.ResizeObserver;
-
-    global.ResizeObserver = class {
-      constructor(callback: ResizeObserverCallback) {
-        observerCallback = callback;
-      }
-      observe = jest.fn();
-      unobserve = jest.fn();
-      disconnect = jest.fn();
-    } as unknown as typeof ResizeObserver;
-
-    const { container, rerender } = render(
-      <AlbumWell album={album}>
-        <div>album one tracklist</div>
-      </AlbumWell>,
-    );
-
-    const shell = container.firstElementChild as HTMLElement;
-    const measure = shell.firstElementChild as HTMLElement;
-    const scrollHeight = 900;
-
-    Object.defineProperty(measure, 'scrollHeight', {
-      configurable: true,
-      get: () => scrollHeight,
-    });
-
-    act(() => {
-      observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
-    });
-
-    expect(wellReserveHeight()).toBe('');
-
-    act(() => {
-      rerender(
-        <AlbumWell album={{ ...album, id: 'album-2', name: 'Other Album' }}>
-          <AlbumDetailBodySkeleton />
-        </AlbumWell>,
-      );
-    });
-
-    expect(wellReserveHeight()).toBe('900px');
-    expect(screen.getByRole('region', { name: 'Other Album details' })).toBeInTheDocument();
-
-    global.ResizeObserver = OriginalResizeObserver;
-  });
-
-  it('has no floor to apply before an album has ever been measured', () => {
-    render(
-      <AlbumWell album={album}>
-        <AlbumDetailBodySkeleton />
-      </AlbumWell>,
-    );
-
-    expect(wellReserveHeight()).toBe('');
-  });
-
-  it('skips height tweening when the user prefers reduced motion', () => {
-    let observerCallback: ResizeObserverCallback | undefined;
-    const OriginalResizeObserver = global.ResizeObserver;
-    const matchMediaSpy = jest.spyOn(window, 'matchMedia').mockImplementation(
-      (query) =>
-        ({
-          addEventListener: jest.fn(),
-          addListener: jest.fn(),
-          dispatchEvent: jest.fn(),
-          matches: query.includes('prefers-reduced-motion'),
-          media: query,
-          onchange: null,
-          removeEventListener: jest.fn(),
-          removeListener: jest.fn(),
-        }) as MediaQueryList,
-    );
-
-    global.ResizeObserver = class {
-      constructor(callback: ResizeObserverCallback) {
-        observerCallback = callback;
-      }
-      observe = jest.fn();
-      unobserve = jest.fn();
-      disconnect = jest.fn();
-    } as unknown as typeof ResizeObserver;
-
-    const { container } = render(
-      <AlbumWell album={album}>
-        <div>skeleton</div>
-      </AlbumWell>,
-    );
-
-    const shell = container.firstElementChild as HTMLElement;
-    const measure = shell.firstElementChild as HTMLElement;
-    let scrollHeight = 80;
-
-    Object.defineProperty(measure, 'scrollHeight', {
-      configurable: true,
-      get: () => scrollHeight,
-    });
-
-    act(() => {
-      observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
-    });
-
-    scrollHeight = 240;
-    act(() => {
-      observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
-    });
-
-    expect(shell).not.toHaveStyle({ height: '80px' });
-
-    matchMediaSpy.mockRestore();
-    global.ResizeObserver = OriginalResizeObserver;
+    expect(container.querySelector('[data-cut-out]')).not.toBeInTheDocument();
+    expect(container.querySelector('.collageBackdrop')).not.toBeInTheDocument();
   });
 });

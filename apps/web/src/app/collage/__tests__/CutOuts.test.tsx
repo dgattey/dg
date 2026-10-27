@@ -3,7 +3,6 @@ import path from 'node:path';
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { act, render } from '@testing-library/react';
 import {
-  ALBUM_DETAIL_BACKDROP,
   ALBUMS_BACKDROP,
   DEV_CONSOLE_BACKDROP,
   HISTORY_BACKDROP,
@@ -109,7 +108,6 @@ describe('collage cut-outs', () => {
   it('keeps all decorative cut-outs strictly behind foreground content (zIndex < 2)', () => {
     const backdropCutOuts = [
       ALBUMS_BACKDROP,
-      ALBUM_DETAIL_BACKDROP,
       HISTORY_BACKDROP,
       DEV_CONSOLE_BACKDROP,
       NOT_FOUND_BACKDROP,

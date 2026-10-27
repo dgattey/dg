@@ -113,7 +113,7 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
                   {track.name}
                 </SpotifyAnchor>
               </Tooltip>
-              <ArtistLinks artists={track.artists} newArtists={stats.newArtists} />
+              <ArtistLinks artists={track.artists} newArtists={stats.newArtists} subject="song" />
             </span>
             <span className="stats__topCountGroup">
               <span className="stats__count" data-typography="title-md">
@@ -183,7 +183,7 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
               <AlbumLink album={album} className="stats__label" variant="label">
                 {album.name}
               </AlbumLink>
-              <ArtistLinks artists={album.artists} newArtists={stats.newArtists} />
+              <ArtistLinks artists={album.artists} newArtists={stats.newArtists} subject="album" />
             </div>
             <span aria-hidden="true" className="stats__meter" style={bar(sessionPlays, plays)} />
             <span className="stats__meta" data-typography="meta">
@@ -257,7 +257,7 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
                 {String(i + 1).padStart(2, '0')}
               </td>
               <th scope="row">
-                <ArtistLinks artists={[artist]} newArtists={stats.newArtists} />
+                <ArtistLinks artists={[artist]} newArtists={stats.newArtists} subject="artist" />
               </th>
               <td className="stats__cell" data-typography="row-title">
                 {formatCount(artist.plays)}

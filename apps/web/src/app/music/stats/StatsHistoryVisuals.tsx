@@ -322,6 +322,7 @@ export function SoundtrackCard({
                   artists={track.artists}
                   className="stats__meta stats__championArtist"
                   newArtists={stats.newArtists}
+                  subject="song"
                   variant="caption"
                 />
               </span>

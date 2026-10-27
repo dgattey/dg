@@ -25,7 +25,7 @@ const albums = [album('album-zebra', 'Zebra'), album('album-mango', 'Mango')];
 const renderGrid = () => renderToString(<FavoriteAlbumsGrid albums={albums} />);
 
 const albumLinks = (html: string) =>
-  [...html.matchAll(/href="\/music\/albums\?album=([^"]+)"/g)].map(([, id]) => id);
+  [...html.matchAll(/href="\/music\/albums\?album=([^"#]+)#album-\1"/g)].map(([, id]) => id);
 
 describe('FavoriteAlbumsGrid on the server', () => {
   it('renders every album tile statically without reading searchParams on the server', () => {

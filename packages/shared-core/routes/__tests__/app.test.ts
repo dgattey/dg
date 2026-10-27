@@ -54,7 +54,7 @@ describe('markdown page registry', () => {
     );
   });
 
-  it('builds album detail routes under favorite albums', () => {
-    expect(albumRoute('abc123')).toBe(`${favoriteAlbumsRoute}?album=abc123`);
+  it('builds album detail routes under favorite albums that target the album cell', () => {
+    expect(albumRoute('abc123')).toBe(`${favoriteAlbumsRoute}?album=abc123#album-abc123`);
   });
 });

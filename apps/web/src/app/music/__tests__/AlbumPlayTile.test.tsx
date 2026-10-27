@@ -57,4 +57,16 @@ describe('AlbumPlayTile', () => {
     expect(screen.getByText('EAST')).toBeInTheDocument();
     expect(screen.getByText('Earl Sweatshirt')).toBeInTheDocument();
   });
+
+  it('tags a new artist on an album run', () => {
+    render(<AlbumPlayTile {...props} newArtist="First played this month" />);
+
+    expect(screen.getByRole('img', { name: 'First played this month' })).toHaveTextContent('New!');
+  });
+
+  it('leaves a single song play untagged even when its artist is new', () => {
+    render(<AlbumPlayTile {...props} newArtist="First played this month" trackCount={1} />);
+
+    expect(screen.queryByRole('img', { name: 'First played this month' })).not.toBeInTheDocument();
+  });
 });
