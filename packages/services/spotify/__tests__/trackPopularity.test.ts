@@ -1,6 +1,6 @@
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import {
-  backfillTrackPopularity,
+  captureSyncedPopularity,
   captureTrackPopularity,
   deezerRankToPopularity,
   selectTracksMissingPopularity,
@@ -44,9 +44,32 @@ const storedRows = async () =>
     }),
   );
 
+const refused = (status: number, retryAfterSeconds?: number) => ({
+  response: { json: async () => ({}) },
+  ...(retryAfterSeconds === undefined ? {} : { retryAfterSeconds }),
+  status,
+});
+
+const echoTracks = (popularity: number) => async (resource: string) =>
+  spotifyTracks(
+    resource
+      .replace('tracks?ids=', '')
+      .split(',')
+      .map((id) => ({ id, popularity })),
+  );
+
+const play = (trackId: string, day = 1) => ({
+  albumId: 'album',
+  artistIds: ['artist'],
+  playedAt: new Date(Date.UTC(2015, 0, day)),
+  trackId,
+});
+
 beforeEach(async () => {
   jest.clearAllMocks();
+  jest.restoreAllMocks();
   await db.MusicTrackPopularity.destroy({ where: {} });
+  await db.SyncBackoff.destroy({ where: {} });
   await db.SpotifyPlay.destroy({ where: {} });
 });
 
@@ -75,7 +98,7 @@ describe('captureTrackPopularity', () => {
     expect(mockSpotifyGet).toHaveBeenCalledWith('tracks?ids=track-a,track-b,track-c');
     expect(mockFetchDeezerTrack).toHaveBeenCalledTimes(1);
     expect(mockFetchDeezerTrack).toHaveBeenCalledWith('USRC17607839');
-    expect(result).toEqual({ deezer: 1, spotify: 1, stoppedEarly: false });
+    expect(result).toEqual({ deezer: 1, remaining: [], spotify: 1, unmatched: 1 });
     expect(await storedRows()).toEqual([
       { capturedOn: '2026-10-26', popularity: 80, source: 'spotify', trackId: 'track-a' },
       { capturedOn: '2026-10-26', popularity: 51, source: 'deezer', trackId: 'track-b' },
@@ -108,44 +131,111 @@ describe('captureTrackPopularity', () => {
   });
 
   it('stops at a refused call and reports the retry delay without throwing', async () => {
-    mockSpotifyGet.mockResolvedValue({
-      response: { json: async () => ({}) },
-      retryAfterSeconds: 12,
-      status: 429,
-    });
+    mockSpotifyGet.mockResolvedValue(refused(429, 12));
 
     const result = await captureTrackPopularity(['track-a'], CAPTURED_AT);
 
-    expect(result).toEqual({ deezer: 0, retryAfterSeconds: 12, spotify: 0, stoppedEarly: true });
+    expect(result).toEqual({
+      deezer: 0,
+      failure: { retryAfterSeconds: 12, status: 429 },
+      remaining: ['track-a'],
+      spotify: 0,
+      unmatched: 0,
+    });
     expect(await db.MusicTrackPopularity.count()).toBe(0);
+  });
+
+  it('keeps rows from earlier calls when a later call is refused or throws', async () => {
+    const ids = Array.from({ length: 120 }, (_, i) => `track-${String(i).padStart(3, '0')}`);
+    const firstCall = echoTracks(55);
+    mockSpotifyGet
+      .mockImplementationOnce(firstCall)
+      .mockRejectedValueOnce(new Error('socket hang up'));
+
+    const thrown = await captureTrackPopularity(ids, CAPTURED_AT);
+
+    expect(thrown).toEqual({
+      deezer: 0,
+      failure: {},
+      remaining: ids.slice(50),
+      spotify: 50,
+      unmatched: 0,
+    });
+    expect(await db.MusicTrackPopularity.count()).toBe(50);
+
+    mockSpotifyGet.mockImplementationOnce(firstCall).mockResolvedValueOnce(refused(503));
+
+    const refusedLater = await captureTrackPopularity(thrown.remaining, CAPTURED_AT);
+
+    expect(refusedLater).toMatchObject({
+      failure: { status: 503 },
+      remaining: ids.slice(100),
+      spotify: 50,
+    });
+    expect(await db.MusicTrackPopularity.count()).toBe(100);
   });
 });
 
-describe('backfillTrackPopularity', () => {
-  it('scores only played tracks that have no snapshot from any source', async () => {
-    await db.SpotifyPlay.bulkCreate([
-      { albumId: 'album', artistIds: ['artist'], playedAt: new Date('2015-01-01'), trackId: 'old' },
-      { albumId: 'album', artistIds: ['artist'], playedAt: new Date('2015-01-02'), trackId: 'old' },
-      {
-        albumId: 'album',
-        artistIds: ['artist'],
-        playedAt: new Date('2016-01-01'),
-        trackId: 'seen',
-      },
-    ]);
+describe('captureSyncedPopularity', () => {
+  const backoff = async () => await db.SyncBackoff.findByPk('spotify:track-popularity');
+
+  it('scores the synced tracks, then only played tracks with no snapshot from any source', async () => {
+    await db.SpotifyPlay.bulkCreate([play('old', 1), play('old', 2), play('seen', 3)]);
     await db.MusicTrackPopularity.create({
       capturedOn: '2026-01-01',
       popularity: 30,
       source: 'deezer',
       trackId: 'seen',
     });
-    mockSpotifyGet.mockResolvedValue(spotifyTracks([{ id: 'old', popularity: 22 }]));
+    mockSpotifyGet.mockImplementation(echoTracks(22));
 
     expect(await selectTracksMissingPopularity()).toEqual(['old']);
-    const result = await backfillTrackPopularity();
+    await captureSyncedPopularity(['new']);
 
-    expect(mockSpotifyGet).toHaveBeenCalledWith('tracks?ids=old');
-    expect(result.spotify).toBe(1);
+    expect(mockSpotifyGet.mock.calls.map(([resource]) => resource)).toEqual([
+      'tracks?ids=new',
+      'tracks?ids=old',
+    ]);
     expect(await selectTracksMissingPopularity()).toEqual([]);
+    expect(await backoff()).toBeNull();
+  });
+
+  it('holds Retry-After: 0 to a one-minute pause and skips Spotify until it passes', async () => {
+    mockSpotifyGet.mockResolvedValue(refused(429, 0));
+    const before = Date.now();
+
+    await captureSyncedPopularity(['track-a']);
+
+    const pause = await backoff();
+    expect(pause?.failures).toBe(1);
+    expect(pause?.retryAt.getTime()).toBeGreaterThanOrEqual(before + 60_000);
+    expect(mockSpotifyGet).toHaveBeenCalledTimes(1);
+
+    await captureSyncedPopularity(['track-a']);
+    expect(mockSpotifyGet).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops on a refused capture and backs off longer each time Spotify keeps failing', async () => {
+    await db.SpotifyPlay.bulkCreate([play('old')]);
+    jest.spyOn(Math, 'random').mockReturnValue(1);
+    mockSpotifyGet.mockResolvedValue(refused(502));
+    const pauses: Array<number> = [];
+
+    for (let run = 0; run < 3; run++) {
+      await db.SyncBackoff.update({ retryAt: new Date(0) }, { where: {} });
+      const before = Date.now();
+      await captureSyncedPopularity(['track-a']);
+      pauses.push(((await backoff())?.retryAt.getTime() ?? 0) - before);
+    }
+
+    expect(mockSpotifyGet).toHaveBeenCalledTimes(3);
+    expect(mockSpotifyGet).not.toHaveBeenCalledWith('tracks?ids=old');
+    expect((await backoff())?.failures).toBe(3);
+    expect(pauses.map((ms) => Math.round(ms / 60_000))).toEqual([15, 30, 60]);
+
+    await db.SyncBackoff.update({ retryAt: new Date(0) }, { where: {} });
+    mockSpotifyGet.mockImplementation(echoTracks(40));
+    await captureSyncedPopularity(['track-a']);
+    expect(await backoff()).toBeNull();
   });
 });

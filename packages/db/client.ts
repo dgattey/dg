@@ -16,6 +16,7 @@ import { Release } from './models/Release';
 import { SpotifyPlay } from './models/SpotifyPlay';
 import { StravaActivity } from './models/StravaActivity';
 import { StravaHistorySummary } from './models/StravaHistorySummary';
+import { SyncBackoff } from './models/SyncBackoff';
 import { Token } from './models/Token';
 
 export const db = {
@@ -34,6 +35,7 @@ export const db = {
   SpotifyPlay,
   StravaActivity,
   StravaHistorySummary,
+  SyncBackoff,
   Token,
 } as const;
 

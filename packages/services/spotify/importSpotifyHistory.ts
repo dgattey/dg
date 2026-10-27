@@ -15,7 +15,7 @@ import { insertSpotifyPlayBatch } from './syncSpotifyHistory';
 import { cacheTrackData, resolveTrackDisplays } from './trackDisplays';
 import { mapInBatches, type TrackMetadata } from './trackMetadataShared';
 import { searchTrackDisplayData, type TrackDisplayData } from './trackMetadataSingle';
-import { captureTrackPopularity } from './trackPopularity';
+import { captureTrackPopularity, summarizeCapture } from './trackPopularity';
 
 /**
  * Spotify's Extended Streaming History export records `ts` in whole seconds,
@@ -270,7 +270,7 @@ export async function importSpotifyHistoryEntries(
     failedTracks: failedIds.length,
     imported,
     musicEntries: entries.length,
-    popularity,
+    popularity: summarizeCapture(popularity),
   });
 
   return { ...baseCounts, alreadyInDb, failedTrackIds: failedIds, imported };

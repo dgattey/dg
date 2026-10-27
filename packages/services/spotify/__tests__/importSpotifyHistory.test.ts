@@ -24,8 +24,8 @@ jest.mock('../spotifyClient', () => ({
 const mockCaptureTrackPopularity = jest.fn();
 
 jest.mock('../trackPopularity', () => ({
-  backfillTrackPopularity: jest.fn(async () => ({ deezer: 0, spotify: 0, stoppedEarly: false })),
   captureTrackPopularity: (...args: Array<unknown>) => mockCaptureTrackPopularity(...args),
+  summarizeCapture: jest.fn(() => ({})),
 }));
 
 const TRACK_1 = '000000000000000import1';
@@ -234,7 +234,12 @@ describe('extractZipJsonFiles', () => {
 describe('importSpotifyHistory', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCaptureTrackPopularity.mockResolvedValue({ deezer: 0, spotify: 0, stoppedEarly: false });
+    mockCaptureTrackPopularity.mockResolvedValue({
+      deezer: 0,
+      remaining: [],
+      spotify: 0,
+      unmatched: 0,
+    });
   });
 
   it('imports new plays, resolves metadata, and is idempotent on re-import', async () => {
