@@ -1,7 +1,8 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { Typography } from '@dg/ui/core/Typography';
+import { albumWellViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import type { CSSProperties, RefObject } from 'react';
-import { Fragment, use } from 'react';
+import { Fragment, use, ViewTransition } from 'react';
 import type { CollageCardTreatment } from '../../collage/collageCardTreatment';
 import { AlbumDetailBody } from './AlbumDetailBody';
 import { AlbumWell } from './AlbumWell';
@@ -43,6 +44,10 @@ function SelectedAlbumDetail({ albumId }: { albumId: string }) {
   return <AlbumDetailBody album={detail} />;
 }
 
+/**
+ * The `album-well` boundary wraps the slot itself: React only names an entering
+ * or exiting `<ViewTransition>` that sits above the first DOM node it mounts.
+ */
 export function SelectedAlbumWell({
   albumCount,
   selectedCard,
@@ -59,16 +64,18 @@ export function SelectedAlbumWell({
   }
 
   return (
-    <div
-      className="music__wellSlot"
-      ref={wellRef}
-      style={wellPlacementStyle(selectedIndex, albumCount)}
-    >
-      <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
-        <Fragment key={selectedCard.album.id}>
-          <SelectedAlbumDetail albumId={selectedCard.album.id} />
-        </Fragment>
-      </AlbumWell>
-    </div>
+    <ViewTransition {...albumWellViewTransitionProps}>
+      <div
+        className="music__wellSlot"
+        ref={wellRef}
+        style={wellPlacementStyle(selectedIndex, albumCount)}
+      >
+        <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
+          <Fragment key={selectedCard.album.id}>
+            <SelectedAlbumDetail albumId={selectedCard.album.id} />
+          </Fragment>
+        </AlbumWell>
+      </div>
+    </ViewTransition>
   );
 }

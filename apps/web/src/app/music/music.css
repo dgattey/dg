@@ -71,7 +71,6 @@
 .music__cardInner {
   display: block;
   padding: 14px 14px 18px;
-  overflow: clip;
 }
 .music__albumLink {
   --album-fan-spread: 1;
@@ -294,12 +293,6 @@
 @media (min-width: 992px) {
   .music__wellSlot {
     order: var(--well-order-lg);
-  }
-}
-@supports not (-moz-appearance: none) {
-  html:active-view-transition-type(album-close) .music__wellCard,
-  html:active-view-transition-type(album-open) .music__wellCard {
-    view-transition-name: album-well;
   }
 }
 .music__wellInner {
