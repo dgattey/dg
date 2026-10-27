@@ -115,13 +115,6 @@
   background-color: #2a2a2a;
 }
 
-[data-atlas-tile-box] {
-  position: absolute;
-  inset: 0;
-  transform: var(--atlas-tile-transform);
-  transform-origin: 0 0;
-}
-
 [data-route-map] {
   position: relative;
   width: 100%;
@@ -178,12 +171,6 @@ html[data-color-scheme="dark"] [data-map-scheme="dark"] {
   position: absolute;
   inset: 0;
   z-index: 1;
-}
-
-[data-map-tile-layer] > div {
-  width: 100% !important;
-  height: 100% !important;
-  background-color: transparent !important;
 }
 
 [data-route-map-scrim] {
