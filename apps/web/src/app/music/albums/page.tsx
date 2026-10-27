@@ -2,10 +2,10 @@ import 'server-only';
 import '../music.css';
 import '../../collage/pills.css';
 
-import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
+import { ALBUM_PARAM, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { getFavoriteAlbums } from '../../../services/albums';
+import { getAlbumDetail, getFavoriteAlbums } from '../../../services/albums';
 import { ALBUMS_BACKDROP } from '../../collage/backdrops';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationTitle } from '../../layouts/musicHeaderDestinations';
@@ -22,8 +22,12 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-async function AlbumsGrid() {
-  const albums = await getFavoriteAlbums();
+type FavoriteAlbumsPageProps = {
+  searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
+};
+
+async function AlbumsGrid({ searchParams }: FavoriteAlbumsPageProps) {
+  const [albums, params] = await Promise.all([getFavoriteAlbums(), searchParams]);
 
   if (albums === null) {
     return (
@@ -40,10 +44,21 @@ async function AlbumsGrid() {
     );
   }
 
-  return <FavoriteAlbumsGrid albums={albums} />;
+  const selectedAlbumId = albums.find(({ id }) => id === params?.[ALBUM_PARAM])?.id;
+  return (
+    <FavoriteAlbumsGrid
+      albums={albums}
+      initialAlbumId={selectedAlbumId}
+      initialDetail={selectedAlbumId ? getAlbumDetail(selectedAlbumId) : undefined}
+    />
+  );
 }
 
-export default function FavoriteAlbumsPage() {
+/**
+ * Keep this sync — `searchParams` is awaited only inside the Suspense boundary
+ * so the shell can prerender.
+ */
+export default function FavoriteAlbumsPage({ searchParams }: FavoriteAlbumsPageProps) {
   return (
     <MusicPageShell
       backdrop={ALBUMS_BACKDROP}
@@ -52,7 +67,7 @@ export default function FavoriteAlbumsPage() {
       title={TITLE}
     >
       <Suspense fallback={<FavoriteAlbumsSkeleton />}>
-        <AlbumsGrid />
+        <AlbumsGrid searchParams={searchParams} />
       </Suspense>
     </MusicPageShell>
   );

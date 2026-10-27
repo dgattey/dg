@@ -1,10 +1,11 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { Typography } from '@dg/ui/core/Typography';
 import { albumWellViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import type { CSSProperties, RefObject } from 'react';
-import { Fragment, use, ViewTransition } from 'react';
+import { Fragment, Suspense, use, ViewTransition } from 'react';
 import type { CollageCardTreatment } from '../../collage/collageCardTreatment';
-import { AlbumDetailBody } from './AlbumDetailBody';
+import { AlbumDetailBody, AlbumDetailBodySkeleton } from './AlbumDetailBody';
 import { AlbumWell } from './AlbumWell';
 import { albumDetailFor } from './albumDetailCache';
 import { COLLAGE_ALBUM_GRID_COLUMNS } from './collageAlbumCardTreatments';
@@ -31,8 +32,12 @@ export type AlbumCard = {
   treatment: CollageCardTreatment;
 };
 
-function SelectedAlbumDetail({ albumId }: { albumId: string }) {
-  const detail = use(albumDetailFor(albumId));
+function SelectedAlbumDetail({
+  detailPromise,
+}: {
+  detailPromise: Promise<AlbumDetail | null | undefined>;
+}) {
+  const detail = use(detailPromise);
   if (!detail) {
     return (
       <Typography color="var(--dg-palette-text-secondary)">
@@ -47,14 +52,18 @@ function SelectedAlbumDetail({ albumId }: { albumId: string }) {
 /**
  * The `album-well` boundary wraps the slot itself: React only names an entering
  * or exiting `<ViewTransition>` that sits above the first DOM node it mounts.
+ * Only the server-rendered album streams behind a skeleton. An album opened on the
+ * client suspends its selection transition instead, so the well opens at its final height.
  */
 export function SelectedAlbumWell({
   albumCount,
+  initialDetail,
   selectedCard,
   selectedIndex,
   wellRef,
 }: {
   albumCount: number;
+  initialDetail: Promise<AlbumDetail | null | undefined> | undefined;
   selectedCard: AlbumCard | undefined;
   selectedIndex: number;
   wellRef: RefObject<HTMLDivElement | null>;
@@ -72,7 +81,13 @@ export function SelectedAlbumWell({
       >
         <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
           <Fragment key={selectedCard.album.id}>
-            <SelectedAlbumDetail albumId={selectedCard.album.id} />
+            {initialDetail ? (
+              <Suspense fallback={<AlbumDetailBodySkeleton />}>
+                <SelectedAlbumDetail detailPromise={initialDetail} />
+              </Suspense>
+            ) : (
+              <SelectedAlbumDetail detailPromise={albumDetailFor(selectedCard.album.id)} />
+            )}
           </Fragment>
         </AlbumWell>
       </div>

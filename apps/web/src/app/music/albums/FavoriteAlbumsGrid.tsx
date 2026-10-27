@@ -1,6 +1,7 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { ALBUM_PARAM, albumAnchorId, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { albumTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { EASING_DEFAULT, TIMING_MEDIUM, TIMING_SLOW } from '@dg/ui/helpers/timing';
@@ -35,9 +36,6 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
 };
 
 function readUrlAlbumId(): string | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
   return new URLSearchParams(window.location.search).get(ALBUM_PARAM);
 }
 
@@ -79,15 +77,19 @@ type PendingSlide = {
 
 type Props = {
   albums: Array<PlaylistAlbum>;
+  /** The album `?album=` opened on the server. */
+  initialAlbumId?: string;
+  /** Its detail, still streaming from the server. */
+  initialDetail?: Promise<AlbumDetail | null | undefined>;
 };
 
-export function FavoriteAlbumsGrid({ albums }: Props) {
-  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
+export function FavoriteAlbumsGrid({ albums, initialAlbumId, initialDetail }: Props) {
+  const [selectedAlbumId, setSelectedAlbumId] = useState(initialAlbumId ?? null);
   const [sortKey, setSortKey] = useState<AlbumSortKey>(DEFAULT_ALBUM_SORT);
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const wellRef = useRef<HTMLDivElement>(null);
   const pendingSlide = useRef<PendingSlide | null>(null);
-  const landOnWell = useRef(false);
+  const landOnWell = useRef(initialAlbumId !== undefined);
   useNearbyAlbumPrefetch(itemRefs);
 
   useEffect(() => {
@@ -96,8 +98,6 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
         setSelectedAlbumId(readUrlAlbumId());
       });
     };
-    landOnWell.current = readUrlAlbumId() !== null;
-    syncFromUrl();
     window.addEventListener('popstate', syncFromUrl);
     return () => {
       window.removeEventListener('popstate', syncFromUrl);
@@ -230,6 +230,7 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   const wellSlot = (
     <SelectedAlbumWell
       albumCount={sortedAlbumCards.length}
+      initialDetail={selectedAlbumId === initialAlbumId ? initialDetail : undefined}
       key="album-well"
       selectedCard={sortedAlbumCards[selectedIndex]}
       selectedIndex={selectedIndex}
