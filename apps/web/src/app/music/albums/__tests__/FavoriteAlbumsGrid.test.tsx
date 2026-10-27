@@ -275,6 +275,24 @@ describe('FavoriteAlbumsGrid', () => {
     expect(screen.queryByRole('region', { name: 'Apple details' })).not.toBeInTheDocument();
   });
 
+  it('starts loading an album on hover or focus, without opening it', async () => {
+    const user = userEvent.setup();
+    const fig = { ...albums[0], id: 'album-fig', name: 'Fig' } as PlaylistAlbum;
+    const lime = { ...albums[1], id: 'album-lime', name: 'Lime' } as PlaylistAlbum;
+    render(<FavoriteAlbumsGrid albums={[fig, lime]} />);
+
+    await user.hover(screen.getByRole('link', { name: /Fig/ }));
+    expect(loadAlbumDetail).toHaveBeenCalledWith('album-fig');
+    expect(loadAlbumDetail).not.toHaveBeenCalledWith('album-lime');
+
+    act(() => {
+      screen.getByRole('link', { name: /Lime/ }).focus();
+    });
+    expect(loadAlbumDetail).toHaveBeenCalledWith('album-lime');
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+    expect(window.location.search).toBe('');
+  });
+
   it('lands on the open well when the page arrives with an album selected', async () => {
     setUrl('album=album-mango');
 
@@ -305,7 +323,8 @@ describe('FavoriteAlbumsGrid', () => {
   });
 
   it('retries an album whose detail failed once the visitor asks for it again', async () => {
-    const user = userEvent.setup();
+    // Hover, press, and click land together, so the first load is still pending at the press.
+    const user = userEvent.setup({ delay: null });
     jest.mocked(loadAlbumDetail).mockClear();
     const kiwi = { ...albums[0], id: 'album-kiwi', name: 'Kiwi' } as PlaylistAlbum;
     jest

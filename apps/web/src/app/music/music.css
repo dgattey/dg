@@ -345,6 +345,10 @@
   width: 100%;
   max-width: 300px;
 }
+/* The pinned tags fly with the cover, so they never pop in on top of it when the morph ends. */
+.music__wellArtFrame {
+  position: relative;
+}
 .music__wellArtCard {
   width: 100%;
   overflow: hidden;

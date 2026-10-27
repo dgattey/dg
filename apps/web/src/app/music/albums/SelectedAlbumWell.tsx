@@ -1,12 +1,11 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { Typography } from '@dg/ui/core/Typography';
 import type { CSSProperties, RefObject } from 'react';
 import { Fragment, use } from 'react';
-import { loadAlbumDetail } from '../../../services/albumDetail.actions';
 import type { CollageCardTreatment } from '../../collage/collageCardTreatment';
 import { AlbumDetailBody } from './AlbumDetailBody';
 import { AlbumWell } from './AlbumWell';
+import { albumDetailFor } from './albumDetailCache';
 import { COLLAGE_ALBUM_GRID_COLUMNS } from './collageAlbumCardTreatments';
 
 /**
@@ -30,30 +29,6 @@ export type AlbumCard = {
   album: PlaylistAlbum;
   treatment: CollageCardTreatment;
 };
-
-const albumDetails = new Map<string, Promise<AlbumDetail | null | undefined>>();
-const failedAlbumIds = new Set<string>();
-
-/**
- * One request per album for the page's lifetime. Selecting an album happens in a
- * transition that suspends on this, so the grid keeps its current layout until the
- * well can open at its final height. A failed load stays failed until the visitor
- * asks for that album again, so rendering the failure never refetches in a loop.
- */
-export function albumDetailFor(albumId: string, { retryFailed = false } = {}) {
-  if (retryFailed && failedAlbumIds.delete(albumId)) {
-    albumDetails.delete(albumId);
-  }
-  let detail = albumDetails.get(albumId);
-  if (!detail) {
-    detail = loadAlbumDetail(albumId).catch(() => {
-      failedAlbumIds.add(albumId);
-      return undefined;
-    });
-    albumDetails.set(albumId, detail);
-  }
-  return detail;
-}
 
 function SelectedAlbumDetail({ albumId }: { albumId: string }) {
   const detail = use(albumDetailFor(albumId));

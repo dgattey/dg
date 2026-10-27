@@ -6,6 +6,7 @@ import type { TypographyVariant } from '@dg/ui/core/Typography';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { Fragment, type ReactNode } from 'react';
 import { cx } from '../../collage/paperVars';
+import { albumDetailFor } from '../albums/albumDetailCache';
 import { type ArtistRowSubject, NewArtistBadge } from '../NewArtistBadge';
 
 export function SpotifyAnchor({
@@ -36,7 +37,10 @@ export function SpotifyAnchor({
   );
 }
 
-/** A favorite album opens in place on the favorite albums page; any other opens on Spotify. */
+/**
+ * A favorite album opens in place on the favorite albums page; any other opens on Spotify.
+ * Hover or focus starts loading the favorite's details, so its well opens without waiting.
+ */
 export function AlbumLink({
   album,
   children,
@@ -50,10 +54,15 @@ export function AlbumLink({
   label?: string;
   variant?: TypographyVariant;
 }) {
+  const prefetchAlbum = () => {
+    void albumDetailFor(album.id);
+  };
   return album.isFavorite ? (
     <PageTransitionLink
       className={cx('stats__itemLink', className)}
       href={albumRoute(album.id)}
+      onFocus={prefetchAlbum}
+      onPointerEnter={prefetchAlbum}
       title={label ?? album.name}
       variant={variant}
     >

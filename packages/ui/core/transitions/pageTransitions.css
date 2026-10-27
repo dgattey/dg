@@ -122,47 +122,45 @@ html:active-view-transition-type(page-close)::view-transition-new(root) {
 }
 
 /*
- * Album well open/close. Vertical clip rather than a second shared-art flight:
- * the cover already morphs under `.vt-album-art`, and this layer only reveals
- * the surface around it, over the same duration as the art.
- * Under art (z 150) so the morph still clears the well surface.
+ * Album well open/close. The cover already morphs under `.vt-album-art`, so this
+ * layer only rolls the surface around it down out of its top edge, like a drawer,
+ * in step with the cells below sliding the same distance. It stays opaque the
+ * whole way: a fade would show the page backdrop through the well and then hide it.
+ * The clip trims only the top edge, so the card's shadow and tilted corners are
+ * already on screen when the live card takes over. Under art (z 150) so the morph
+ * still clears the well surface.
  */
 ::view-transition-group(album-well) {
   z-index: 140;
-  overflow: clip;
+  clip-path: inset(0 -48px -48px);
   animation-duration: var(--timing-medium);
   animation-timing-function: var(--easing-default);
 }
 
 ::view-transition-old(album-well) {
-  transform-origin: top center;
   animation: var(--timing-medium) var(--easing-default) both vt-album-well-collapse;
 }
 
 ::view-transition-new(album-well) {
-  transform-origin: top center;
   animation: var(--timing-medium) var(--easing-default) both vt-album-well-expand;
 }
 
+/* The extra few pixels tuck the card's shadow above the clip too. */
 @keyframes vt-album-well-expand {
   from {
-    opacity: 0;
-    transform: translateY(-8px) scaleY(0.96);
+    transform: translateY(calc(-100% - 6px));
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }
 
 @keyframes vt-album-well-collapse {
   from {
-    opacity: 1;
     transform: none;
   }
   to {
-    opacity: 0;
-    transform: translateY(-8px) scaleY(0.96);
+    transform: translateY(calc(-100% - 6px));
   }
 }
 

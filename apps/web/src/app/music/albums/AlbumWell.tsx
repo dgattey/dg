@@ -24,8 +24,9 @@ type Props = {
 
 /**
  * Expanded album well. The grid only mounts it once the detail has loaded, so it
- * opens at its final height in one commit: the `album-well` view transition fades
- * it in while the cells below slide down, and nothing inside it resizes afterwards.
+ * opens at its final height in one commit: the `album-well` view transition rolls
+ * it down while the cells below slide the same distance, and nothing inside it
+ * resizes afterwards.
  */
 export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
   return (
@@ -48,37 +49,39 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
             name={albumArtViewTransitionName(album.id)}
             share="vt-album-art"
           >
-            <div className="music__wellArtCard">
-              <Image
-                alt={album.name}
-                fetchPriority="high"
-                height={WELL_ART_SIZE}
-                preload={true}
-                sizes={COLLAGE_WELL_ART_SIZES}
-                url={album.imageUrl}
-                width={WELL_ART_SIZE}
-              />
+            <div className="music__wellArtFrame">
+              <div className="music__wellArtCard">
+                <Image
+                  alt={album.name}
+                  fetchPriority="high"
+                  height={WELL_ART_SIZE}
+                  preload={true}
+                  sizes={COLLAGE_WELL_ART_SIZES}
+                  url={album.imageUrl}
+                  width={WELL_ART_SIZE}
+                />
+              </div>
+              <PaperTag
+                className="collagePin music__wellAlbumTag"
+                edge="quad-c"
+                tiltDeg={-5}
+                tone="ochre"
+                variant="meta"
+              >
+                <span>Album</span>
+                <small>{album.releaseDate.slice(0, 4)}</small>
+              </PaperTag>
+              <PaperTag
+                className="collagePin music__wellSpotifyTag"
+                edge="quad-c"
+                tiltDeg={3}
+                tone="cream"
+                variant="meta"
+              >
+                Spotify ↗
+              </PaperTag>
             </div>
           </ViewTransition>
-          <PaperTag
-            className="collagePin music__wellAlbumTag"
-            edge="quad-c"
-            tiltDeg={-5}
-            tone="ochre"
-            variant="meta"
-          >
-            <span>Album</span>
-            <small>{album.releaseDate.slice(0, 4)}</small>
-          </PaperTag>
-          <PaperTag
-            className="collagePin music__wellSpotifyTag"
-            edge="quad-c"
-            tiltDeg={3}
-            tone="cream"
-            variant="meta"
-          >
-            Spotify ↗
-          </PaperTag>
         </Link>
         <h2 className="music__wellName" data-typography="display-page">
           <Link href={album.url} isExternal={true} title={album.name}>

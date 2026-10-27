@@ -4,7 +4,7 @@ import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { ALBUM_PARAM, albumAnchorId, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { albumTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { EASING_DEFAULT, TIMING_MEDIUM, TIMING_SLOW } from '@dg/ui/helpers/timing';
-import type { CSSProperties, MouseEvent, PointerEvent } from 'react';
+import type { CSSProperties, FocusEvent, MouseEvent, PointerEvent } from 'react';
 import {
   addTransitionType,
   startTransition,
@@ -14,6 +14,7 @@ import {
   useState,
 } from 'react';
 import { collageCardTreatment } from '../../collage/collageCardTreatment';
+import { albumDetailFor } from './albumDetailCache';
 import {
   type AlbumSortKey,
   COLLAGE_ALBUM_GRID_COLUMNS,
@@ -21,7 +22,8 @@ import {
   DEFAULT_ALBUM_SORT,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
-import { type AlbumCard, albumDetailFor, SelectedAlbumWell } from './SelectedAlbumWell';
+import { type AlbumCard, SelectedAlbumWell } from './SelectedAlbumWell';
+import { useNearbyAlbumPrefetch } from './useNearbyAlbumPrefetch';
 
 const COLLAGE_FIRST_SCREEN_CELLS = COLLAGE_ALBUM_GRID_COLUMNS.xs * 2;
 
@@ -86,6 +88,7 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   const wellRef = useRef<HTMLDivElement>(null);
   const pendingSlide = useRef<PendingSlide | null>(null);
   const landOnWell = useRef(false);
+  useNearbyAlbumPrefetch(itemRefs);
 
   useEffect(() => {
     const syncFromUrl = () => {
@@ -115,10 +118,13 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
     };
   };
 
-  const onAlbumPointerDownCapture = (event: PointerEvent<HTMLElement>) => {
+  const prefetchAlbumFor = (
+    event: FocusEvent<HTMLElement> | PointerEvent<HTMLElement>,
+    { retryFailed = false } = {},
+  ) => {
     const nextAlbumId = albumsRouteAnchor(event)?.searchParams.get(ALBUM_PARAM);
     if (nextAlbumId) {
-      void albumDetailFor(nextAlbumId, { retryFailed: true });
+      void albumDetailFor(nextAlbumId, { retryFailed });
     }
   };
 
@@ -187,11 +193,27 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
       }
       moves.push({ deltaX, deltaY, element });
     }
-    for (const { deltaX, deltaY, element } of moves) {
+    const slides = moves.map(({ deltaX, deltaY, element }) =>
       element.animate(
         [{ transform: `translate(${deltaX}px, ${deltaY}px)` }, { transform: 'translate(0, 0)' }],
         { duration: previous.duration, easing: EASING_DEFAULT },
-      );
+      ),
+    );
+    // The view transition's own animations only start once its new snapshot is captured, a
+    // frame or more after this commit. Holding the cells on their first frame until then keeps
+    // them level with the well instead of opening a gap to the backdrop.
+    const viewTransition = document.activeViewTransition;
+    if (viewTransition) {
+      for (const slide of slides) {
+        slide.pause();
+      }
+      void viewTransition.ready
+        .catch(() => undefined)
+        .then(() => {
+          for (const slide of slides) {
+            slide.play();
+          }
+        });
     }
   });
 
@@ -254,7 +276,9 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
       <div
         className="music__albumGrid"
         onClickCapture={onAlbumNavigationCapture}
-        onPointerDownCapture={onAlbumPointerDownCapture}
+        onFocusCapture={(event) => prefetchAlbumFor(event)}
+        onPointerDownCapture={(event) => prefetchAlbumFor(event, { retryFailed: true })}
+        onPointerOverCapture={(event) => prefetchAlbumFor(event)}
       >
         {cells}
       </div>
