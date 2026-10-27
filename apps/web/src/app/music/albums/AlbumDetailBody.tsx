@@ -1,4 +1,5 @@
 import type { AlbumDetail, AlbumDetailArtist } from '@dg/services/spotify/albumDetailTypes';
+import { Skeleton } from '@dg/ui/core/Skeleton';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Link } from '@dg/ui/dependent/Link';
 import type { ReactNode } from 'react';
@@ -48,6 +49,42 @@ function LinkedArtists({ artists }: { artists: ReadonlyArray<AlbumDetailArtist> 
       </Link>
     </span>
   ));
+}
+
+const PLACEHOLDER_TRACK_NUMBERS = Array.from({ length: 13 }, (_, index) => index + 1);
+
+/** `AlbumDetailBody`'s layout, line for line, at the most common favorite-album length. */
+export function AlbumDetailBodySkeleton() {
+  return (
+    <>
+      <div className="music__wellMeta">
+        <h3 className="music__wellArtists" data-typography="title-md">
+          <Skeleton height="1lh" maxWidth="320px" width="55%" />
+        </h3>
+        <p className="music__wellFacts" data-typography="meta">
+          <Skeleton height="1lh" maxWidth="240px" width="45%" />
+        </p>
+      </div>
+      <ol className="music__wellTracks" data-typography="prose">
+        {PLACEHOLDER_TRACK_NUMBERS.map((trackNumber) => (
+          <li className="music__wellTrack" key={trackNumber}>
+            <span className="music__wellTrackNumber">{trackNumber}</span>
+            <span className="music__wellTrackBody">
+              <span className="music__wellTrackTitle">
+                <Skeleton height="1lh" width="70%" />
+              </span>
+              <span className="music__wellTrackArtist">
+                <Skeleton height="1lh" width="45%" />
+              </span>
+            </span>
+            <span className="music__wellTrackDuration">
+              <Skeleton height="1lh" width="2.5em" />
+            </span>
+          </li>
+        ))}
+      </ol>
+    </>
+  );
 }
 
 /**
