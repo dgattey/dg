@@ -40,7 +40,7 @@ export function frameTiles({
             decoding="async"
             loading="lazy"
             src={url()}
-            srcSet={tileSource.mode === 'offline' ? undefined : `${url(1)}, ${url(2)} 2x`}
+            srcSet={`${url(1)}, ${url(2)} 2x`}
           />
         </div>,
       );

@@ -1,6 +1,7 @@
-import { OFFLINE_TILES } from './offlineTile';
-
 const STADIA_ORIGIN = 'https://tiles.stadiamaps.com';
+
+/** Offline tiles come from this site's own `/tiles` route, which mirrors Stadia's paths. */
+const TILE_ORIGINS = { offline: '', stadia: STADIA_ORIGIN } as const;
 
 export type TileSource = { mode: 'offline' } | { apiKey: string | null; mode: 'stadia' };
 
@@ -26,7 +27,6 @@ export function resolveTileSource({ MAP_TILES, NODE_ENV, STADIA_API_KEY }: TileE
 }
 
 type TileRequest = {
-  dark?: boolean;
   extension: 'jpg' | 'png';
   retina?: boolean;
   style: string;
@@ -46,15 +46,12 @@ export function withStadiaKey(source: TileSource, url: string) {
 
 export function stadiaTileUrl(
   source: TileSource,
-  { dark = false, extension, retina = false, style, x, y, zoom }: TileRequest,
+  { extension, retina = false, style, x, y, zoom }: TileRequest,
 ) {
-  if (source.mode === 'offline') {
-    return dark ? OFFLINE_TILES.dark : OFFLINE_TILES.light;
-  }
   const density = retina ? '@2x' : '';
   return withStadiaKey(
     source,
-    `${STADIA_ORIGIN}/tiles/${style}/${zoom}/${x}/${y}${density}.${extension}`,
+    `${TILE_ORIGINS[source.mode]}/tiles/${style}/${zoom}/${x}/${y}${density}.${extension}`,
   );
 }
 
@@ -79,7 +76,6 @@ export function outdoorsTileUrl(
   },
 ) {
   return stadiaTileUrl(source, {
-    dark,
     extension: 'png',
     retina: Boolean(dpr && dpr > 1),
     style: dark ? 'alidade_smooth_dark' : 'outdoors',

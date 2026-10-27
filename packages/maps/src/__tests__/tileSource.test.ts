@@ -1,4 +1,3 @@
-import { OFFLINE_TILES } from '../offlineTile';
 import { resolveTileSource, stadiaTileUrl } from '../tileSource';
 
 const watercolor = { extension: 'jpg', style: 'stamen_watercolor', x: 1, y: 2, zoom: 3 } as const;
@@ -49,18 +48,20 @@ describe('tile source', () => {
     { MAP_TILES: 'offline', NODE_ENV: 'production' },
     { MAP_TILES: 'offline', NODE_ENV: 'development' },
     { NODE_ENV: 'test' },
-  ])('serves the local placeholder for %o', (env) => {
+  ])('serves Stadia paths from this site for %o', (env) => {
     const source = resolveTileSource({ ...env, STADIA_API_KEY });
 
     expect(source).toEqual({ mode: 'offline' });
-    expect(stadiaTileUrl(source, watercolor)).toBe(OFFLINE_TILES.light);
-    expect(stadiaTileUrl(source, { ...watercolor, dark: true })).toBe(OFFLINE_TILES.dark);
-  });
-
-  it('keeps the placeholder inline so offline maps make no requests', () => {
-    for (const tile of Object.values(OFFLINE_TILES)) {
-      expect(tile).toMatch(/^data:image\/svg\+xml,/);
-      expect(tile).not.toContain('stadiamaps');
-    }
+    expect(stadiaTileUrl(source, watercolor)).toBe('/tiles/stamen_watercolor/3/1/2.jpg');
+    expect(
+      stadiaTileUrl(source, {
+        extension: 'png',
+        retina: true,
+        style: 'outdoors',
+        x: 4,
+        y: 5,
+        zoom: 6,
+      }),
+    ).toBe('/tiles/outdoors/6/4/5@2x.png');
   });
 });

@@ -21,7 +21,7 @@ Lightweight map component using Pigeon Maps with Stamen Watercolor tiles.
 
 - Production (`NODE_ENV=production`) sends `STADIA_API_KEY`
 - Development sends no key; Stadia serves keyless `localhost` requests without spending account credits
-- Tests and `MAP_TILES=offline` render an inline placeholder tile and make no tile requests
+- Tests and `MAP_TILES=offline` load debug tiles from this site's `/tiles` route, which serves Stadia's paths with each tile's z/x/y, a grid, and hard edges drawn on it, so tile placement and drift stay visible without any Stadia requests
 
 ## Usage
 
