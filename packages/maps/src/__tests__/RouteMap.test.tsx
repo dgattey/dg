@@ -36,9 +36,11 @@ describe('RouteMap', () => {
   it('positions tiles in card-relative percentages so rotated cards and all breakpoints render without ResizeObserver reflow', () => {
     const html = serverMarkup();
 
-    expect(html).toMatch(/--tile-h:\d+\.\d{4}%/);
-    expect(html).toMatch(/--tile-w:\d+\.\d{4}%/);
-    expect(html).toMatch(/--tile-left:-?\d+\.\d{4}%/);
-    expect(html).toMatch(/--tile-top:-?\d+\.\d{4}%/);
+    expect(html).toContain('data-atlas-tile-stage=""');
+    expect(html).toMatch(
+      /--box-transform:translate3d\(-?\d+\.\d{4}%, -?\d+\.\d{4}%, 0px\) scale\(\d+\.\d{6}, \d+\.\d{6}\)/,
+    );
+    expect(html).toContain('--tile-w:100%');
+    expect(html).toContain('--tile-h:100%');
   });
 });

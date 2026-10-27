@@ -40,38 +40,46 @@ const basisOf = (v: RefViewport): Basis => {
   return { scale, tx: W / 2 - v.x * scale, ty: H / 2 - v.y * scale };
 };
 
-const applyTransform = (el: HTMLElement | null, live: Basis, base: Basis) => {
+const applyTransform = (el: HTMLElement | null, live: Basis, base: Basis, cw = W, ch = H) => {
   if (!el) return;
   const s = live.scale / base.scale;
-  const tx = ((live.tx - base.tx * s) / W) * 100;
-  const ty = ((live.ty - base.ty * s) / H) * 100;
+  const tx = (live.tx - base.tx * s) * (cw / W);
+  const ty = (live.ty - base.ty * s) * (ch / H);
   el.style.transform =
-    Math.abs(s - 1) < 1e-5 && Math.abs(tx) < 0.01 && Math.abs(ty) < 0.01
+    Math.abs(s - 1) < 1e-5 && Math.abs(tx) < 0.05 && Math.abs(ty) < 0.05
       ? ''
-      : `translate3d(${tx.toFixed(3)}%, ${ty.toFixed(3)}%, 0px) scale(${s.toFixed(5)})`;
-};
-
-const cssColor = (styles: CSSStyleDeclaration, name: string, dark: boolean) => {
-  const raw = styles.getPropertyValue(name).trim();
-  const parts = raw.startsWith('light-dark(') ? raw.slice(11, -1).split(',') : null;
-  return (parts ? parts[dark ? 1 : 0]?.trim() : raw) || '#1d1a15';
+      : `translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0px) scale(${s.toFixed(5)})`;
 };
 
 const WORKER_SCRIPT = `let allRoutes = [], offscreen = null, ctx = null;
+const PAL = {
+  light: [['#2c4db0',0.36,0.9],['#2658c8',0.66,1],['#7cc4ff',0.94,1],['#e0f2ff',0.98,1.12]],
+  dark: [['#457ae0',0.36,0.9],['#5896f5',0.66,1],['#94d2ff',0.94,1],['#e6f5ff',0.98,1.12]],
+};
 function packLeg(leg) {
   const pts = []; let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, px = -999999, py = -999999;
   for (let i = 0; i < leg.length; i++) { const x = Math.round(leg[i].x), y = Math.round(leg[i].y); if (x === px && y === py) continue; px = x; py = y; pts.push(x, y); if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
   return { minX, maxX, minY, maxY, coords: new Int32Array(pts) };
 }
 self.onmessage = ({ data: msg }) => {
-  if (msg.type === 'routes') { allRoutes = msg.routes.map((r) => ({ id: r.id, tone: r.tone, chunks: r.legs.map(packLeg).filter((c) => c.coords.length >= 4) })); return; }
+  if (msg.type === 'routes') { allRoutes = msg.routes.map((r) => ({ id: r.id, chunks: r.legs.map(packLeg).filter((c) => c.coords.length >= 4) })); return; }
   if (msg.type !== 'render') return;
-  const { id, width, height, dpr, scale, tx, ty, bScale, bTx, bTy, casingColor, casingWidth, lineWidth, toneColors, visibleIds } = msg, pw = Math.max(1, Math.round(width * dpr)), ph = Math.max(1, Math.round(height * dpr));
+  const { id, width, height, dpr, scale, tx, ty, bScale, bTx, bTy, dark, zf, visibleIds } = msg, pw = Math.max(1, Math.round(width * dpr)), ph = Math.max(1, Math.round(height * dpr));
   if (!offscreen || offscreen.width !== pw || offscreen.height !== ph) { offscreen = new OffscreenCanvas(pw, ph); ctx = offscreen.getContext('2d'); }
   if (!ctx) return; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, width, height);
-  const vis = visibleIds ? new Set(visibleIds) : null, m = 16, vMinX = (-tx - m) / scale, vMaxX = (width - tx + m) / scale, vMinY = (-ty - m) / scale, vMaxY = (height - ty + m) / scale, byTone = new Map(), seenByTone = new Map();
-  for (const route of allRoutes) { if (vis && !vis.has(route.id)) continue; let p2 = byTone.get(route.tone), seen = seenByTone.get(route.tone); for (const ch of route.chunks) { if (ch.maxX < vMinX || ch.minX > vMaxX || ch.maxY < vMinY || ch.minY > vMaxY) continue; if (!p2) { p2 = new Path2D(); seen = new Set(); byTone.set(route.tone, p2); seenByTone.set(route.tone, seen); } const coords = ch.coords; let prevX = -999999, prevY = -999999, started = false; for (let j = 0; j < coords.length; j += 2) { const sx = Math.round(coords[j] * scale + tx), sy = Math.round(coords[j + 1] * scale + ty); if (sx === prevX && sy === prevY) continue; if (prevX !== -999999) { if ((prevX < -m || prevX > width + m || prevY < -m || prevY > height + m) && (sx < -m || sx > width + m || sy < -m || sy > height + m)) { started = false; prevX = sx; prevY = sy; continue; } const k = prevX < sx || (prevX === sx && prevY < sy) ? ((prevX & 0xfff) << 20) ^ ((prevY & 0xfff) << 10) ^ ((sx & 0xfff) << 5) ^ (sy & 0xfff) : ((sx & 0xfff) << 20) ^ ((sy & 0xfff) << 10) ^ ((prevX & 0xfff) << 5) ^ (prevY & 0xfff); if (seen.has(k)) { started = false; prevX = sx; prevY = sy; continue; } seen.add(k); if (!started) { p2.moveTo(prevX, prevY); started = true; } p2.lineTo(sx, sy); } prevX = sx; prevY = sy; } } }
-  if (byTone.size > 0) { ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = casingColor; ctx.globalAlpha = 0.8; ctx.lineWidth = casingWidth; for (const p2 of byTone.values()) ctx.stroke(p2); ctx.globalAlpha = 1; ctx.lineWidth = lineWidth; for (const [tone, p2] of byTone.entries()) { ctx.strokeStyle = toneColors[tone] || '#2c4db0'; ctx.stroke(p2); } }
+  const vis = visibleIds ? new Set(visibleIds) : null, m = 16, vMinX = (-tx - m) / scale, vMaxX = (width - tx + m) / scale, vMinY = (-ty - m) / scale, vMaxY = (height - ty + m) / scale;
+  const gw = (width + 32) >> 2, gh = (height + 32) >> 2, grid = new Uint16Array(gw * gh), stamp = new Int32Array(gw * gh), seen = new Set(), segs = [];
+  let maxCount = 1, routeIdx = 0;
+  for (const route of allRoutes) { if (vis && !vis.has(route.id)) continue; routeIdx++; for (const ch of route.chunks) { if (ch.maxX < vMinX || ch.minX > vMaxX || ch.maxY < vMinY || ch.minY > vMaxY) continue; const coords = ch.coords; let prevX = -999999, prevY = -999999; for (let j = 0; j < coords.length; j += 2) { const sx = Math.round(coords[j] * scale + tx), sy = Math.round(coords[j + 1] * scale + ty); if (sx === prevX && sy === prevY) continue; if (prevX !== -999999 && !((prevX < -m || prevX > width + m || prevY < -m || prevY > height + m) && (sx < -m || sx > width + m || sy < -m || sy > height + m))) { const gx = (((prevX + sx) >> 1) + m) >> 2, gy = (((prevY + sy) >> 1) + m) >> 2; if (gx >= 0 && gx < gw && gy >= 0 && gy < gh) { const idx = gy * gw + gx; if (stamp[idx] !== routeIdx) { stamp[idx] = routeIdx; const c = ++grid[idx]; if (c > maxCount) maxCount = c; } const k = prevX < sx || (prevX === sx && prevY < sy) ? ((prevX & 0xfff) << 20) ^ ((prevY & 0xfff) << 10) ^ ((sx & 0xfff) << 5) ^ (sy & 0xfff) : ((sx & 0xfff) << 20) ^ ((sy & 0xfff) << 10) ^ ((prevX & 0xfff) << 5) ^ (prevY & 0xfff); if (!seen.has(k)) { seen.add(k); segs.push(prevX, prevY, sx, sy, idx); } } } prevX = sx; prevY = sy; } } }
+  if (segs.length > 0) {
+    const logMax = Math.log(Math.max(maxCount, 6)), tiers = [new Path2D(), new Path2D(), new Path2D(), new Path2D()], hasTier = [false, false, false, false], lx = [-999999,-999999,-999999,-999999], ly = [-999999,-999999,-999999,-999999];
+    for (let i = 0; i < segs.length; i += 5) { const c = grid[segs[i + 4]], u = c <= 1 ? 0 : Math.log(c) / logMax, t = u <= 0 ? 0 : u < 0.48 ? 1 : u < 0.78 ? 2 : 3, x0 = segs[i], y0 = segs[i + 1], x1 = segs[i + 2], y1 = segs[i + 3]; hasTier[t] = true; if (lx[t] !== x0 || ly[t] !== y0) tiers[t].moveTo(x0, y0); tiers[t].lineTo(x1, y1); lx[t] = x1; ly[t] = y1; }
+    const baseW = 0.8 + zf * 1.5, pal = dark ? PAL.dark : PAL.light;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    if (hasTier[0] || hasTier[1]) { const casing = new Path2D(); if (hasTier[0]) casing.addPath(tiers[0]); if (hasTier[1]) casing.addPath(tiers[1]); ctx.strokeStyle = dark ? '#0c1424' : '#f7f1e2'; ctx.globalAlpha = 0.42; ctx.lineWidth = baseW * 1.85; ctx.stroke(casing); }
+    if (hasTier[2] || hasTier[3]) { const sheath = new Path2D(); if (hasTier[2]) sheath.addPath(tiers[2]); if (hasTier[3]) sheath.addPath(tiers[3]); ctx.strokeStyle = dark ? '#2354cf' : '#193b96'; ctx.globalAlpha = 0.88; ctx.lineWidth = baseW * 2.05; ctx.stroke(sheath); }
+    for (let t = 0; t < 4; t++) { if (!hasTier[t]) continue; const [color, alpha, wMul] = pal[t]; ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = baseW * wMul; ctx.stroke(tiers[t]); }
+  }
   const bitmap = offscreen.transferToImageBitmap(); self.postMessage({ id, scale: bScale, tx: bTx, ty: bTy, width, height, dpr, bitmap }, [bitmap]);
 };`;
 
@@ -142,36 +150,26 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
     if (!st.worker || !canvas || cw <= 0 || ch <= 0) return onReady?.();
     if (st.sentRoutes !== routes) {
       st.sentRoutes = routes;
-      const packed = decodeRoutes(routes).map(({ id, points, tone }) => ({
+      const packed = decodeRoutes(routes).map(({ id, points }) => ({
         id,
         legs: routeLegs(points).map((leg) => leg.map(refOf)),
-        tone,
       }));
       st.worker.postMessage({ routes: packed, type: 'routes' });
     }
     const basis = basisOf(target);
     const key = `${visible ? [...visible].join(',') : '*'}|${dark ? 1 : 0}|${cw}x${ch}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
     if (st.lastKey === key) {
-      applyTransform(canvas, basisOf(st.live), st.basis);
+      applyTransform(canvas, basisOf(st.live), st.basis, cw, ch);
       return onReady?.();
     }
     st.lastKey = key;
-    const styles = getComputedStyle(canvas.closest('.collageRoot') ?? document.documentElement);
-    const tones = [...new Set(routes.map((r) => r.tone))];
     const zf = Math.max(0, Math.min(1, (target.zoom - 4) / (15 - 4)));
-    const kx = cw / W;
-    const ky = ch / H;
     st.reqId += 1;
     st.onReady = onReady ?? null;
     const msg = Object.assign(
-      { bScale: basis.scale, bTx: basis.tx, bTy: basis.ty },
-      {
-        casingColor: cssColor(styles, dark ? '--black' : '--cream', dark),
-        casingWidth: 2 + zf * 5,
-      },
+      { bScale: basis.scale, bTx: basis.tx, bTy: basis.ty, dark, zf },
       { dpr: Math.min(2, window.devicePixelRatio || 1), height: ch, id: st.reqId, width: cw },
-      { lineWidth: 1 + zf * 2.5, scale: basis.scale * kx, tx: basis.tx * kx, ty: basis.ty * ky },
-      { toneColors: Object.fromEntries(tones.map((t) => [t, cssColor(styles, `--${t}`, dark)])) },
+      { scale: basis.scale * (cw / W), tx: basis.tx * (cw / W), ty: basis.ty * (ch / H) },
       { type: 'render', visibleIds: visible ? [...visible] : null },
     );
     st.worker.postMessage(msg);
@@ -180,26 +178,31 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
   st.syncLive = (next: RefViewport) => {
     st.live = next;
     const liveBasis = basisOf(next);
-    applyTransform(tilesRef.current, liveBasis, basisOf(st.settled));
-    applyTransform(canvasRef.current, liveBasis, st.basis);
+    applyTransform(tilesRef.current, liveBasis, basisOf(st.settled), st.cw, st.ch);
+    applyTransform(canvasRef.current, liveBasis, st.basis, st.cw, st.ch);
   };
 
   st.settleTo = (target: RefViewport, isReset = false) => {
     if (st.wheelTimer !== null) clearTimeout(st.wheelTimer);
     st.wheelTimer = null;
+    const prev = basisOf(st.settled);
+    const next = basisOf(target);
+    const same =
+      Math.abs(next.scale - prev.scale) < 1e-5 &&
+      Math.abs(next.tx - prev.tx) < 0.25 &&
+      Math.abs(next.ty - prev.ty) < 0.25;
+    if (!isReset && same) {
+      st.live = st.settled;
+      if (tilesRef.current) tilesRef.current.style.transform = '';
+      applyTransform(canvasRef.current, prev, st.basis, st.cw, st.ch);
+      return;
+    }
     st.syncLive(target);
     const commit = () => {
-      const prev = basisOf(st.settled);
-      const next = basisOf(target);
       st.live = target;
-      if (tilesRef.current) tilesRef.current.style.transform = '';
-      applyTransform(canvasRef.current, next, st.basis);
-      const same =
-        Math.abs(next.scale - prev.scale) < 1e-5 &&
-        Math.abs(next.tx - prev.tx) < 0.25 &&
-        Math.abs(next.ty - prev.ty) < 0.25;
-      if (!isReset && same) return;
       st.settled = target;
+      if (tilesRef.current) tilesRef.current.style.transform = '';
+      applyTransform(canvasRef.current, next, st.basis, st.cw, st.ch);
       if (isReset) return setViewport(null);
       setViewport({ boundsKey, v: target });
       onCenterChange?.(toLatLng(target));
@@ -231,7 +234,7 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
         canvas.getContext('bitmaprenderer')?.transferFromImageBitmap(bitmap);
         ssrRef.current?.remove();
         s.basis = { scale, tx, ty };
-        applyTransform(canvas, basisOf(s.live), s.basis);
+        applyTransform(canvas, basisOf(s.live), s.basis, bw, bh);
         cb?.();
       };
       worker.onerror = () => {
@@ -298,31 +301,25 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
 
   useEffect(() => {
     if (tilesRef.current) tilesRef.current.style.transform = '';
-    applyTransform(canvasRef.current, settledBasis, st.basis);
+    applyTransform(canvasRef.current, settledBasis, st.basis, st.cw, st.ch);
     dispatchRender(activeRef);
-  });
-
-  const tiles = frameTiles({
-    center: toLatLng(activeRef),
-    dark,
-    height: H,
-    tileSource,
-    width: W,
-    zoom: activeRef.zoom,
   });
 
   return (
     <section aria-label={label} data-atlas-map="" ref={hostRef}>
       <div data-atlas-tiles="" data-dark={dark ? 'true' : undefined} ref={tilesRef}>
-        {tiles}
+        {frameTiles({
+          center: toLatLng(activeRef),
+          dark,
+          height: H,
+          tileSource,
+          width: W,
+          zoom: activeRef.zoom,
+        })}
       </div>
       {ssrPathRef.current ? (
         <svg aria-hidden="true" data-atlas-ssr="" ref={ssrRef} viewBox="0 0 390 470">
-          <path
-            d={ssrPathRef.current}
-            stroke={`var(--${activeTones[0] ?? 'cobalt'})`}
-            vectorEffect="non-scaling-stroke"
-          />
+          <path d={ssrPathRef.current} stroke="var(--cobalt)" vectorEffect="non-scaling-stroke" />
         </svg>
       ) : null}
       <canvas

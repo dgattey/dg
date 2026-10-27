@@ -49,7 +49,10 @@ describe('RouteAtlasMap', () => {
     ).toHaveLength(1);
     expect(html).toContain('data-tones="cobalt,vermilion"');
     expect(html).toContain('data:image/svg+xml,');
-    expect(html).toMatch(/--tile-w:\d+\.\d{4}%/);
+    expect(html).toContain('data-atlas-tile-stage=""');
+    expect(html).toMatch(
+      /--box-transform:translate3d\(-?\d+\.\d{4}%, -?\d+\.\d{4}%, 0px\) scale\(\d+\.\d{6}, \d+\.\d{6}\)/,
+    );
   });
 
   it('renders Stadia tiles, filtered route tones, and zoom controls when online', () => {
