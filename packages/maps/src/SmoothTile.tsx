@@ -47,10 +47,11 @@ export function useHostSize(
     const observer = new ResizeObserver(([entry]) => {
       const box = entry?.borderBoxSize[0];
       if (box && box.blockSize > 0 && box.inlineSize > 0) {
-        setSize({
-          height: round ? Math.round(box.blockSize) : box.blockSize,
-          width: round ? Math.round(box.inlineSize) : box.inlineSize,
-        });
+        const height = round ? Math.round(box.blockSize) : box.blockSize;
+        const width = round ? Math.round(box.inlineSize) : box.inlineSize;
+        setSize((prev) =>
+          prev.height === height && prev.width === width ? prev : { height, width },
+        );
       }
     });
     observer.observe(element);

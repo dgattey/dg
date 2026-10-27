@@ -142,6 +142,7 @@ export function framePaths(
   frame: RouteFrame,
   routes: ReadonlyArray<DecodedRoute>,
   margin = FRAME_MARGIN,
+  tolerance = PIXEL_TOLERANCE,
 ): Array<FramedPath> {
   const onScreen = (pixel: { x: number; y: number }) => isNearFrame(pixel, frame, margin);
   const byTone = new Map<string, Array<string>>();
@@ -162,7 +163,7 @@ export function framePaths(
       if (!pixels.some(onScreen)) {
         continue;
       }
-      const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]);
+      const simplified = simplifyLine(pixels, tolerance, ({ x, y }) => [x, y]);
       const rounded: Array<readonly [number, number]> = [];
       for (const { x, y } of simplified) {
         const point = [Math.round(x), Math.round(y)] as const;
@@ -176,7 +177,7 @@ export function framePaths(
       let steps: Array<string> = [];
       const flush = () => {
         if (start && steps.length > 0) {
-          runs.push(`M${start[0]} ${start[1]}l${steps.join(' ')}`);
+          runs.push(`M${start[0]} ${start[1]}l${steps.join(' ').replace(/ -/g, '-')}`);
         }
         start = null;
         steps = [];

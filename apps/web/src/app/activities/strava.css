@@ -84,6 +84,20 @@
   overflow: visible;
   border-radius: 0;
 }
+.strava__atlasMat::after {
+  --r: var(--print-radius);
+  --c: transparent calc(var(--r) - 0.5px), var(--pc, var(--cream)) var(--r);
+  position: absolute;
+  inset: var(--mat-feature);
+  z-index: 2;
+  pointer-events: none;
+  content: "";
+  background:
+    radial-gradient(circle at var(--r) var(--r), var(--c)) 0 0 / var(--r) var(--r) no-repeat,
+    radial-gradient(circle at 0 var(--r), var(--c)) 100% 0 / var(--r) var(--r) no-repeat,
+    radial-gradient(circle at var(--r) 0, var(--c)) 0 100% / var(--r) var(--r) no-repeat,
+    radial-gradient(circle at 0 0, var(--c)) 100% 100% / var(--r) var(--r) no-repeat;
+}
 .strava__atlasMap {
   position: relative;
 }

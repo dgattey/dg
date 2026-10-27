@@ -1,10 +1,16 @@
 'use client';
 
 import type { Point } from 'pigeon-maps';
-import { Map as PigeonMapCore } from 'pigeon-maps';
-import { use, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, type ReactElement, use, useEffect, useRef, useState } from 'react';
 import { VisibleRoutes } from '../VisibleRoutes';
-import { decodeRoutes, frameAround, type GeoBounds, type MapRoute, routeLegs } from './routeFrame';
+import {
+  decodeRoutes,
+  frameAround,
+  framePaths,
+  type GeoBounds,
+  type MapRoute,
+  routeLegs,
+} from './routeFrame';
 import { project, unproject } from './routeGeometry';
 import { SmoothTile, useHostSize } from './SmoothTile';
 import { outdoorsTileUrl, type TileSource } from './tileSource';
@@ -15,14 +21,12 @@ const MIN_ZOOM = 3;
 const MAX_ZOOM = 18;
 const REF_ZOOM = 12;
 const REF_SCALE = 256 * 2 ** REF_ZOOM;
+const NOOP = () => {};
 
 type Basis = { scale: number; tx: number; ty: number };
 type RefViewport = { x: number; y: number; zoom: number };
 
-const refOf = (pt: Point) => {
-  const { x, y } = project(pt);
-  return { x: x * REF_SCALE, y: y * REF_SCALE };
-};
+const refOf = (pt: Point) => ({ x: project(pt).x * REF_SCALE, y: project(pt).y * REF_SCALE });
 
 const toLatLng = ({ x, y }: { x: number; y: number }): Point =>
   unproject({
@@ -85,20 +89,27 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
   const hostRef = useRef<HTMLElement>(null);
   const tilesRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const ssrRef = useRef<SVGSVGElement>(null);
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
   const activeBounds = view ?? bounds;
   const boundsKey = `${fitKey}:${activeBounds[0][0]},${activeBounds[0][1]}:${activeBounds[1][0]},${activeBounds[1][1]}`;
-  const size = useHostSize(hostRef, { height: 600, width: 800 }, { round: true });
+  const size = useHostSize(hostRef, { height: 979, width: 812 }, { round: true });
   const [viewport, setViewport] = useState<{ boundsKey: string; v: RefViewport } | null>(null);
 
-  const activeTones = [
-    ...new Set(routes.filter((r) => !visible || visible.has(r.id)).map((r) => r.tone)),
-  ];
+  const visibleRoutes = routes.filter((r) => !visible || visible.has(r.id));
+  const activeTones = [...new Set(visibleRoutes.map((r) => r.tone))];
   const defaultFrame = frameAround(activeBounds, { ...size, padding: 36 });
   const defaultRef: RefViewport = { ...refOf(defaultFrame.center), zoom: defaultFrame.zoom };
   const activeRef = viewport?.boundsKey === boundsKey ? viewport.v : defaultRef;
   const settledBasis = basisOf(activeRef, size.width, size.height);
+
+  const ssrPathRef = useRef<string | null>(null);
+  if (ssrPathRef.current === null) {
+    const ssrFrame = { ...defaultFrame, height: 489.5, width: 406, zoom: defaultFrame.zoom - 1 };
+    const ssrDecoded = decodeRoutes(visibleRoutes.map((r) => ({ ...r, tone: 'ink' })));
+    ssrPathRef.current = framePaths(ssrFrame, ssrDecoded, 4, 1.5)[0]?.d ?? '';
+  }
 
   const stRef = useRef({
     basis: settledBasis,
@@ -128,14 +139,12 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
     if (!st.worker || !canvas || size.width <= 0 || size.height <= 0) return onReady?.();
     if (st.sentRoutes !== routes) {
       st.sentRoutes = routes;
-      st.worker.postMessage({
-        routes: decodeRoutes(routes).map(({ id, points, tone }) => ({
-          id,
-          legs: routeLegs(points).map((leg) => leg.map(refOf)),
-          tone,
-        })),
-        type: 'routes',
-      });
+      const packed = decodeRoutes(routes).map(({ id, points, tone }) => ({
+        id,
+        legs: routeLegs(points).map((leg) => leg.map(refOf)),
+        tone,
+      }));
+      st.worker.postMessage({ routes: packed, type: 'routes' });
     }
     const basis = basisOf(target, size.width, size.height);
     const key = `${visible ? [...visible].join(',') : '*'}|${dark ? 1 : 0}|${size.width}x${size.height}|${basis.tx.toFixed(2)},${basis.ty.toFixed(2)},${basis.scale.toFixed(6)}`;
@@ -149,21 +158,15 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
     const zf = Math.max(0, Math.min(1, (target.zoom - 4) / (15 - 4)));
     st.reqId += 1;
     st.onReady = onReady ?? null;
-    st.worker.postMessage({
-      casingColor: cssColor(styles, dark ? '--black' : '--cream', dark),
-      casingWidth: 2 + zf * 5,
-      dpr: Math.min(2, window.devicePixelRatio || 1),
-      height: size.height,
-      id: st.reqId,
-      lineWidth: 1 + zf * 2.5,
-      scale: basis.scale,
-      toneColors: Object.fromEntries(tones.map((t) => [t, cssColor(styles, `--${t}`, dark)])),
-      tx: basis.tx,
-      ty: basis.ty,
-      type: 'render',
-      visibleIds: visible ? [...visible] : null,
-      width: size.width,
-    });
+    const msg = Object.assign(
+      { casingColor: cssColor(styles, dark ? '--black' : '--cream', dark) },
+      { casingWidth: 2 + zf * 5, dpr: Math.min(2, window.devicePixelRatio || 1), id: st.reqId },
+      { lineWidth: 1 + zf * 2.5, type: 'render', visibleIds: visible ? [...visible] : null },
+      { toneColors: Object.fromEntries(tones.map((t) => [t, cssColor(styles, `--${t}`, dark)])) },
+      basis,
+      size,
+    );
+    st.worker.postMessage(msg);
   };
 
   st.syncLive = (next: RefViewport) => {
@@ -183,11 +186,11 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
       st.live = target;
       if (tilesRef.current) tilesRef.current.style.transform = '';
       applyTransform(canvasRef.current, next, st.basis);
-      const unchanged =
+      const same =
         Math.abs(next.scale - prev.scale) < 1e-5 &&
         Math.abs(next.tx - prev.tx) < 0.25 &&
         Math.abs(next.ty - prev.ty) < 0.25;
-      if (!isReset && unchanged) return;
+      if (!isReset && same) return;
       st.settled = target;
       if (isReset) return setViewport(null);
       setViewport({ boundsKey, v: target });
@@ -215,9 +218,10 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
         s.onReady = null;
         const pw = Math.max(1, Math.round(bw * dpr));
         const ph = Math.max(1, Math.round(bh * dpr));
-        if (canvas.width !== pw) canvas.width = pw;
-        if (canvas.height !== ph) canvas.height = ph;
+        if (canvas.width !== pw || canvas.height !== ph)
+          Object.assign(canvas, { height: ph, width: pw });
         canvas.getContext('bitmaprenderer')?.transferFromImageBitmap(bitmap);
+        ssrRef.current?.remove();
         s.basis = { scale, tx, ty };
         applyTransform(canvas, basisOf(s.live, bw, bh), s.basis);
         cb?.();
@@ -235,18 +239,15 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       clearWheel();
-      s.cachedRect ??= tilesEl.getBoundingClientRect();
-      const r = s.cachedRect;
+      const r = s.cachedRect ?? tilesEl.getBoundingClientRect();
+      s.cachedRect = r;
       const zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, s.live.zoom - e.deltaY / 150));
       const sd = 1 / 2 ** (s.live.zoom - REF_ZOOM) - 1 / 2 ** (zoom - REF_ZOOM);
-      s.syncLive({
-        x: s.live.x + (e.clientX - r.left - r.width / 2) * sd,
-        y: s.live.y + (e.clientY - r.top - r.height / 2) * sd,
-        zoom,
-      });
+      const x = s.live.x + (e.clientX - r.left - r.width / 2) * sd;
+      const y = s.live.y + (e.clientY - r.top - r.height / 2) * sd;
+      s.syncLive({ x, y, zoom });
       s.wheelTimer = setTimeout(() => {
-        s.wheelTimer = null;
-        s.cachedRect = null;
+        Object.assign(s, { cachedRect: null, wheelTimer: null });
         s.settleTo(s.live);
       }, 140);
     };
@@ -260,11 +261,9 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
     const onMove = (e: MouseEvent) => {
       if (!s.dragging) return;
       const scale = 2 ** (s.live.zoom - REF_ZOOM);
-      s.syncLive({
-        x: s.dragStart.x - (e.clientX - s.dragStart.clientX) / scale,
-        y: s.dragStart.y - (e.clientY - s.dragStart.clientY) / scale,
-        zoom: s.live.zoom,
-      });
+      const x = s.dragStart.x - (e.clientX - s.dragStart.clientX) / scale;
+      const y = s.dragStart.y - (e.clientY - s.dragStart.clientY) / scale;
+      s.syncLive({ x, y, zoom: s.live.zoom });
     };
     const onUp = () => {
       if (!s.dragging) return;
@@ -293,27 +292,47 @@ export function RouteAtlasMap(props: RouteAtlasMapProps) {
     dispatchRender(activeRef);
   });
 
+  const tz = Math.round(activeRef.zoom);
+  const ts = 2 ** (activeRef.zoom - tz);
+  const cx = activeRef.x / 256 / 2 ** (REF_ZOOM - tz);
+  const cy = activeRef.y / 256 / 2 ** (REF_ZOOM - tz);
+  const minX = Math.floor(cx - size.width / ts / 512);
+  const maxX = Math.min(Math.floor(cx + size.width / ts / 512), 2 ** tz - 1);
+  const minY = Math.floor(cy - size.height / ts / 512);
+  const maxY = Math.min(Math.floor(cy + size.height / ts / 512), 2 ** tz - 1);
+  const baseTile = { active: true, height: 256, width: 256 };
+  const tiles: Array<ReactElement> = [];
+  for (let x = Math.max(minX, 0); x <= maxX; x++) {
+    for (let y = Math.max(minY, 0); y <= maxY; y++) {
+      const url = (dpr?: number) => outdoorsTileUrl(tileSource, { dark, dpr, x, y, zoom: tz });
+      const key = `${x}-${y}-${tz}`;
+      const srcSet = tileSource.mode === 'offline' ? '' : `${url(1)}, ${url(2)} 2x`;
+      const pos = { left: (x - minX) * 256, top: (y - minY) * 256 };
+      const tile = { ...baseTile, ...pos, key, srcSet, url: url() };
+      tiles.push(<SmoothTile key={key} tile={tile} tileLoaded={NOOP} />);
+    }
+  }
+  const tileBoxTransform = `translate3d(${(settledBasis.tx + minX * 256 * ts).toFixed(2)}px, ${(settledBasis.ty + minY * 256 * ts).toFixed(2)}px, 0px) scale(${ts.toFixed(6)})`;
+
   return (
     <section aria-label={label} data-atlas-map="" ref={hostRef}>
       <div data-atlas-tiles="" data-dark={dark ? 'true' : undefined} ref={tilesRef}>
-        <PigeonMapCore
-          animate={false}
-          attribution={false}
-          center={toLatLng(activeRef)}
-          defaultHeight={600}
-          defaultWidth={800}
-          dprs={tileSource.mode === 'offline' ? [] : [1, 2]}
-          maxZoom={MAX_ZOOM}
-          minZoom={MIN_ZOOM}
-          mouseEvents={false}
-          provider={(x, y, tileZoom, dpr) =>
-            outdoorsTileUrl(tileSource, { dark, dpr, x, y, zoom: tileZoom })
-          }
-          tileComponent={SmoothTile}
-          touchEvents={false}
-          zoom={activeRef.zoom}
-        />
+        <div
+          data-atlas-tile-box=""
+          style={{ '--atlas-tile-transform': tileBoxTransform } as CSSProperties}
+        >
+          {tiles}
+        </div>
       </div>
+      {ssrPathRef.current ? (
+        <svg aria-hidden="true" data-atlas-ssr="" ref={ssrRef} viewBox="0 0 406 489.5">
+          <path
+            d={ssrPathRef.current}
+            stroke={`var(--${activeTones[0] ?? 'cobalt'})`}
+            vectorEffect="non-scaling-stroke"
+          />
+        </svg>
+      ) : null}
       <canvas
         data-atlas-canvas=""
         data-tones={activeTones.join(',')}

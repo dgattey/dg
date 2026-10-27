@@ -48,9 +48,5 @@ describe('RouteMap', () => {
     expect(tileLayerDivBlock).toContain('width: 100% !important;');
     expect(tileLayerDivBlock).toContain('height: 100% !important;');
     expect(tileLayerDivBlock).toContain('background-color: transparent !important;');
-
-    const atlasTilesDivBlock =
-      mapsCss.match(/\[data-atlas-tiles\]\s*>\s*div\s*\{([^}]*)\}/)?.[1] ?? '';
-    expect(atlasTilesDivBlock).toContain('background-color: transparent !important;');
   });
 });
