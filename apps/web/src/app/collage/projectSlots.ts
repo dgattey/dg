@@ -176,14 +176,15 @@ const WORK_RAIL_ROWS = [
   'sp sp sp sp c1 c1 c1 c1 c1 c1 c1 c1',
   'lt lt lt lt c1 c1 c1 c1 c1 c1 c1 c1',
   'tk tk tk tk . . . . . . . .',
-  'bm bm bm bm bm . ws ws ws ws ws ws',
+  'bm bm bm bm bm ws ws ws ws ws ws ws',
 ] as const;
 
 /**
  * Wide grids run Now playing, the latest ride, the ticket pair, and the big map
  * down a left rail beside the two frames. The big map takes one more column, and
  * its row starts below the first frame's, so the extra column never meets it.
- * The second frame shares only the big map's row, so the two can center on each other.
+ * The second frame shares only the big map's row, so the two can center on each other,
+ * and takes every column the big map leaves, stopping short of the first frame's width.
  * Compact grids share two rows between the frames and the whole Strava card.
  */
 export function workSheetGridAreas(slots: { c1: boolean; ws: boolean }): {
