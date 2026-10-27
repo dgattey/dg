@@ -34,18 +34,21 @@ const INK_TEXT = { dark: inkText('dark'), light: inkText('light') };
 
 function AlbumArtWithNotes({
   bounceIntensity,
+  bpm,
   children,
   isPlaying,
   noteColor,
   variant,
 }: {
   bounceIntensity?: number;
+  bpm?: number;
   children: ReactNode;
   isPlaying: boolean;
   noteColor?: string;
   variant: ListingVariant;
 }) {
   const bounceRef = useWaveformBounce<HTMLDivElement>({
+    bpm,
     intensity: bounceIntensity,
     isPlaying,
   });
@@ -194,6 +197,7 @@ export function TrackListing({
         <div data-thumbnail-outer="">
           <AlbumArtWithNotes
             bounceIntensity={COLLAGE_COMPACT_BOUNCE}
+            bpm={track.bpm}
             isPlaying={track.isPlaying ?? false}
             noteColor="var(--ink)"
             variant="compact"
@@ -209,6 +213,7 @@ export function TrackListing({
         </div>
         <div data-compact-text="">
           <PlaybackStatus
+            bpm={track.bpm}
             color="var(--on)"
             isPlaying={track.isPlaying}
             listingVariant="compact"
@@ -233,6 +238,7 @@ export function TrackListing({
   return (
     <div className="home__spotify" data-slot="sp">
       <AlbumArtWithNotes
+        bpm={track.bpm}
         isPlaying={Boolean(track.isPlaying)}
         noteColor="var(--cream)"
         variant="card"
@@ -273,6 +279,7 @@ export function TrackListing({
           <AlbumGradientBackdrop gradient={albumColors?.surface} variant="surface" />
           <div className="home__spotifyMetaInner">
             <PlaybackStatus
+              bpm={track.bpm}
               color={primary}
               isPlaying={track.isPlaying}
               listingVariant="card"

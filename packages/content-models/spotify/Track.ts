@@ -66,6 +66,10 @@ export const trackApiSchema = v.looseObject({
    */
   duration_ms: v.optional(v.number()),
   /**
+   * Cross-service identifiers, like the ISRC used to look up tempo elsewhere.
+   */
+  external_ids: v.optional(v.looseObject({ isrc: v.optional(v.string()) })),
+  /**
    * Whether the track is currently playing.
    */
   is_playing: v.optional(v.boolean()),
@@ -112,7 +116,12 @@ export type Track = Artist & {
   artists: Array<Artist>;
   album: Album;
   albumImage: AlbumImage;
+  /**
+   * Tempo in beats per minute, attached server-side when a lookup knows it.
+   */
+  bpm?: number;
   durationMs?: number;
+  isrc?: string;
   playedAt?: string;
   progressMs?: number;
   isPlaying?: boolean;
@@ -149,6 +158,7 @@ export const mapTrackFromApi = (track: TrackApi): Track | null => {
     artists: track.artists.map(mapArtistFromApi),
     durationMs: track.duration_ms,
     isPlaying: track.is_playing,
+    isrc: track.external_ids?.isrc,
     playedAt: track.played_at,
     progressMs: track.progress_ms,
   };
