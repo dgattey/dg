@@ -296,12 +296,6 @@
     order: var(--well-order-lg);
   }
 }
-@supports not (-moz-appearance: none) {
-  html:active-view-transition-type(album-close) .music__wellCard,
-  html:active-view-transition-type(album-open) .music__wellCard {
-    view-transition-name: album-well;
-  }
-}
 .music__wellInner {
   overflow: clip;
 }

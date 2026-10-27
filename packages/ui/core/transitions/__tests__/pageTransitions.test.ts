@@ -9,6 +9,7 @@ import {
 import {
   albumArtViewTransitionName,
   albumTransitionTypes,
+  albumWellViewTransitionProps,
   inPageViewTransitionProps,
   pageTransitionTypes,
   pageViewTransitionProps,
@@ -49,6 +50,18 @@ describe('pageTransitions', () => {
       'page-close': 'none',
       'page-open': 'none',
     });
+  });
+
+  it('names the album well only for album types, matching its wipe in the stylesheet', () => {
+    expect(albumWellViewTransitionProps).toEqual({
+      default: 'none',
+      enter: { 'album-open': 'vt-album-well', default: 'none' },
+      exit: { 'album-close': 'vt-album-well', default: 'none' },
+      name: 'album-well',
+      update: { 'album-close': 'vt-album-well', 'album-open': 'vt-album-well', default: 'none' },
+    });
+    expect(css).toContain('::view-transition-new(album-well)');
+    expect(css).toContain('::view-transition-old(album-well)');
   });
 
   it('updates --vt-scroll-offset and preserves root view-transition-name during page navigation', () => {

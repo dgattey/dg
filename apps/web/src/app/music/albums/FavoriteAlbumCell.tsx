@@ -13,6 +13,11 @@ import { CollageAlbumPaper } from './collageAlbumCardTreatments';
 
 /** Every favorite is a whole album, so every cell wears the full fan. */
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;
+/**
+ * Firefox (157 and 158) segfaults its parent process when a grid cover is the
+ * arriving half of the shared cover morph, as an album closes. Its covers stay
+ * out of the morph, so the well's view transition still runs there without it.
+ */
 const IS_GECKO =
   typeof CSS !== 'undefined' &&
   typeof CSS.supports === 'function' &&
