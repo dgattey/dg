@@ -29,7 +29,7 @@ const ROUTES: ReadonlyArray<MapRoute> = [
 ];
 
 describe('RouteAtlasMap', () => {
-  it('renders offline placeholder tiles, single combined SSR route path, canvas layer, and zoom controls', () => {
+  it('renders offline tiles, single combined SSR route path, canvas layer, and zoom controls', () => {
     const html = renderToString(
       <RouteAtlasMap
         bounds={BOUNDS}
@@ -48,7 +48,7 @@ describe('RouteAtlasMap', () => {
       html.match(/<svg[^>]*data-atlas-ssr=""[\s\S]*?<\/svg>/)?.[0].match(/<path/g),
     ).toHaveLength(1);
     expect(html).toContain('data-tones="cobalt,vermilion"');
-    expect(html).toContain('data:image/svg+xml,');
+    expect(html).toMatch(/src="\/tiles\/outdoors\/\d+\/\d+\/\d+\.png"/);
     expect(html).toContain('data-atlas-tile-stage=""');
     expect(html).toMatch(
       /--box-transform:translate3d\(-?\d+\.\d{4}%, -?\d+\.\d{4}%, 0px\) scale\(\d+\.\d{6}, \d+\.\d{6}\)/,

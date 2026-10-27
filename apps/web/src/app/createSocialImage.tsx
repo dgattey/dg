@@ -88,7 +88,6 @@ async function fetchTileDataUri(coord: StravaTileCoord): Promise<StravaMapTile |
     return null;
   }
   const stadiaUrl = stadiaTileUrl(tileSource, {
-    dark: false,
     extension: 'png',
     retina: true,
     style: 'alidade_smooth',

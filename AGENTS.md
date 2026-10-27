@@ -14,7 +14,7 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - `turbo dev` does NOT start the Cloudflare tunnel (the `dev` task does not depend on `tunnel`), so a set `CLOUDFLARE_TUNNEL_TOKEN` is ignored during normal dev.
 
 ### Map tiles (Stadia free tier)
-- Browser verification, screenshot and fuzz runs MUST start dev with `MAP_TILES=offline` (e.g. `MAP_TILES=offline pnpm exec turbo dev`) unless they are explicitly testing real tiles. Offline mode renders an inline paper placeholder and makes zero tile requests; Jest (`NODE_ENV=test`) is always offline.
+- Browser verification, screenshot and fuzz runs MUST start dev with `MAP_TILES=offline` (e.g. `MAP_TILES=offline pnpm exec turbo dev`) unless they are explicitly testing real tiles. Offline mode serves deterministic debug tiles from the app's own `/tiles/<style>/<z>/<x>/<y>.png` route (Stadia's paths, so the same URL, `srcSet` and positioning code runs), each labelled with its z/x/y over a grid with hard edges, and makes zero Stadia requests. A tile drawn in the wrong slot or drifting from the routes shows up in screenshots. Jest (`NODE_ENV=test`) is always offline.
 - The free tier is 200k credits per calendar month, after which production maps show "Account Limit Exceeded" until the month resets. Never loop resizes or reloads against real tiles.
 
 ### Agent surfaces

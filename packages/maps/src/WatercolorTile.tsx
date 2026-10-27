@@ -29,8 +29,7 @@ function toLabelsUrl(watercolorUrl: string) {
 /**
  * Custom pigeon-maps tile that stacks Stamen Watercolor (base) with
  * Stamen Terrain Labels (overlay). Every rendered image must load before
- * signaling tile completion to pigeon-maps. Offline placeholder tiles
- * have no labels layer.
+ * signaling tile completion to pigeon-maps.
  */
 export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
   const loadedCount = useRef(0);
