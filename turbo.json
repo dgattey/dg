@@ -66,6 +66,11 @@
     "db": {
       "cache": false
     },
+    "deploy": {
+      "cache": false,
+      "dependsOn": ["check", "check:types", "test"],
+      "passThroughEnv": ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_API_TOKEN", "CRON_SECRET"]
+    },
     "dev": {
       "cache": false,
       "dependsOn": ["env", "topo", "migrate"],

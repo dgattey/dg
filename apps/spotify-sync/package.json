@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@dg/shared-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261027.1",
+    "@dg/tsconfig": "workspace:*",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "wrangler": "4.153.0"
+  },
+  "name": "@dg/spotify-sync",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:ci": "biome ci .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo .wrangler *.tsbuildinfo",
+    "deploy": ": \"${CRON_SECRET:?CRON_SECRET must be set to deploy}\" && wrangler deploy --secrets-file deploy-secrets.env",
+    "test": "tsx --test src/__tests__/*.test.ts"
+  },
+  "type": "module"
+}

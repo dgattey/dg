@@ -20,6 +20,7 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+  workerd: true
 
 catalog:
   "@contentful/rich-text-types": 17.2.7

@@ -1,4 +1,4 @@
-# CI checks: formatting, types, tests
+# CI checks: formatting, types, tests. Pushes to main also deploy the Spotify sync Worker.
 name: CI
 
 on:
@@ -51,3 +51,27 @@ jobs:
         env:
           DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:5432/dg_test?sslmode=disable
         run: NODE_OPTIONS=--max_old_space_size=8192 pnpm turbo ${{ matrix.command }}
+
+  deploy-spotify-sync:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: ci
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    name: "☁️ Deploy Spotify sync Worker"
+
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .node-version
+          cache: "pnpm"
+      - run: pnpm install
+      - name: Deploy and sync CRON_SECRET
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: pnpm turbo deploy --filter=@dg/spotify-sync

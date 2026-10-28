@@ -4,7 +4,7 @@
 
 ## Cursor Cloud specific instructions
 
-This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. See `README.md` for the full command list; use `pnpm exec turbo <task>` (turbo is a local devDependency, there is no global `turbo`). Common tasks: `turbo check:ci` (lint), `turbo check:types`, `turbo test`, `turbo migrate`, `turbo dev` (Next dev on port 3000).
+This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo, plus a tiny Cloudflare Worker (`@dg/spotify-sync`, `apps/spotify-sync`) whose 15-minute cron trigger calls `/api/spotify/sync` in production. CI deploys it on pushes to `main` (see `apps/spotify-sync/README.md`); never run `turbo deploy` yourself. See `README.md` for the full command list; use `pnpm exec turbo <task>` (turbo is a local devDependency, there is no global `turbo`). Common tasks: `turbo check:ci` (lint), `turbo check:types`, `turbo test`, `turbo migrate`, `turbo dev` (Next dev on port 3000).
 
 ### Environment / secrets
 - Runtime config comes from env vars, not a checked-in file. Normally `turbo dev`/`turbo migrate` run a `dg#env` step that generates `.env` from 1Password via the `op` CLI; `op` is not installed here, so that step logs "1Password CLI not found, skipping .env generation" and is a harmless no-op. The app instead reads the injected secret env vars directly.

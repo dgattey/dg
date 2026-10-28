@@ -27,6 +27,7 @@
       "!**/.next",
       "!**/.vscode",
       "!**/.vercel",
+      "!**/.wrangler",
       "!**/.turbo",
       "!**/node_modules",
       "!**/pnpm-lock.yaml",

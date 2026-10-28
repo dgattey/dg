@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "compatibility_date": "2026-10-01",
+  "main": "src/index.ts",
+  "name": "dg-spotify-sync",
+  "observability": {
+    "enabled": true,
+    "issues": {
+      "enabled": true
+    }
+  },
+  "preview_urls": false,
+  // CRON_SECRET is a Worker secret uploaded on every deploy from deploy-secrets.env, never a var here.
+  "triggers": {
+    "crons": ["*/15 * * * *"]
+  },
+  "vars": {
+    "SITE_URL": "https://dylangattey.com"
+  },
+  "workers_dev": false
+}

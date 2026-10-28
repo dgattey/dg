@@ -29,6 +29,9 @@ npm-debug.log*
 
 # vercel
 .vercel
+
+# wrangler
+.wrangler
 tsconfig.tsbuildinfo
 graph.html
 .claude
