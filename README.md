@@ -122,7 +122,7 @@ Core tables include:
 
 #### Spotify History
 
-- Spotify only exposes the 50 most recent plays. Sync runs every 15 minutes via GitHub Actions calling `/api/spotify/sync`.
+- Spotify only exposes the 50 most recent plays. Sync runs every 15 minutes from a Cloudflare Worker cron trigger (`apps/spotify-sync`, Worker `dg-spotify-sync`) that calls `/api/spotify/sync` with `Authorization: Bearer $CRON_SECRET`. CI deploys it on every push to `main` and uploads GitHub's `CRON_SECRET` with it. Setup, secret rotation, and alerts: [`apps/spotify-sync/README.md`](apps/spotify-sync/README.md).
 - An empty DB is seeded by the first cron sync from that recent-plays window; later runs fetch only plays after the latest stored timestamp.
 - Historical gaps older than 50 plays can be backfilled from a Spotify Extended Streaming History `.zip` or `.json` export via `turbo spotify:import -- <path.zip | dir | file.json ...> [--dry-run] [--from=YYYY-MM-DD] [--to=YYYY-MM-DD]`.
 - Track popularity is snapshotted per Pacific day whenever plays sync or import (Spotify's 0–100 score, Deezer rank only when Spotify has none). Plays from before snapshots began read a track's earliest snapshot, labeled as current popularity on `/music/stats`. Each history sync also scores a slice of never-scored tracks, backing off when Spotify refuses.
