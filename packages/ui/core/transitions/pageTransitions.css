@@ -131,18 +131,38 @@ html:active-view-transition-type(page-close)::view-transition-new(root) {
  * on screen by the time the live card takes over. Under art (z 150) so the morph
  * still clears the well surface.
  */
-::view-transition-group(album-well) {
+::view-transition-group(.vt-album-well),
+::view-transition-group(.vt-album-well-fold),
+::view-transition-group(.vt-album-well-swap) {
   z-index: 140;
   animation-duration: var(--timing-medium);
   animation-timing-function: var(--easing-default);
 }
 
-::view-transition-old(album-well) {
+::view-transition-old(.vt-album-well) {
   animation: var(--timing-medium) var(--easing-default) both vt-album-well-conceal;
 }
 
-::view-transition-new(album-well) {
+::view-transition-new(.vt-album-well),
+::view-transition-new(.vt-album-well-swap) {
   animation: var(--timing-medium) var(--easing-default) both vt-album-well-reveal;
+}
+
+/* Switching rows slides the row above down onto the old well, so it folds from the top. */
+::view-transition-old(.vt-album-well-fold) {
+  animation: var(--timing-medium) var(--easing-default) both vt-album-well-fold;
+}
+
+/*
+ * Switching within the row, the old album holds still under the new one's wipe,
+ * both clipped to the resizing well.
+ */
+::view-transition-image-pair(.vt-album-well-swap) {
+  clip-path: inset(0 -48px -48px);
+}
+
+::view-transition-old(.vt-album-well-swap) {
+  animation: none;
 }
 
 @keyframes vt-album-well-reveal {
@@ -160,6 +180,15 @@ html:active-view-transition-type(page-close)::view-transition-new(root) {
   }
   to {
     clip-path: inset(0 -48px 100%);
+  }
+}
+
+@keyframes vt-album-well-fold {
+  from {
+    clip-path: inset(0 -48px -48px);
+  }
+  to {
+    clip-path: inset(100% -48px -48px);
   }
 }
 

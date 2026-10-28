@@ -28,19 +28,20 @@ export function albumTransitionTypes(intent: PageNavigationIntent): Array<AlbumT
 /**
  * The album well's own boundary, so React starts the album view transition
  * wherever the well opens, closes, or moves to another row, even when no cover
- * morph pairs up. Named only for album types, so route navigations never lift
- * it out of the page. Matched by name in `pageTransitions.css`.
+ * morph pairs up. Classed only for album types, so route navigations never lift
+ * it out of the page. Unnamed, so a well closing in one row never pairs with
+ * one opening in another. Switching albums is an `album-open`: a well in another
+ * row folds away, and within the row the new album wipes in over the old.
  */
 export const albumWellViewTransitionProps = {
   default: 'none',
   enter: { [ALBUM_TRANSITION_TYPES.open]: 'vt-album-well', default: 'none' },
-  exit: { [ALBUM_TRANSITION_TYPES.close]: 'vt-album-well', default: 'none' },
-  name: 'album-well',
-  update: {
+  exit: {
     [ALBUM_TRANSITION_TYPES.close]: 'vt-album-well',
-    [ALBUM_TRANSITION_TYPES.open]: 'vt-album-well',
+    [ALBUM_TRANSITION_TYPES.open]: 'vt-album-well-fold',
     default: 'none',
   },
+  update: { [ALBUM_TRANSITION_TYPES.open]: 'vt-album-well-swap', default: 'none' },
 } as const;
 
 /** Shared element name so album art flies between the grid cell and the well. */
