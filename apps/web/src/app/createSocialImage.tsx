@@ -3,9 +3,6 @@ import 'server-only';
 import { readFile } from 'node:fs/promises';
 import { getTileSource } from '@dg/maps/src/getTileSource';
 import { stadiaTileUrl } from '@dg/maps/src/tileSource';
-import { fetchBooks } from '@dg/services/contentful/fetchBooks';
-import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
-import { fetchSideProjects } from '@dg/services/contentful/fetchSideProjects';
 import { readFavoriteAlbumsSnapshot } from '@dg/services/spotify/favoriteAlbumsSnapshot';
 import { fetchListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
@@ -13,6 +10,7 @@ import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistory
 import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
 import { CACHE_TAGS } from '../services/cacheTags';
+import { getBooks, getIntroContent, getSideProjects } from '../services/contentful';
 import { getChangelogReleases } from '../services/github';
 import { getAppVersionInfo } from '../services/version';
 import { SocialCard, type SocialCardVariant } from './collage/SocialCard';
@@ -124,7 +122,7 @@ async function loadStravaMapTiles(
 async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardVariant> {
   switch (page) {
     case 'home':
-      return buildHomeCardVariant(await safeLoad(fetchIntroContent, null));
+      return buildHomeCardVariant(await safeLoad(getIntroContent, null));
     case 'music-stats': {
       const year = currentPacificYear();
       const stats = await safeLoad(() => fetchListeningStats({ kind: 'year', year }), null);
@@ -140,7 +138,7 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
     case 'favorite-albums':
       return buildFavoriteAlbumsCardVariant(await safeLoad(readFavoriteAlbumsSnapshot, null));
     case 'reading':
-      return buildReadingCardVariant(await safeLoad(fetchBooks, []));
+      return buildReadingCardVariant(await safeLoad(getBooks, []));
     case 'strava': {
       const history = await safeLoad(fetchStravaHistoryFromDb, null);
       const mapTiles = await loadStravaMapTiles(history);
@@ -151,7 +149,7 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
       return buildChangelogCardVariant(releases, getAppVersionInfo().version);
     }
     case 'site-map': {
-      const sideProjects = await safeLoad(fetchSideProjects, []);
+      const sideProjects = await safeLoad(getSideProjects, []);
       return buildSiteMapCardVariant(sideProjects);
     }
     default: {
