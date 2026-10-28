@@ -1,0 +1,56 @@
+# Vercel previews for pull requests that touch the site. Vercel's Git
+# integration only deploys main (git.deploymentEnabled in apps/web/vercel.json).
+name: Preview
+
+on:
+  pull_request:
+    # Later patterns override earlier ones, and public/ is served as-is.
+    paths:
+      - "**"
+      - "!**.md"
+      - "!**/__tests__/**"
+      - "!**.test.*"
+      - "!.cursor/**"
+      - "!.github/**"
+      - "!.vscode/**"
+      - "apps/web/public/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: "🔭 Deploy preview"
+    # Pull requests from forks get no secrets.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    environment:
+      name: Preview
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: .node-version
+      - name: Deploy to Vercel
+        id: deploy
+        env:
+          BRANCH: ${{ github.head_ref }}
+          VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          url=$(npx --yes vercel@65.5.0 deploy --token "$VERCEL_TOKEN" \
+            --meta githubDeployment=1 --meta "githubCommitRef=$BRANCH")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+      - uses: marocchino/sticky-pull-request-comment@v3.0.5
+        with:
+          header: preview
+          message: "Preview: ${{ steps.deploy.outputs.url }}"
