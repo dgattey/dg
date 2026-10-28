@@ -8,6 +8,11 @@ import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import * as v from 'valibot';
 import { fetchDeezerTrack } from './fetchTrackBpm';
 import { select } from './listeningStatsQueries';
+import {
+  type PopularityFailure,
+  readPopularityPause,
+  recordPopularityOutcome,
+} from './popularityBackoff';
 import { mapInBatches, sleep, spotifyGet } from './trackMetadataShared';
 
 /** Spotify's Get Several Tracks endpoint accepts at most this many ids per call. */
@@ -16,7 +21,7 @@ const SPOTIFY_CALL_THROTTLE_MS = 150;
 /** Deezer ranks run 0–1,000,000; dividing by this puts them on Spotify's 0–100 scale. */
 const DEEZER_RANK_PER_POINT = 10_000;
 /** Tracks with no snapshot yet that each history sync fills in, a few calls' worth. */
-export const POPULARITY_BACKFILL_PER_SYNC = 200;
+const POPULARITY_BACKFILL_PER_SYNC = 200;
 
 const severalTracksSchema = v.looseObject({
   tracks: v.array(
@@ -39,13 +44,14 @@ type PopularityRow = {
 
 export type PopularityCapture = {
   deezer: number;
-  /** Set when Spotify refused a call, so the remaining tracks wait for a later run. */
-  retryAfterSeconds?: number;
+  /** Set when a refused Spotify call or a thrown error stopped the run early. */
+  failure?: PopularityFailure;
+  /** Tracks the run never reached because it stopped early. */
+  remaining: Array<string>;
   spotify: number;
-  stoppedEarly: boolean;
+  /** Tracks looked up that neither Spotify nor Deezer could score. */
+  unmatched: number;
 };
-
-const EMPTY_CAPTURE: PopularityCapture = { deezer: 0, spotify: 0, stoppedEarly: false };
 
 function toPercent(value: number): number {
   return Math.min(100, Math.max(0, Math.round(value)));
@@ -82,35 +88,56 @@ async function readUncapturedIds(
   return unique.filter((id) => !capturedIds.has(id));
 }
 
-async function readDeezerPopularity(
-  misses: ReadonlyArray<{ isrc: string; trackId: string }>,
+async function scoreTracks(
+  tracks: ReadonlyArray<v.InferOutput<typeof severalTracksSchema>['tracks'][number]>,
   capturedOn: string,
-): Promise<Array<PopularityRow>> {
-  return await mapInBatches(misses, async ({ isrc, trackId }) => {
+): Promise<{ deezer: Array<PopularityRow>; spotify: Array<PopularityRow> }> {
+  const spotify: Array<PopularityRow> = [];
+  const deezerMisses: Array<{ isrc: string; trackId: string }> = [];
+  for (const track of tracks.filter(isNotNullish)) {
+    if (typeof track.popularity === 'number') {
+      spotify.push({
+        capturedOn,
+        popularity: toPercent(track.popularity),
+        source: 'spotify',
+        trackId: track.id,
+      });
+    } else if (track.external_ids?.isrc) {
+      deezerMisses.push({ isrc: track.external_ids.isrc, trackId: track.id });
+    }
+  }
+  const deezer = await mapInBatches(deezerMisses, async ({ isrc, trackId }) => {
     const popularity = deezerRankToPopularity((await fetchDeezerTrack(isrc))?.rank);
-    return popularity === null ? null : { capturedOn, popularity, source: 'deezer', trackId };
+    return popularity === null
+      ? null
+      : { capturedOn, popularity, source: 'deezer' as const, trackId };
   });
+  return { deezer, spotify };
 }
 
 /**
  * Stores today's (Pacific) popularity for each track, one batched Spotify
  * `/tracks` call per 50 tracks. Tracks Spotify returns without a popularity fall
- * back to Deezer's rank by ISRC. Tracks already captured today are skipped, and
- * a refused Spotify call stops the run so the rest are picked up next time.
- * Never throws, since a missing snapshot only thins the popularity chart.
+ * back to Deezer's rank by ISRC. Tracks already captured today are skipped.
+ * Each call's rows are written before the next call, so a refused call or a
+ * thrown error keeps everything scored so far and reports the tracks it never
+ * reached. Never throws, since a missing snapshot only thins the popularity chart.
  */
 export async function captureTrackPopularity(
   trackIds: ReadonlyArray<string>,
   capturedAt: Date = new Date(),
 ): Promise<PopularityCapture> {
   const capturedOn = calendarDayKey(capturedAt.getTime(), SITE_TIME_ZONE);
+  const capture: PopularityCapture = {
+    deezer: 0,
+    remaining: [...new Set(trackIds)],
+    spotify: 0,
+    unmatched: 0,
+  };
   try {
-    const pending = await readUncapturedIds(trackIds, capturedOn);
-    const spotifyRows: Array<PopularityRow> = [];
-    const deezerMisses: Array<{ isrc: string; trackId: string }> = [];
-    let refused: { retryAfterSeconds?: number } | null = null;
-
-    for (const [index, ids] of chunk(pending, SPOTIFY_TRACKS_PER_CALL).entries()) {
+    const calls = chunk(await readUncapturedIds(trackIds, capturedOn), SPOTIFY_TRACKS_PER_CALL);
+    capture.remaining = calls.flat();
+    for (const [index, ids] of calls.entries()) {
       if (index > 0) {
         await sleep(SPOTIFY_CALL_THROTTLE_MS);
       }
@@ -124,39 +151,31 @@ export async function captureTrackPopularity(
           error: result.error,
           retryAfterSeconds: result.retryAfterSeconds,
         });
-        refused = { retryAfterSeconds: result.retryAfterSeconds };
-        break;
+        capture.failure = {
+          status: result.status,
+          ...(result.retryAfterSeconds === undefined
+            ? {}
+            : { retryAfterSeconds: result.retryAfterSeconds }),
+        };
+        return capture;
       }
-      for (const track of result.data.tracks.filter(isNotNullish)) {
-        if (typeof track.popularity === 'number') {
-          spotifyRows.push({
-            capturedOn,
-            popularity: toPercent(track.popularity),
-            source: 'spotify',
-            trackId: track.id,
-          });
-        } else if (track.external_ids?.isrc) {
-          deezerMisses.push({ isrc: track.external_ids.isrc, trackId: track.id });
-        }
-      }
+      const { deezer, spotify } = await scoreTracks(result.data.tracks, capturedOn);
+      await db.MusicTrackPopularity.bulkCreate([...spotify, ...deezer], { ignoreDuplicates: true });
+      capture.deezer += deezer.length;
+      capture.spotify += spotify.length;
+      capture.unmatched += Math.max(0, ids.length - spotify.length - deezer.length);
+      capture.remaining = capture.remaining.slice(ids.length);
     }
-
-    const deezerRows = await readDeezerPopularity(deezerMisses, capturedOn);
-    await db.MusicTrackPopularity.bulkCreate([...spotifyRows, ...deezerRows], {
-      ignoreDuplicates: true,
-    });
-    return {
-      deezer: deezerRows.length,
-      spotify: spotifyRows.length,
-      stoppedEarly: refused !== null,
-      ...(refused?.retryAfterSeconds !== undefined
-        ? { retryAfterSeconds: refused.retryAfterSeconds }
-        : {}),
-    };
+    return capture;
   } catch (error) {
-    log.warn('Could not capture track popularity', { error, tracks: trackIds.length });
-    return { ...EMPTY_CAPTURE, stoppedEarly: true };
+    log.warn('Could not capture track popularity', { error, remaining: capture.remaining.length });
+    return { ...capture, failure: {} };
   }
+}
+
+/** A capture's counts for logs, without the remaining track ids. */
+export function summarizeCapture({ failure, remaining, ...counts }: PopularityCapture) {
+  return { ...counts, failure, remaining: remaining.length };
 }
 
 /**
@@ -177,16 +196,31 @@ export async function selectTracksMissingPopularity(limit?: number): Promise<Arr
 }
 
 /**
- * Gives a slice of never-scored tracks today's popularity. Their older plays
- * then read that score as "current popularity", which the chart labels as such.
+ * The history sync's popularity step: today's popularity for the tracks it just
+ * synced, then a slice of never-scored tracks, whose older plays read that score
+ * as "current popularity". A refusal ends the step, and later syncs skip it
+ * until Spotify's Retry-After (or a jittered pause that doubles with each
+ * refused run) has passed.
  */
-export async function backfillTrackPopularity(
-  limit = POPULARITY_BACKFILL_PER_SYNC,
-): Promise<PopularityCapture> {
+export async function captureSyncedPopularity(trackIds: ReadonlyArray<string>): Promise<void> {
   try {
-    return await captureTrackPopularity(await selectTracksMissingPopularity(limit));
+    const pausedUntil = await readPopularityPause();
+    if (pausedUntil) {
+      log.info('Skipping track popularity while Spotify backs off', { pausedUntil });
+      return;
+    }
+    const captured = await captureTrackPopularity(trackIds);
+    const backfilled = captured.failure
+      ? null
+      : await captureTrackPopularity(
+          await selectTracksMissingPopularity(POPULARITY_BACKFILL_PER_SYNC),
+        );
+    await recordPopularityOutcome(captured.failure ?? backfilled?.failure);
+    log.info('Spotify track popularity captured', {
+      backfilled: backfilled && summarizeCapture(backfilled),
+      captured: summarizeCapture(captured),
+    });
   } catch (error) {
-    log.warn('Could not backfill track popularity', { error });
-    return { ...EMPTY_CAPTURE, stoppedEarly: true };
+    log.warn('Could not capture synced track popularity', { error });
   }
 }

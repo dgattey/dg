@@ -140,17 +140,6 @@
         "SPOTIFY_CLIENT_SECRET"
       ]
     },
-    "spotify:popularity": {
-      "cache": false,
-      "dependsOn": ["env", "^migrate"],
-      "env": [
-        "CRON_SECRET",
-        "DATABASE_URL",
-        "SITE_URL",
-        "SPOTIFY_CLIENT_ID",
-        "SPOTIFY_CLIENT_SECRET"
-      ]
-    },
     "strava:backfill": {
       "cache": false,
       "dependsOn": ["env", "^migrate"],
