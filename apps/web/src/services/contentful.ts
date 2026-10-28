@@ -12,9 +12,14 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { CACHE_TAGS } from './cacheTags';
 
 /**
- * Shared Contentful cache life/tag. Each caller still owns its own `'use cache'`
+ * Shared Contentful cache life/tag. Each caller still owns its own `'use cache: remote'`
  * so Next keeps a distinct cache entry per wrapper (args alone are not enough
  * when the fetcher callback is not serializable).
+ *
+ * Remote, not in-memory: every ISR regeneration of a page (hourly, plus each Spotify or
+ * Strava tag revalidation) re-renders the layout and page, and serverless instances rarely
+ * share memory, so in-memory entries re-hit Contentful's monthly API call quota on nearly
+ * every regeneration. The Contentful webhook still expires these via `CACHE_TAGS.contentful`.
  */
 async function cachedContentful<T>(fn: () => Promise<T>): Promise<T> {
   cacheLife('max');
@@ -23,27 +28,27 @@ async function cachedContentful<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 export const getProjects = async () => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(fetchProjects);
 };
 
 export const getSideProjects = async () => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(fetchSideProjects);
 };
 
 export const getIntroContent = async () => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(fetchIntroContent);
 };
 
 export const getFooterContent = async () => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(fetchFooterContent);
 };
 
 export const getHeaderContent = async () => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(fetchHeaderContent);
 };
 
@@ -51,16 +56,16 @@ export const getHeaderContent = async () => {
  * Gets a specific link by name (partial match on title) directly from Contentful.
  */
 export const getLinkByName = async (name: string) => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(() => fetchLinkByName(name));
 };
 
 export const getCurrentLocation = async () => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(fetchCurrentLocation);
 };
 
 export const getBooks = async () => {
-  'use cache';
+  'use cache: remote';
   return await cachedContentful(fetchBooks);
 };
