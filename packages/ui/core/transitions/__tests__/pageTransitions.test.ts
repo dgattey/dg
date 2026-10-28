@@ -52,16 +52,18 @@ describe('pageTransitions', () => {
     });
   });
 
-  it('names the album well only for album types, matching its wipe in the stylesheet', () => {
+  it('classes the album well only for album types, matching its wipes in the stylesheet', () => {
     expect(albumWellViewTransitionProps).toEqual({
       default: 'none',
       enter: { 'album-open': 'vt-album-well', default: 'none' },
-      exit: { 'album-close': 'vt-album-well', default: 'none' },
-      name: 'album-well',
-      update: { 'album-close': 'vt-album-well', 'album-open': 'vt-album-well', default: 'none' },
+      exit: { 'album-close': 'vt-album-well', 'album-open': 'vt-album-well-fold', default: 'none' },
+      update: { 'album-open': 'vt-album-well-swap', default: 'none' },
     });
-    expect(css).toContain('::view-transition-new(album-well)');
-    expect(css).toContain('::view-transition-old(album-well)');
+    expect(css).toContain('::view-transition-new(.vt-album-well)');
+    expect(css).toContain('::view-transition-old(.vt-album-well)');
+    expect(css).toContain('::view-transition-old(.vt-album-well-fold)');
+    expect(css).toContain('::view-transition-new(.vt-album-well-swap)');
+    expect(keyframeBlock('vt-album-well-fold')).toContain('inset(100% -48px -48px)');
   });
 
   it('updates --vt-scroll-offset and preserves root view-transition-name during page navigation', () => {

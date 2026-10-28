@@ -39,11 +39,6 @@ function readUrlAlbumId(): string | null {
   return new URLSearchParams(window.location.search).get(ALBUM_PARAM);
 }
 
-function pageOffset(element: HTMLElement) {
-  const rect = element.getBoundingClientRect();
-  return { left: rect.left + window.scrollX, top: rect.top + window.scrollY };
-}
-
 function isPlainNavigationClick(event: MouseEvent<HTMLElement>) {
   return (
     !event.defaultPrevented &&
@@ -69,6 +64,8 @@ function albumsRouteAnchor(event: { target: EventTarget | null }) {
 
 /** Where every cell sat before a change, kept until the commit that shows that change. */
 type PendingSlide = {
+  /** Held where it was clicked, even when a well above it closes. */
+  anchorAlbumId: string | null;
   duration: number;
   offsets: Map<string, { left: number; top: number }>;
   selectedAlbumId: string | null;
@@ -85,6 +82,8 @@ type Props = {
 
 export function FavoriteAlbumsGrid({ albums, initialAlbumId, initialDetail }: Props) {
   const [selectedAlbumId, setSelectedAlbumId] = useState(initialAlbumId ?? null);
+  /** Changes only when the well moves rows, so switching within a row keeps the one well. */
+  const [wellAlbumId, setWellAlbumId] = useState(initialAlbumId ?? null);
   const [sortKey, setSortKey] = useState<AlbumSortKey>(DEFAULT_ALBUM_SORT);
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const wellRef = useRef<HTMLDivElement>(null);
@@ -114,7 +113,9 @@ export function FavoriteAlbumsGrid({ albums, initialAlbumId, initialDetail }: Pr
   const slideCellsInto = (next: Omit<PendingSlide, 'offsets'>) => {
     pendingSlide.current = {
       ...next,
-      offsets: new Map([...itemRefs.current].map(([id, element]) => [id, pageOffset(element)])),
+      offsets: new Map(
+        [...itemRefs.current].map(([id, element]) => [id, element.getBoundingClientRect()]),
+      ),
     };
   };
 
@@ -145,14 +146,27 @@ export function FavoriteAlbumsGrid({ albums, initialAlbumId, initialDetail }: Pr
       void albumDetailFor(nextAlbumId, { retryFailed: true });
     }
     const types = albumTransitionTypes(nextAlbumId ? 'open' : 'close');
+    const rowTop = (albumId: string) => itemRefs.current.get(albumId)?.getBoundingClientRect().top;
+    const staysInRow =
+      selectedAlbumId !== null &&
+      nextAlbumId !== null &&
+      rowTop(selectedAlbumId) === rowTop(nextAlbumId);
     window.history.pushState(null, '', `${destination.pathname}${destination.search}`);
-    // Matches the `album-well` view transition, so the cells below move with the well.
-    slideCellsInto({ duration: TIMING_MEDIUM, selectedAlbumId: nextAlbumId, sortKey });
+    // Matches the album well's view transition, so the cells below move with the well.
+    slideCellsInto({
+      anchorAlbumId: nextAlbumId,
+      duration: TIMING_MEDIUM,
+      selectedAlbumId: nextAlbumId,
+      sortKey,
+    });
     startTransition(() => {
       for (const type of types) {
         addTransitionType(type);
       }
       setSelectedAlbumId(nextAlbumId);
+      if (!staysInRow) {
+        setWellAlbumId(nextAlbumId);
+      }
     });
   };
 
@@ -160,7 +174,7 @@ export function FavoriteAlbumsGrid({ albums, initialAlbumId, initialDetail }: Pr
     if (next === sortKey) {
       return;
     }
-    slideCellsInto({ duration: TIMING_SLOW, selectedAlbumId, sortKey: next });
+    slideCellsInto({ anchorAlbumId: null, duration: TIMING_SLOW, selectedAlbumId, sortKey: next });
     setSortKey(next);
   };
 
@@ -173,16 +187,25 @@ export function FavoriteAlbumsGrid({ albums, initialAlbumId, initialDetail }: Pr
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
       return;
     }
+    // Switching to an album below the open well closes that well above it. Scrolling by the
+    // distance that removes keeps the clicked album where it was clicked, with its well below it.
+    const { anchorAlbumId } = previous;
+    const anchorBefore = anchorAlbumId ? previous.offsets.get(anchorAlbumId) : undefined;
+    const anchor = anchorAlbumId ? itemRefs.current.get(anchorAlbumId) : undefined;
+    const anchorTravel =
+      anchor && anchorBefore ? anchor.getBoundingClientRect().top - anchorBefore.top : 0;
+    if (anchorTravel !== 0) {
+      window.scrollBy({ behavior: 'instant', top: anchorTravel });
+    }
     const maxTravel = (window.innerHeight || 900) + 240;
-    const viewportBottom = window.scrollY + maxTravel;
     const moves: Array<{ deltaX: number; deltaY: number; element: HTMLElement }> = [];
     for (const [id, element] of itemRefs.current) {
       const before = previous.offsets.get(id);
       if (!before || typeof element.animate !== 'function') {
         continue;
       }
-      const after = pageOffset(element);
-      if (before.top > viewportBottom && after.top > viewportBottom) {
+      const after = element.getBoundingClientRect();
+      if (before.top > maxTravel && after.top > maxTravel) {
         continue;
       }
       const deltaX = before.left - after.left;
@@ -231,7 +254,7 @@ export function FavoriteAlbumsGrid({ albums, initialAlbumId, initialDetail }: Pr
     <SelectedAlbumWell
       albumCount={sortedAlbumCards.length}
       initialDetail={selectedAlbumId === initialAlbumId ? initialDetail : undefined}
-      key="album-well"
+      key={`album-well-${wellAlbumId}`}
       selectedCard={sortedAlbumCards[selectedIndex]}
       selectedIndex={selectedIndex}
       wellRef={wellRef}

@@ -350,6 +350,33 @@ describe('FavoriteAlbumsGrid', () => {
     expect(scrollIntoView).not.toHaveBeenCalled();
   });
 
+  it('keeps a clicked album in place when switching closes the well above it', async () => {
+    // One album per row, and an open well pushes the rows after it down by 300px.
+    jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+      this: HTMLElement,
+    ) {
+      const siblings = [...(this.parentElement?.children ?? [])];
+      const top = siblings
+        .slice(0, siblings.indexOf(this))
+        .reduce(
+          (sum, sibling) => sum + (sibling.classList.contains('music__wellSlot') ? 300 : 100),
+          0,
+        );
+      return { height: 100, left: 0, top, width: 100 } as DOMRect;
+    });
+    const scrollBy = jest.spyOn(window, 'scrollBy').mockImplementation(() => undefined);
+    const user = userEvent.setup();
+    render(<FavoriteAlbumsGrid albums={albums} />);
+
+    await whileAlbumsLoad(() => user.click(screen.getByRole('link', { name: /Apple/ })));
+    expect(scrollBy).not.toHaveBeenCalled();
+
+    await whileAlbumsLoad(() => user.click(screen.getByRole('link', { name: /Mango/ })));
+
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
+    expect(scrollBy.mock.calls).toEqual([[{ behavior: 'instant', top: -300 }]]);
+  });
+
   it('gives every album cell the id its links target', () => {
     const { container } = render(<FavoriteAlbumsGrid albums={albums} />);
 

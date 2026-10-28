@@ -3,7 +3,7 @@ import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { Typography } from '@dg/ui/core/Typography';
 import { albumWellViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import type { CSSProperties, RefObject } from 'react';
-import { Fragment, Suspense, use, ViewTransition } from 'react';
+import { Suspense, use, ViewTransition } from 'react';
 import type { CollageCardTreatment } from '../../collage/collageCardTreatment';
 import { AlbumDetailBody, AlbumDetailBodySkeleton } from './AlbumDetailBody';
 import { AlbumWell } from './AlbumWell';
@@ -50,8 +50,10 @@ function SelectedAlbumDetail({
 }
 
 /**
- * The `album-well` boundary wraps the slot itself: React only names an entering
- * or exiting `<ViewTransition>` that sits above the first DOM node it mounts.
+ * The well boundary wraps the slot itself: React only names an entering or
+ * exiting `<ViewTransition>` that sits above the first DOM node it mounts.
+ * Keying the well by album remounts its cover on a switch, so each cover pairs
+ * with its grid cell's.
  * Only the server-rendered album streams behind a skeleton. An album opened on the
  * client suspends its selection transition instead, so the well opens at its final height.
  */
@@ -79,16 +81,18 @@ export function SelectedAlbumWell({
         ref={wellRef}
         style={wellPlacementStyle(selectedIndex, albumCount)}
       >
-        <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
-          <Fragment key={selectedCard.album.id}>
-            {initialDetail ? (
-              <Suspense fallback={<AlbumDetailBodySkeleton />}>
-                <SelectedAlbumDetail detailPromise={initialDetail} />
-              </Suspense>
-            ) : (
-              <SelectedAlbumDetail detailPromise={albumDetailFor(selectedCard.album.id)} />
-            )}
-          </Fragment>
+        <AlbumWell
+          album={selectedCard.album}
+          key={selectedCard.album.id}
+          tone={selectedCard.treatment.tone}
+        >
+          {initialDetail ? (
+            <Suspense fallback={<AlbumDetailBodySkeleton />}>
+              <SelectedAlbumDetail detailPromise={initialDetail} />
+            </Suspense>
+          ) : (
+            <SelectedAlbumDetail detailPromise={albumDetailFor(selectedCard.album.id)} />
+          )}
         </AlbumWell>
       </div>
     </ViewTransition>
