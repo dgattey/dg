@@ -8,7 +8,7 @@ import { CACHE_TAGS } from './cacheTags';
 import { getAppVersionInfo } from './version';
 
 async function fetchCachedChangelogReleases(appVersion: string): Promise<Array<ChangelogRelease>> {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
   cacheTag(CACHE_TAGS.changelog);
   cacheTag(CACHE_TAGS.contentful);
