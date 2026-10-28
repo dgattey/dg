@@ -118,6 +118,12 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_APP_VERSION: resolveBuildVersion(),
   },
   experimental: {
+    // Preview deploys key `'use cache: remote'` entries by code hash instead of build ID, so
+    // each preview build reuses the shared preview cache instead of refetching Contentful.
+    // Keys only stay stable across builds when the Preview environment sets a fixed
+    // NEXT_SERVER_ACTIONS_ENCRYPTION_KEY. Production stays per-deployment so every deploy
+    // reads fresh content.
+    durableUseCacheEntries: process.env.VERCEL_ENV === 'preview',
     inlineCss: true,
     scrollRestoration: true,
     serverActions: {

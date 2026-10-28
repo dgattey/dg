@@ -15,6 +15,7 @@
         "CONTENTFUL_SPACE_ID",
         "DATABASE_URL",
         "MAP_TILES",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY",
         "OAUTH_CALLBACK_URL",
         "SPOTIFY_CLIENT_ID",
         "SPOTIFY_CLIENT_SECRET",
@@ -22,7 +23,8 @@
         "STRAVA_CLIENT_ID",
         "STRAVA_CLIENT_SECRET",
         "STRAVA_VERIFY_TOKEN",
-        "STRAVA_WEBHOOK_CALLBACK_URL"
+        "STRAVA_WEBHOOK_CALLBACK_URL",
+        "VERCEL_ENV"
       ],
       "inputs": [
         "$TURBO_DEFAULT$",
