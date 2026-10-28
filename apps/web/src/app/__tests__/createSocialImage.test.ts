@@ -20,6 +20,10 @@ jest.mock('@dg/services/contentful/fetchSideProjects', () => ({
   fetchSideProjects: jest.fn(),
 }));
 
+jest.mock('@dg/services/contentful/fetchChangelogSnapshots', () => ({
+  fetchChangelogSnapshots: jest.fn(async () => new Map()),
+}));
+
 jest.mock('@dg/services/github/fetchReleases', () => ({
   fetchReleases: jest.fn(),
 }));
@@ -134,7 +138,7 @@ describe('createSocialImage', () => {
     expect([...new Uint8Array(await response.arrayBuffer())]).toEqual([0x89, 0x50, 0x4e, 0x47]);
     expect(cacheLife).toHaveBeenCalledWith('days');
     expect(cacheTag).toHaveBeenCalledWith(SOCIAL_IMAGE_TAG);
-    expect(cacheTag).not.toHaveBeenCalledWith('contentful');
+    expect(cacheTag).toHaveBeenCalledWith('contentful');
     expect(card.props).toMatchObject({
       headline: 'Hey friends!',
       name: SITE_NAME,
@@ -428,7 +432,6 @@ describe('createSocialImage', () => {
         version: '2.81.1',
       },
     ]);
-
     const { card } = await renderCard('changelog');
     expect(card.props).toMatchObject({
       latestVersionTag: 'v2.81.1',
