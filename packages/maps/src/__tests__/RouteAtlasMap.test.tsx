@@ -68,7 +68,7 @@ describe('RouteAtlasMap', () => {
           bounds={BOUNDS}
           label="Route atlas"
           routes={ROUTES}
-          tileSource={{ apiKey: null, mode: 'stadia' }}
+          tileSource={{ mode: 'stadia' }}
         />
       </VisibleRoutes>,
     );
