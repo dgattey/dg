@@ -1,8 +1,7 @@
 import 'server-only';
 
 import { readFile } from 'node:fs/promises';
-import { getTileSource } from '@dg/maps/src/getTileSource';
-import { stadiaTileUrl } from '@dg/maps/src/tileSource';
+import { getTileSource, keyedStadiaTileUrl } from '@dg/maps/src/getTileSource';
 import { readFavoriteAlbumsSnapshot } from '@dg/services/spotify/favoriteAlbumsSnapshot';
 import { fetchListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
@@ -81,11 +80,10 @@ async function safeLoad<T>(loader: () => Promise<T>, fallback: T): Promise<T> {
 }
 
 async function fetchTileDataUri(coord: StravaTileCoord): Promise<StravaMapTile | null> {
-  const tileSource = getTileSource();
-  if (tileSource.mode === 'offline') {
+  if (getTileSource().mode === 'offline') {
     return null;
   }
-  const stadiaUrl = stadiaTileUrl(tileSource, {
+  const stadiaUrl = keyedStadiaTileUrl({
     extension: 'png',
     retina: true,
     style: 'alidade_smooth',

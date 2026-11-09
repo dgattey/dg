@@ -10,7 +10,7 @@ const serverMarkup = () =>
       frame={frame}
       paths={[{ d: 'M0 0L10 10', tone: 'cobalt' }]}
       strokeWidth={2}
-      tileSource={{ apiKey: null, mode: 'stadia' }}
+      tileSource={{ mode: 'stadia' }}
     />,
   );
 

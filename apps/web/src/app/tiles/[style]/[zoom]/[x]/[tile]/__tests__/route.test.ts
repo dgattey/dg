@@ -60,7 +60,7 @@ describe('offline tile route', () => {
   });
 
   it('is not served when maps use Stadia', async () => {
-    tileSource.mockReturnValue({ apiKey: null, mode: 'stadia' });
+    tileSource.mockReturnValue({ mode: 'stadia' });
 
     expect((await get({ style: 'outdoors', tile: '395.png', x: '163', zoom: '10' })).status).toBe(
       404,

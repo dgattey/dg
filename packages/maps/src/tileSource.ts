@@ -3,30 +3,28 @@ const STADIA_ORIGIN = 'https://tiles.stadiamaps.com';
 /** Offline tiles come from this site's own `/tiles` route, which mirrors Stadia's paths. */
 const TILE_ORIGINS = { offline: '', stadia: STADIA_ORIGIN } as const;
 
-export type TileSource = { mode: 'offline' } | { apiKey: string | null; mode: 'stadia' };
+/**
+ * Reaches the browser as a prop, so it never carries the API key. Stadia
+ * authorizes browser tile requests by the page's domain, and localhost needs no key.
+ */
+export type TileSource = { mode: keyof typeof TILE_ORIGINS };
 
 type TileEnv = {
   MAP_TILES?: string;
   NODE_ENV?: string;
-  STADIA_API_KEY?: string;
+  VERCEL_ENV?: string;
 };
 
 /**
- * Stadia serves keyless requests from localhost without drawing on the account's
- * monthly credits, so the key only goes out in production. Tests and
- * `MAP_TILES=offline` skip Stadia entirely.
+ * Stadia's domain auth covers the production domain only, so Vercel previews
+ * use offline tiles like tests and `MAP_TILES=offline` do.
  */
-export function resolveTileSource({ MAP_TILES, NODE_ENV, STADIA_API_KEY }: TileEnv): TileSource {
-  if (MAP_TILES === 'offline' || NODE_ENV === 'test') {
-    return { mode: 'offline' };
-  }
-  return {
-    apiKey: NODE_ENV === 'production' && STADIA_API_KEY ? STADIA_API_KEY : null,
-    mode: 'stadia',
-  };
+export function resolveTileSource({ MAP_TILES, NODE_ENV, VERCEL_ENV }: TileEnv): TileSource {
+  const offline = MAP_TILES === 'offline' || NODE_ENV === 'test' || VERCEL_ENV === 'preview';
+  return { mode: offline ? 'offline' : 'stadia' };
 }
 
-type TileRequest = {
+export type TileRequest = {
   extension: 'jpg' | 'png';
   retina?: boolean;
   style: string;
@@ -35,24 +33,12 @@ type TileRequest = {
   zoom: number;
 };
 
-export function withStadiaKey(source: TileSource, url: string) {
-  if (source.mode !== 'stadia' || !source.apiKey || !url.startsWith(STADIA_ORIGIN)) {
-    return url;
-  }
-  const keyed = new URL(url);
-  keyed.searchParams.set('api_key', source.apiKey);
-  return keyed.toString();
-}
-
 export function stadiaTileUrl(
   source: TileSource,
   { extension, retina = false, style, x, y, zoom }: TileRequest,
 ) {
   const density = retina ? '@2x' : '';
-  return withStadiaKey(
-    source,
-    `${TILE_ORIGINS[source.mode]}/tiles/${style}/${zoom}/${x}/${y}${density}.${extension}`,
-  );
+  return `${TILE_ORIGINS[source.mode]}/tiles/${style}/${zoom}/${x}/${y}${density}.${extension}`;
 }
 
 /**
